@@ -1,0 +1,371 @@
+{
+"ref_color": [
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "BEIGE",
+		"created_at" : "2025-02-15T09:20:43.042Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.042Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "BLACK",
+		"created_at" : "2025-02-15T09:20:43.047Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.047Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "BLUE",
+		"created_at" : "2025-02-15T09:20:43.049Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.049Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "DEEP BLUE",
+		"created_at" : "2025-02-15T09:20:43.051Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.051Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "DEEP GREEN",
+		"created_at" : "2025-02-15T09:20:43.052Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.052Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "GOLDEN",
+		"created_at" : "2025-02-15T09:20:43.054Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.054Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "GREEN",
+		"created_at" : "2025-02-15T09:20:43.056Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.056Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "GREY",
+		"created_at" : "2025-02-15T09:20:43.058Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.058Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "MAROON",
+		"created_at" : "2025-02-15T09:20:43.060Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.060Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "ORANGE",
+		"created_at" : "2025-02-15T09:20:43.062Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.062Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "PEARL",
+		"created_at" : "2025-02-15T09:20:43.063Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.063Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "PURPLE",
+		"created_at" : "2025-02-15T09:20:43.066Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.066Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "RED",
+		"created_at" : "2025-02-15T09:20:43.067Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.067Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "SILVER",
+		"created_at" : "2025-02-15T09:20:43.069Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.069Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "WHITE",
+		"created_at" : "2025-02-15T09:20:43.071Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.071Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "WINE",
+		"created_at" : "2025-02-15T09:20:43.076Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.076Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "YELLOW",
+		"created_at" : "2025-02-15T09:20:43.078Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.078Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "IVORY",
+		"created_at" : "2025-02-15T09:20:43.080Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.080Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "BROWN",
+		"created_at" : "2025-02-15T09:20:43.082Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.082Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "GOLD",
+		"created_at" : "2025-02-15T09:20:43.083Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.083Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "METALLIC GREEN",
+		"created_at" : "2025-02-15T09:20:43.085Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.085Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "GUN METALLIC",
+		"created_at" : "2025-02-15T09:20:43.086Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.086Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"color" : "PINK",
+		"created_at" : "2025-02-15T09:20:43.091Z",
+		"created_by" : null,
+		"updated_at" : "2025-02-15T09:20:43.091Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "BEIGE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "BLACK",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "BLUE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "NAVY BLUE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "DEEP GREEN",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "GOLDEN",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "GREEN",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "GREY",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "MAROON",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "ORANGE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "PEARL",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "PURPLE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "RED",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "SILVER",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "WHITE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "WINE",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "YELLOW",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "IVORY",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "BROWN",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "GOLD",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "METALLIC GREEN",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "GUN METALLIC",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"color" : "PINK",
+		"created_at" : "2025-02-15T12:30:04.854Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T12:30:04.854Z",
+		"updated_by" : null
+	}
+]}

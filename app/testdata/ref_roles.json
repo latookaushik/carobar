@@ -1,0 +1,15 @@
+{
+"ref_roles": [
+	{
+		"role_name" : "SA",
+		"description" : "Super Admin (only carobar admins can have it)"
+	},
+	{
+		"role_name" : "CA",
+		"description" : "Company Admin(Elevated role for company incharge )"
+	},
+	{
+		"role_name" : "CU",
+		"description" : "Standard Company user"
+	}
+]}

@@ -1,0 +1,35 @@
+{
+"ref_fueltype": [
+	{
+		"name" : "GAS",
+		"description" : "Gasoline"
+	},
+	{
+		"name" : "DSL",
+		"description" : "Diesel"
+	},
+	{
+		"name" : "CNG",
+		"description" : "Compressed Natural Gas"
+	},
+	{
+		"name" : "LPG",
+		"description" : "Liquefied Petroleum Gas"
+	},
+	{
+		"name" : "EV",
+		"description" : "Electric"
+	},
+	{
+		"name" : "HYB",
+		"description" : "Hybrid"
+	},
+	{
+		"name" : "PHEV",
+		"description" : "Plug-in Hybrid"
+	},
+	{
+		"name" : "FCEV",
+		"description" : "Hydrogen Fuel Cell"
+	}
+]}

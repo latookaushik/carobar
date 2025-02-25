@@ -1,0 +1,211 @@
+{
+"ref_location": [
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "KAWASAKI",
+		"created_at" : "2025-02-15T09:20:44.509Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.509Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "UTOC",
+		"created_at" : "2025-02-15T09:20:44.514Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.514Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "SUNPHOENIX",
+		"created_at" : "2025-02-15T09:20:44.516Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.516Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "ARAI",
+		"created_at" : "2025-02-15T09:20:44.517Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.517Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "USS YOKOHAMA",
+		"created_at" : "2025-02-15T09:20:44.518Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.518Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "JAA",
+		"created_at" : "2025-02-15T09:20:44.519Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.519Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "TAA  TOUHOKU",
+		"created_at" : "2025-02-15T09:20:44.521Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.521Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "TAA  YOKOHAMA",
+		"created_at" : "2025-02-15T09:20:44.522Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.522Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "FIRST TRADERS CO.,LTD",
+		"created_at" : "2025-02-15T09:20:44.524Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.524Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "IBARAKI YARD",
+		"created_at" : "2025-02-15T09:20:44.525Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.525Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "SUNPHOENIX KOBE",
+		"created_at" : "2025-02-15T09:20:44.526Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.526Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "SUNPHOENIX OGISHIMA",
+		"created_at" : "2025-02-15T09:20:44.528Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.528Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "ARAI",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "FIRST TRADERS CO.,LTD",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "IBARAKI YARD",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "JAA",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "KAWASAKI",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "SUNPHOENIX",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "SUNPHOENIX KOBE",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "SUNPHOENIX OGISHIMA",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "TAA  TOUHOKU",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "TAA  YOKOHAMA",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "USS YOKOHAMA",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "UTOC",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "ECL YOKOHAMA",
+		"created_at" : "2025-02-15T09:20:44.529Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:44.529Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "ECL YOKOHAMA",
+		"created_at" : "2025-02-15T16:30:34.784Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:30:34.784Z",
+		"updated_by" : null
+	}
+]}

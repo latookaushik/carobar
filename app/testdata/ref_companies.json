@@ -1,0 +1,45 @@
+{
+"ref_companies": [
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"company_name" : "Carobar",
+		"address1" : "Edogawa Ku",
+		"address2" : "Tokyo",
+		"address3" : "Tokyo",
+		"country" : "JPN",
+		"phone" : "03-1111-2222",
+		"mobile" : "080-1111-2222",
+		"email" : "carobar.tradecars@gmail.com",
+		"is_active" : true,
+		"base_currency" : "JPY",
+		"lastopeningday" : 20240401,
+		"lastinvoiceno" : 0,
+		"lastlocalinvoice" : 0,
+		"taxpercent" : 10.0,
+		"report_prefix" : "carb",
+		"last_login_date" : "2025-02-14T16:01:01.100Z",
+		"created_at" : "2025-02-02T17:51:26.403Z",
+		"updated_at" : "2025-02-02T17:51:26.403Z"
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"company_name" : "Dummy",
+		"address1" : "Meguro Ku",
+		"address2" : "Tokyo",
+		"address3" : "Tokyo",
+		"country" : "JPN",
+		"phone" : "03-7777-8888",
+		"mobile" : "080-7777-8888",
+		"email" : "carobar.tradecars@gmail.com",
+		"is_active" : true,
+		"base_currency" : "JPY",
+		"lastopeningday" : 20240401,
+		"lastinvoiceno" : 0,
+		"lastlocalinvoice" : 0,
+		"taxpercent" : 10.0,
+		"report_prefix" : "dumb",
+		"last_login_date" : "2025-02-02T17:51:26.403Z",
+		"created_at" : "2025-02-02T17:51:26.403Z",
+		"updated_at" : "2025-02-02T17:51:26.403Z"
+	}
+]}

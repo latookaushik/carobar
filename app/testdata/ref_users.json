@@ -1,0 +1,68 @@
+{
+"ref_users": [
+	{
+		"user_id" : "caradmin",
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"role_name" : "SA",
+		"first_name" : "Carobar",
+		"last_name" : "Admin",
+		"email" : "carobar.tradecars@gmail.com",
+		"password_hash" : "$2b$10$Z9ApsaiThDaa97.K4DRS..h\/FEDG1L0wjzhV4Kv5.PurtbP8g.SsO",
+		"is_active" : true,
+		"created_at" : "2025-02-15T09:17:42.899Z",
+		"updated_at" : "2025-02-15T09:17:42.899Z",
+		"last_login_date" : null
+	},
+	{
+		"user_id" : "caruser",
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"role_name" : "CU",
+		"first_name" : "Carobar",
+		"last_name" : "User",
+		"email" : "carobar.tradecars@gmail.com",
+		"password_hash" : "$2b$10$7GdB9okV2e.MWWk7sHMDwOvZq1vghzYDxGjsSxNm2LEHnyWhC8\/7a",
+		"is_active" : true,
+		"created_at" : "2025-02-15T09:17:42.899Z",
+		"updated_at" : "2025-02-15T09:17:42.899Z",
+		"last_login_date" : null
+	},
+	{
+		"user_id" : "dumadmin",
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"role_name" : "CA",
+		"first_name" : "Dummy",
+		"last_name" : "Admin",
+		"email" : "carobar.tradecars@gmail.com",
+		"password_hash" : "$2b$10$XfkTjL62HuE7Z9qvudkewenWy3HVVorxzr2u3Yo\/JsW\/F26hYz9wC",
+		"is_active" : true,
+		"created_at" : "2025-02-15T09:17:42.899Z",
+		"updated_at" : "2025-02-15T09:17:42.899Z",
+		"last_login_date" : null
+	},
+	{
+		"user_id" : "dumuser",
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"role_name" : "CU",
+		"first_name" : "Dummy",
+		"last_name" : "User",
+		"email" : "carobar.tradecars@gmail.com",
+		"password_hash" : "$2b$10$kjHs1qGsW1F75YBkCkErF.60pBGdLu6aJrlYKKmcCaXlbOTZmSFm",
+		"is_active" : true,
+		"created_at" : "2025-02-15T09:17:42.899Z",
+		"updated_at" : "2025-02-15T09:17:42.899Z",
+		"last_login_date" : null
+	},
+	{
+		"user_id" : "carobari1",
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"role_name" : "CA",
+		"first_name" : "Carobar",
+		"last_name" : "User",
+		"email" : "carobar.tradecars@gmail.com",
+		"password_hash" : "$2b$10$CgxOuRjjh9Xk4Vcmax4yOuAaSHb90UEBl9Zj30tNvYryJ44tXeu96",
+		"is_active" : true,
+		"created_at" : "2025-02-15T09:17:42.899Z",
+		"updated_at" : "2025-02-15T09:17:42.899Z",
+		"last_login_date" : null
+	}
+]}
