@@ -1,14 +1,16 @@
+'use client';
+
 import Hero from "@/app/components/Layout/Hero";
-import Features from "@/app/components/Layout/Features";
+import { cn } from "@/app/lib/utils";
 
-export default function MainContent() {
-    return (
-      <main className="text-center mt-16">
-        <Hero />
-        <Features />
-      </main>
-    );
-  }
+interface MainContentProps {
+  className?: string;
+}
 
-  
-  
+export default function MainContent({ className }: MainContentProps) {
+  return (
+    <main className={cn("text-center mt-1", className)}>
+      <Hero />
+    </main>
+  );
+}

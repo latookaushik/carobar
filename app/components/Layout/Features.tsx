@@ -1,7 +1,7 @@
 export default function Features() {
     return (
-      <section className="mt-20 bg-white py-16">
-        <h3 className="text-4xl font-bold mb-10 text-maroon-800">Features</h3>
+      <section className="mt-2  py-6">
+       
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 px-6">
           {featureData.map(({ title, description }) => (
             <Feature key={title} title={title} description={description} />

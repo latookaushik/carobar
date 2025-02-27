@@ -60,6 +60,7 @@ model ref_companies {
   last_login_date  DateTime?     @db.Timestamp(6)
   created_at       DateTime?     @default(now()) @db.Timestamp(6)
   updated_at       DateTime?     @default(now()) @db.Timestamp(6)
+  ref_coa          ref_coa[]
   ref_bank         ref_bank[]
   ref_contact      ref_contact[]
   ref_users        ref_users[]
@@ -177,6 +178,23 @@ model ref_users {
 
   @@id([user_id, company_id], map: "pk_users")
 }
+
+
+model ref_coa {
+  company_id      String        @db.Uuid
+  account_code    String        @db.VarChar(50)
+  account_name    String        @db.VarChar(100)
+  account_type    String        @db.VarChar(50)
+  description     String?       @db.VarChar(250)
+  is_active       Boolean?
+  created_at      DateTime?     @default(now()) @db.Timestamp(6)
+  created_by      String?       @db.VarChar(50)
+  updated_at      DateTime?     @default(now()) @db.Timestamp(6)
+  updated_by      String?       @db.VarChar(50)
+  ref_companies   ref_companies @relation(fields: [company_id], references: [company_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_coa_company")
+  @@id([company_id, account_code], map: "pk_ref_coa")
+}
+
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model ref_vehicle_type {

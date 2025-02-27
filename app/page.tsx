@@ -5,7 +5,7 @@ import Footer from "@/app/components/Layout/Footer";
 
 export default function HomePage() {
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen flex flex-col">
       <Head>
         <title>Carobar - Vehicle trade management for Dealers</title>
         <meta
@@ -17,7 +17,7 @@ export default function HomePage() {
 
       <Header />
 
-      <MainContent />
+      <MainContent className="flex-grow"/>
 
       <Footer />
     </div>

@@ -3,18 +3,12 @@
 "use client";
 import Link from "next/link";
 import { User, LogOut, LogIn } from "lucide-react";
-import { useAuthStatus } from '@/app/hooks/useAuthStatus';
+import { useAuth } from '@/app/contexts/AuthContext';
 
-// Purpose: React component to display  authentication status and user information 
+// Purpose: React component to display authentication status and user information 
 // in application header.
 export default function AuthStatus() {
-  const { user, loading } = useAuthStatus();
-
-  const handleLogout = () => {
-    // Clear token cookie
-    document.cookie = "token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    window.location.href = "/";
-  };
+  const { user, loading, logout } = useAuth();
 
   if (loading) {
     return <div className="text-white/80">Loading...</div>;
@@ -38,7 +32,7 @@ export default function AuthStatus() {
             </div>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="p-1.5 hover:bg-maroon-400/30 rounded-full transition-colors"
             title="Logout"
           >
@@ -52,7 +46,7 @@ export default function AuthStatus() {
           title="Login"
         >
           <LogIn className="w-4 h-4" />
-          <span className="text-sm font-medium">Login</span>
+          <span className="text-sm">Login</span>
         </Link>
       )}
     </div>
