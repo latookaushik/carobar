@@ -11,16 +11,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Role } from '@/app/lib/enums';
 import PageTemplate from '@/app/components/PageTemplate';
-/* import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/app/components/ui/table';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input'; */
 import { PlusCircle, Edit, Trash2, Check, X, RefreshCw } from 'lucide-react';
 import { toast } from '@/app/components/ui/use-toast';
 
@@ -68,7 +58,8 @@ const isLightColor = (color: string): boolean => {
     }
     
     return true; // Default to light if we can't determine
-  } catch (e) {
+  } catch (error) {
+    console.error('Error determining color brightness:', error);
     return true; // Default to light on error
   }
 };
@@ -108,7 +99,7 @@ export default function ColorsPage() {
       // Create a lookup object with user_id as key and name info as value
       const userMap: Record<string, {first_name: string, last_name: string}> = {};
       if (data.users) {
-        data.users.forEach((user: any) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
             last_name: user.last_name
@@ -400,7 +391,7 @@ export default function ColorsPage() {
               ) : colors.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No colors found. Add your first color by clicking the "Add New Color" button.
+                    No colors found. Add your first color by clicking the &quot;Add New Color&quot; button.
                   </td>
                 </tr>
               ) : (

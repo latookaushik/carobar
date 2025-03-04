@@ -11,16 +11,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Role } from '@/app/lib/enums';
 import PageTemplate from '@/app/components/PageTemplate';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/app/components/ui/table';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
 import { PlusCircle, Edit, Trash2, Check, X, RefreshCw, Truck } from 'lucide-react';
 import { toast } from '@/app/components/ui/use-toast';
 
@@ -67,7 +57,7 @@ export default function VehicleTypePage() {
       // Create a lookup object with user_id as key and name info as value
       const userMap: Record<string, {first_name: string, last_name: string}> = {};
       if (data.users) {
-        data.users.forEach((user: any) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
             last_name: user.last_name
@@ -198,7 +188,7 @@ export default function VehicleTypePage() {
 
   // Function to handle deleting a vehicle type
   const handleDeleteType = async (type: string) => {
-    if (!window.confirm(`Are you sure you want to delete the vehicle type "${type}"?`)) {
+    if (!window.confirm(`Are you sure you want to delete the vehicle type &quot;${type}&quot;?`)) {
       return;
     }
     
@@ -336,7 +326,7 @@ export default function VehicleTypePage() {
               ) : vehicleTypes.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No vehicle types found. Add your first type by clicking the "Add New Type" button.
+                    No vehicle types found. Add your first type by clicking the &quot;Add New Type&quot; button.
                   </td>
                 </tr>
               ) : (

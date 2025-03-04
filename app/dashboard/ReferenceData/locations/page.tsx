@@ -11,16 +11,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Role } from '@/app/lib/enums';
 import PageTemplate from '@/app/components/PageTemplate';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/app/components/ui/table';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
 import { PlusCircle, Edit, Trash2, Check, X, RefreshCw, MapPin } from 'lucide-react';
 import { toast } from '@/app/components/ui/use-toast';
 
@@ -67,7 +57,7 @@ export default function LocationsPage() {
       // Create a lookup object with user_id as key and name info as value
       const userMap: Record<string, {first_name: string, last_name: string}> = {};
       if (data.users) {
-        data.users.forEach((user: any) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
             last_name: user.last_name
@@ -198,7 +188,7 @@ export default function LocationsPage() {
 
   // Function to handle deleting a location
   const handleDeleteLocation = async (name: string) => {
-    if (!window.confirm(`Are you sure you want to delete the location "${name}"?`)) {
+    if (!window.confirm(`Are you sure you want to delete the location &quot;${name}&quot;?`)) {
       return;
     }
     
@@ -336,7 +326,7 @@ export default function LocationsPage() {
               ) : locations.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No locations found. Add your first location by clicking the "Add New Location" button.
+                    No locations found. Add your first location by clicking the &quot;Add New Location&quot; button.
                   </td>
                 </tr>
               ) : (

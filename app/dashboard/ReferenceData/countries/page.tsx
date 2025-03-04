@@ -1,65 +1,83 @@
 "use client";
 
-/**
- * Country Management Page
- * 
- * Provides UI for viewing, adding, editing, and deleting countries
- * for the authenticated user's company.
- */
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Role } from '@/app/lib/enums';
 import PageTemplate from '@/app/components/PageTemplate';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/app/components/ui/table';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { PlusCircle, Edit, Trash2, Check, X, RefreshCw, Globe, Target } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Check, X, RefreshCw } from 'lucide-react';
 import { toast } from '@/app/components/ui/use-toast';
 
-interface Country {
-  code: string;
-  name: string;
-  is_targetcountry: boolean;
+interface Color {
+  color: string;
   created_at: string;
   created_by: string;
   updated_at: string;
   updated_by: string;
 }
 
-export default function CountriesPage() {
+// Function to determine if a color is valid CSS color
+const isValidColor = (color: string): boolean => {
+  const s = new Option().style;
+  s.color = color;
+  return s.color !== '';
+};
+
+// Function to determine if color is light or dark (for text contrast)
+const isLightColor = (color: string): boolean => {
+  // If not valid color, return true (we'll treat as light)
+  if (!isValidColor(color)) return true;
+  
+  try {
+    // Convert to RGB then calculate luminance
+    const s = new Option().style;
+    s.color = color;
+    // Try to extract RGB values from computed style
+    const tempDiv = document.createElement('div');
+    tempDiv.style.color = color;
+    document.body.appendChild(tempDiv);
+    const computedColor = getComputedStyle(tempDiv).color;
+    document.body.removeChild(tempDiv);
+    
+    // Extract RGB values if format is "rgb(r, g, b)"
+    const rgbMatch = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (rgbMatch) {
+      const r = parseInt(rgbMatch[1], 10) / 255;
+      const g = parseInt(rgbMatch[2], 10) / 255;
+      const b = parseInt(rgbMatch[3], 10) / 255;
+      
+      // Calculate luminance
+      const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return luminance > 0.5;
+    }
+    
+    return true; // Default to light if we can't determine
+  } catch (error) {
+    console.error('Error determining color brightness:', error);
+    return true; // Default to light on error
+  }
+};
+
+export default function ColorsPage() {
   const { } = useAuth();
   
-  const [countries, setCountries] = useState<Country[]>([]);
+  const [colors, setColors] = useState<Color[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<Record<string, {first_name: string, last_name: string}>>({});
   
-  // New country form state
-  const [addingCountry, setAddingCountry] = useState(false);
-  const [newCountryCode, setNewCountryCode] = useState('');
-  const [newCountryName, setNewCountryName] = useState('');
-  const [newIsTargetCountry, setNewIsTargetCountry] = useState(false);
+  const [newColor, setNewColor] = useState('');
+  const [addingColor, setAddingColor] = useState(false);
   
-  // Edit country state
-  const [editCountryId, setEditCountryId] = useState<string | null>(null);
-  const [editCountryName, setEditCountryName] = useState('');
-  const [editIsTargetCountry, setEditIsTargetCountry] = useState(false);
+  const [editColorId, setEditColorId] = useState<string | null>(null);
+  const [editColorValue, setEditColorValue] = useState('');
 
-  // Load countries and users on component mount
+  // Load colors and users on component mount
   useEffect(() => {
-    fetchCountries();
+    fetchColors();
     fetchUsers();
   }, []);
 
-  // Function to fetch users from API
+  // Function to fetch users from ref_users.json
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
@@ -74,7 +92,7 @@ export default function CountriesPage() {
       // Create a lookup object with user_id as key and name info as value
       const userMap: Record<string, {first_name: string, last_name: string}> = {};
       if (data.users) {
-        data.users.forEach((user: any) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
             last_name: user.last_name
@@ -87,21 +105,21 @@ export default function CountriesPage() {
     }
   };
 
-  // Function to fetch countries from API
-  const fetchCountries = async () => {
+  // Function to fetch colors from API
+  const fetchColors = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch('/api/countries');
+      const response = await fetch('/api/colors');
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch countries');
+        throw new Error(errorData.error || 'Failed to fetch colors');
       }
       
       const data = await response.json();
-      setCountries(data.countries || []);
+      setColors(data.colors || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       toast({
@@ -114,54 +132,39 @@ export default function CountriesPage() {
     }
   };
 
-  // Function to handle adding a new country
-  const handleAddCountry = async () => {
-    if (!newCountryCode.trim()) {
+  // Function to handle adding a new color
+  const handleAddColor = async () => {
+    if (!newColor.trim()) {
       toast({
         title: "Validation Error",
-        description: "Country code cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!newCountryName.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Country name cannot be empty",
+        description: "Color name cannot be empty",
         variant: "destructive",
       });
       return;
     }
     
     try {
-      const response = await fetch('/api/countries', {
+      const response = await fetch('/api/colors', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          code: newCountryCode.trim(),
-          name: newCountryName.trim(),
-          is_targetcountry: newIsTargetCountry
-        }),
+        body: JSON.stringify({ color: newColor.trim() }),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add country');
+        throw new Error(errorData.error || 'Failed to add color');
       }
       
-      // Refresh countries list and reset form
-      await fetchCountries();
-      setNewCountryCode('');
-      setNewCountryName('');
-      setNewIsTargetCountry(false);
-      setAddingCountry(false);
+      // Refresh colors list and reset form
+      await fetchColors();
+      setNewColor('');
+      setAddingColor(false);
       
       toast({
         title: "Success",
-        description: "Country added successfully",
+        description: "Color added successfully",
       });
     } catch (err) {
       toast({
@@ -172,44 +175,42 @@ export default function CountriesPage() {
     }
   };
 
-  // Function to handle updating a country
-  const handleUpdateCountry = async (code: string) => {
-    if (!editCountryName.trim()) {
+  // Function to handle updating a color
+  const handleUpdateColor = async (oldColor: string) => {
+    if (!editColorValue.trim()) {
       toast({
         title: "Validation Error",
-        description: "Country name cannot be empty",
+        description: "Color name cannot be empty",
         variant: "destructive",
       });
       return;
     }
     
     try {
-      const response = await fetch('/api/countries', {
+      const response = await fetch('/api/colors', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          code,
-          name: editCountryName.trim(),
-          is_targetcountry: editIsTargetCountry
+          oldColor, 
+          newColor: editColorValue.trim() 
         }),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update country');
+        throw new Error(errorData.error || 'Failed to update color');
       }
       
-      // Refresh countries list and reset edit state
-      await fetchCountries();
-      setEditCountryId(null);
-      setEditCountryName('');
-      setEditIsTargetCountry(false);
+      // Refresh colors list and reset edit state
+      await fetchColors();
+      setEditColorId(null);
+      setEditColorValue('');
       
       toast({
         title: "Success",
-        description: "Country updated successfully",
+        description: "Color updated successfully",
       });
     } catch (err) {
       toast({
@@ -220,28 +221,28 @@ export default function CountriesPage() {
     }
   };
 
-  // Function to handle deleting a country
-  const handleDeleteCountry = async (code: string) => {
-    if (!window.confirm(`Are you sure you want to delete this country?`)) {
+  // Function to handle deleting a color
+  const handleDeleteColor = async (color: string) => {
+    if (!window.confirm(`Are you sure you want to delete the color "${color}"?`)) {
       return;
     }
     
     try {
-      const response = await fetch(`/api/countries?code=${encodeURIComponent(code)}`, {
+      const response = await fetch(`/api/colors?color=${encodeURIComponent(color)}`, {
         method: 'DELETE',
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete country');
+        throw new Error(errorData.error || 'Failed to delete color');
       }
       
-      // Refresh countries list
-      await fetchCountries();
+      // Refresh colors list
+      await fetchColors();
       
       toast({
         title: "Success",
-        description: "Country deleted successfully",
+        description: "Color deleted successfully",
       });
     } catch (err) {
       toast({
@@ -252,103 +253,101 @@ export default function CountriesPage() {
     }
   };
 
-  // Start editing a country
-  const startEditCountry = (country: Country) => {
-    setEditCountryId(country.code);
-    setEditCountryName(country.name);
-    setEditIsTargetCountry(country.is_targetcountry);
+  // Start editing a color
+  const startEditColor = (color: Color) => {
+    setEditColorId(color.color);
+    setEditColorValue(color.color);
   };
 
   // Cancel editing
   const cancelEdit = () => {
-    setEditCountryId(null);
-    setEditCountryName('');
-    setEditIsTargetCountry(false);
+    setEditColorId(null);
+    setEditColorValue('');
+  };
+
+  // Get a color display element for the provided color name
+  const getColorDisplay = (colorName: string) => {
+    const isValid = isValidColor(colorName);
+    const displayColor = isValid ? colorName : '#e5e7eb'; // Use gray if invalid
+    const textColor = isValid && !isLightColor(colorName) ? 'white' : 'black';
+    
+    return (
+      <div className="flex items-center space-x-2">
+        <div 
+          className="w-6 h-6 rounded border shadow-sm flex items-center justify-center"
+          style={{ 
+            backgroundColor: displayColor,
+            borderColor: '#ddd',
+            color: textColor
+          }}
+        >
+          {!isValid && '?'}
+        </div>
+        <span>{colorName}</span>
+      </div>
+    );
   };
 
   return (
     <PageTemplate 
-      title="Country Management" 
+      title="Color Management" 
       requiredRoles={[Role.ADMIN, Role.MANAGER, Role.STAFF]}
     >
       <div className="w-full">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Country Management</h1>
+          <h1 className="text-2xl font-bold">Color Management</h1>
           <div className="flex gap-2">
             <button
-              onClick={fetchCountries}
+              onClick={fetchColors}
               className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
               Refresh
             </button>
-            {!addingCountry && (
+            {!addingColor && (
               <button
-                onClick={() => setAddingCountry(true)}
+                onClick={() => setAddingColor(true)}
                 className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
               >
                 <PlusCircle size={16} />
-                Add New Country
+                Add New Color
               </button>
             )}
           </div>
         </div>
         
-        {/* Add new country form */}
-        {addingCountry && (
+        {/* Add new color form */}
+        {addingColor && (
           <div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50">
-            <h2 className="text-xl font-semibold mb-3">Add New Country</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h2 className="text-xl font-semibold mb-3">Add New Color</h2>
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Country Code * (2-3 characters)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Color Name *</label>
                 <input
                   type="text"
-                  placeholder="e.g. US, UK, JP"
-                  value={newCountryCode}
-                  onChange={(e) => setNewCountryCode(e.target.value)}
+                  placeholder="Enter color name"
+                  value={newColor}
+                  onChange={(e) => setNewColor(e.target.value)}
                   className="w-full p-2 border rounded"
-                  maxLength={3}
+                  maxLength={30}
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Country Name *</label>
-                <input
-                  type="text"
-                  placeholder="Enter country name"
-                  value={newCountryName}
-                  onChange={(e) => setNewCountryName(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  maxLength={100}
-                  required
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={newIsTargetCountry}
-                    onChange={(e) => setNewIsTargetCountry(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-maroon-600 focus:ring-maroon-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Is Target Country</span>
-                </label>
               </div>
             </div>
             
             <div className="mt-4 flex gap-2 justify-end">
               <button
-                onClick={() => setAddingCountry(false)}
+                onClick={() => setAddingColor(false)}
                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
               >
                 Cancel
               </button>
               <button
-                onClick={handleAddCountry}
+                onClick={handleAddColor}
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               >
-                Add Country
+                Add Color
               </button>
             </div>
           </div>
@@ -361,14 +360,12 @@ export default function CountriesPage() {
           </div>
         )}
         
-        {/* Countries table */}
+        {/* Colors table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border rounded-lg">
             <thead className="bg-maroon-700 text-white">
               <tr>
-                <th className="py-2 px-4 border-b text-left">Code</th>
-                <th className="py-2 px-4 border-b text-left">Country</th>
-                <th className="py-2 px-4 border-b text-center">Target</th>
+                <th className="py-2 px-4 border-b text-left">Color</th>
                 <th className="py-2 px-4 border-b text-left">Updated By</th>
                 <th className="py-2 px-4 border-b text-left">Updated At</th>
                 <th className="py-2 px-4 border-b text-center">Actions</th>
@@ -380,60 +377,38 @@ export default function CountriesPage() {
                   <td colSpan={6} className="py-4 text-center">
                     <div className="flex justify-center items-center">
                       <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-                      Loading countries...
+                      Loading colors...
                     </div>
                   </td>
                 </tr>
-              ) : countries.length === 0 ? (
+              ) : colors.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No countries found. Add your first country by clicking the "Add New Country" button.
+                    No colors found. Add your first color by clicking the &quot;Add New Color&quot; button.
                   </td>
                 </tr>
               ) : (
-                countries.map((country) => (
-                  <tr key={country.code} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b font-medium">{country.code}</td>
+                colors.map((color) => (
+                  <tr key={color.color} className="hover:bg-gray-50">
                     <td className="py-2 px-4 border-b">
-                      {editCountryId === country.code ? (
+                      {editColorId === color.color ? (
                         <input
                           type="text"
-                          value={editCountryName}
-                          onChange={(e) => setEditCountryName(e.target.value)}
+                          value={editColorValue}
+                          onChange={(e) => setEditColorValue(e.target.value)}
                           className="w-full p-1 border rounded"
-                          maxLength={100}
+                          maxLength={30}
                         />
                       ) : (
-                        <div className="flex items-center space-x-2">
-                          <Globe size={16} className="text-maroon-600" />
-                          <span>{country.name}</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {editCountryId === country.code ? (
-                        <input
-                          type="checkbox"
-                          checked={editIsTargetCountry}
-                          onChange={(e) => setEditIsTargetCountry(e.target.checked)}
-                          className="h-4 w-4 rounded border-gray-300 text-maroon-600 focus:ring-maroon-500"
-                        />
-                      ) : country.is_targetcountry ? (
-                        <div className="flex justify-center">
-                          <Target size={16} className="text-green-600" />
-                        </div>
-                      ) : (
-                        <div className="flex justify-center">
-                          <span className="text-gray-400">—</span>
-                        </div>
+                        getColorDisplay(color.color)
                       )}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {users[country.updated_by] 
-                        ? `${users[country.updated_by].first_name} ${users[country.updated_by].last_name}`
-                        : country.updated_by}
+                      {users[color.updated_by] 
+                        ? `${users[color.updated_by].first_name} ${users[color.updated_by].last_name}`
+                        : color.updated_by}
                     </td>
-                    <td className="py-2 px-4 border-b">{new Date(country.updated_at).toLocaleString('en-GB', {
+                    <td className="py-2 px-4 border-b">{new Date(color.updated_at).toLocaleString('en-GB', {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',
@@ -443,10 +418,10 @@ export default function CountriesPage() {
                       hour12: false
                     }).replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}</td>
                     <td className="py-2 px-4 border-b text-center">
-                      {editCountryId === country.code ? (
+                      {editColorId === color.color ? (
                         <div className="flex justify-center gap-2">
                           <button
-                            onClick={() => handleUpdateCountry(country.code)}
+                            onClick={() => handleUpdateColor(color.color)}
                             className="text-blue-500 hover:text-blue-700"
                             title="Save"
                           >
@@ -463,14 +438,14 @@ export default function CountriesPage() {
                       ) : (
                         <div className="flex justify-center gap-2">
                           <button
-                            onClick={() => startEditCountry(country)}
+                            onClick={() => startEditColor(color)}
                             className="text-blue-500 hover:text-blue-700"
                             title="Edit"
                           >
                             <Edit size={18} />
                           </button>
                           <button
-                            onClick={() => handleDeleteCountry(country.code)}
+                            onClick={() => handleDeleteColor(color.color)}
                             className="text-red-500 hover:text-red-700"
                             title="Delete"
                           >

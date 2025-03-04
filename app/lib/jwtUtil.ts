@@ -5,10 +5,11 @@
  * It handles token creation, verification, and payload management in a centralized way.
  */
 
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken'; // Import SignOptions for type safety
 import { logError, logInfo } from '@/app/lib/logger';
 
-// Environment variables should be loaded at the application level
+// Define a custom type for valid expiration strings (matching jsonwebtoken's expected format)
+type ExpiresInString = `${number}${'d' | 'h' | 'm' | 's'}`; // e.g., "1d", "2h", "30m", "60s"
 
 /**
  * Standard structure for JWT payload in the Carobar application
@@ -29,7 +30,7 @@ export interface JWTPayload {
 
 // JWT configuration
 const JWT_SECRET = process.env.JWT_SECRET;
-const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY || '1d';
+const TOKEN_EXPIRY: ExpiresInString = (process.env.TOKEN_EXPIRY || '1d') as ExpiresInString; // Explicitly type as ExpiresInString
 
 // Ensure the JWT_SECRET is set in the environment
 if (!JWT_SECRET) {
@@ -39,21 +40,46 @@ if (!JWT_SECRET) {
 }
 
 /**
+ * Validates if a string is in the correct format for expiresIn (e.g., '1d', '2h', '30m', '60s')
+ * @param value The string to validate
+ * @returns boolean indicating if the format is valid
+ */
+function isValidExpiresInString(value: string): value is ExpiresInString {
+  return /^\d+[dhms]$/.test(value); // Matches '1d', '2h', '30m', '60s', etc.
+}
+
+/**
  * Creates a signed JWT token with the provided payload
  * 
  * @param payload - The data to be encoded in the token
  * @param expiresIn - Token expiration time (defaults to environment setting or 1 day)
  * @returns The signed JWT token string
  */
-export function createToken(payload: JWTPayload, expiresIn: string | number = TOKEN_EXPIRY): string {
+export function createToken(payload: JWTPayload, expiresIn: number | ExpiresInString = TOKEN_EXPIRY): string {
   try {
     if (!JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined');
     }
-    
-    // Ensure expiresIn is a valid string or number
-    const token = jwt.sign(payload, JWT_SECRET as string, { expiresIn: expiresIn as string });
-    
+
+    let finalExpiresIn: number | ExpiresInString;
+
+    if (typeof expiresIn === 'number') {
+      finalExpiresIn = expiresIn; // Use as-is for seconds
+    } else if (typeof expiresIn === 'string') {
+      if (!isValidExpiresInString(expiresIn)) {
+        throw new Error(`Invalid expiresIn format: ${expiresIn}. Use format like '1d', '2h', '30m', or '60s'.`);
+      }
+      finalExpiresIn = expiresIn as ExpiresInString; // Explicit cast to ensure type safety
+    } else {
+      // Default to TOKEN_EXPIRY if expiresIn is invalid or undefined (already validated as ExpiresInString)
+      finalExpiresIn = TOKEN_EXPIRY;
+    }
+
+    const options: SignOptions = {
+      expiresIn: finalExpiresIn // Type-safe assignment (number | ExpiresInString matches SignOptions)
+    };
+
+    const token = jwt.sign(payload, JWT_SECRET as string, options);
     logInfo(`Token created for user: ${payload.userId} (${payload.userName})`);
     return token;
   } catch (error) {
