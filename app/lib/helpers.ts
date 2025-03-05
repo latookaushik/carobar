@@ -1,76 +1,48 @@
-/**
- * Common Helper Functions and Utilities
- * 
- * This file contains shared helper functions and utilities used across the application.
- */
-
-import { Role } from '@/app/lib/enums';
+// Helper functions for common tasks
 
 /**
- * Role checking utility for page authorization
+ * Format a Date object to YYYY-MM-DD string (for HTML date inputs)
+ * @param date The Date object to format
+ * @returns Formatted date string in YYYY-MM-DD format
  */
-export const CheckRoles = {
-  /**
-   * All roles (Admin, Manager, Staff)
-   */
-  allRoles: [Role.ADMIN, Role.MANAGER, Role.STAFF],
+export function formatDateYYYYMMDD(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
 
-  /**
-   * Admin role only
-   */
-  adminOnly: [Role.ADMIN],
+/**
+ * Parse a date string or Date object to YYYYMMDD integer format
+ * @param date The date to parse (string or Date object)
+ * @returns Date as integer in YYYYMMDD format
+ */
+export function parseDateToYYYYMMDD(date: Date | string): number {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
   
-  /**
-   * Manager role only
-   */
-  managerOnly: [Role.MANAGER],
-
-  /**
-   * Staff role only
-   */
-  staffOnly: [Role.STAFF],
+  return parseInt(`${year}${month}${day}`);
+}
 
 /**
-   * All Company roles (Staff, Manager)
-   */
-staffAndManager: [Role.STAFF, Role.MANAGER],
-
-};
-
-/**
- * Format date string to localized format
- * @param dateString - ISO date string
+ * Format YYYYMMDD integer to YYYY-MM-DD string
+ * @param dateInt Date as integer in YYYYMMDD format
  * @returns Formatted date string
  */
-export function formatDate(dateString: string): string {
-  if (!dateString) return '';
+export function formatIntDateToString(dateInt: number): string {
+  if (!dateInt) return '';
   
-  const date = new Date(dateString);
-  return date.toLocaleDateString();
+  const dateStr = dateInt.toString();
+  if (dateStr.length !== 8) return '';
+  
+  return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
 }
 
 /**
- * Format date and time string to localized format
- * @param dateString - ISO date string
- * @returns Formatted date and time string
+ * Format currency value for display
+ * @param value The value to format
+ * @param currency The currency code
+ * @returns Formatted currency string
  */
-export function formatDateTime(dateString: string): string {
-  if (!dateString) return '';
-  
-  const date = new Date(dateString);
-  return date.toLocaleString();
-}
-
-/**
- * Truncate long text with ellipsis
- * @param text - Text to truncate
- * @param maxLength - Maximum length before truncation
- * @returns Truncated text with ellipsis if needed
- */
-export function truncateText(text: string, maxLength: number = 50): string {
-  if (!text) return '';
-  
-  if (text.length <= maxLength) return text;
-  
-  return text.substring(0, maxLength) + '...';
+export function formatCurrency(value: number, currency: string = 'JPY'): string {
+  return `${currency} ${value.toLocaleString()}`;
 }
