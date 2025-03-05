@@ -1,4 +1,26 @@
 // Helper functions for common tasks
+import { RoleType } from './roleUtils';
+
+/**
+ * Role combinations for permissions checking
+ * Used in PageTemplate component to control which user roles can access a page
+ */
+export const CheckRoles = {
+  // All authenticated users
+  allRoles: ['SA', 'CA', 'CU'] as RoleType[],
+  
+  // Admin users only
+  adminOnly: ['SA'] as RoleType[],
+  
+  // Admin and company managers
+  management: ['SA', 'CA'] as RoleType[],
+  
+  // Company managers and staff
+  companyUsers: ['CA', 'CU'] as RoleType[],
+  
+  // All users including public
+  public: ['SA', 'CA', 'CU', 'PUBLIC'] as RoleType[]
+};
 
 /**
  * Format a Date object to YYYY-MM-DD string (for HTML date inputs)
