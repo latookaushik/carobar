@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-Carobar is a comprehensive SaaS application designed to manage all aspects of a vehicle trading business, with a specific focus on the Japanese market. The platform provides functionality for vehicle sales, purchases, stock management, reporting, invoicing, and accounting.
+Carobar is a NextJS 15-based Multi-Tenent SaaS application for used car traders, focusing on the Japanese market. It is designed to manage all aspects of a vehicle trading business. The platform provides functionality for vehicle sales, purchases, stock management, reporting, invoicing, and accounting.
 
 ## 2. System Architecture
 
@@ -124,10 +124,16 @@ graph LR
     Stock --> Repair[Repair & Maintenance]
     Stock --> Shipment[Shipment & Transport]
     Sales --> Invoice[Invoicing]
+    Shipment --> Invoice[Invoicing]
+    Stock --> Invoice[Invoicing]
+    
     Purchase --> Accounting[Accounting]
     Sales --> Accounting
     Repair --> Accounting
     Shipment --> Accounting
+    Transport --> Accounting
+    Journal --> Accounting
+    Bank Transaction --> Accounting
 ```
 
 ### 4.2. Module Overview
@@ -136,12 +142,15 @@ graph LR
    - Purchase transactions
    - Vehicle details and specifications
    - Sales transactions
-   - Shipment and transport
+   - Shipment 
+   - Local Transport
+   - Repair Expenses
+
 
 2. **Financial Management**
    - Bank transactions
    - Journal entries
-   - Party accounts
+   - Party accounts ( Auto Generated based on Counterparty Transactions)
    - Invoicing
 
 3. **Reference Data Management**
@@ -224,6 +233,9 @@ sequenceDiagram
 - System-controlled fields: created_at, created_by, updated_at, updated_by
 - Multi-tenant data access patterns
 - Role-based feature access
+- Use comments in `app/testdata/crebas.sql` to understand  purpose of  tables and columns.
+- To further understand data context, read sampke data from real world usage that I have prepared as json files in  `app/testdata/
+
 
 ## 7. Future Development Considerations
 
