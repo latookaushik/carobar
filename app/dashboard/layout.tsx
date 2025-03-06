@@ -37,8 +37,7 @@ export default function DashboardLayout({
   return (
     <div className="bg-background min-h-screen max-w-[95%] flex flex-col">
       <Header />
-      
-      <main className="flex-grow container mx-auto px-4 py-8 max-w-[95%]">
+      <main className="flex-grow container mx-auto px-4 py-4 max-w-[95%]">
         {children}
       </main>
       

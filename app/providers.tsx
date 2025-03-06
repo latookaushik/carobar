@@ -9,6 +9,7 @@
 
 import { ReactNode } from 'react';
 import { AuthProvider } from '@/app/contexts/AuthContext';
+import { CompanyProvider } from '@/app/contexts/CompanyContext';
 import { Toaster } from '@/app/components/ui/toaster';
 
 interface ProvidersProps {
@@ -18,8 +19,10 @@ interface ProvidersProps {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <AuthProvider>
-      {children}
-      <Toaster />
+      <CompanyProvider>
+        {children}
+        <Toaster />
+      </CompanyProvider>
     </AuthProvider>
   );
 }

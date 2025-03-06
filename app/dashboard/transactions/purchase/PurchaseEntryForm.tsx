@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { toast } from "@/app/components/ui/use-toast";
-import { Save, X, Search, Upload, Camera, Calendar, RefreshCw } from "lucide-react";
-import { formatDateYYYYMMDD, parseDateToYYYYMMDD } from "@/app/lib/helpers";
+import { useState, useEffect, useCallback } from 'react';
+import { useCompany } from '@/app/contexts/CompanyContext';
+import { toast } from '@/app/components/ui/use-toast';
+import { Save, X, Search, Upload, Camera, Calendar, RefreshCw } from 'lucide-react';
+import { formatDateYYYYMMDD, parseDateToYYYYMMDD } from '@/app/lib/helpers';
 
 // Types
 interface Counterparty {
@@ -12,6 +13,8 @@ interface Counterparty {
   is_supplier: boolean;
 }
 
+// At the top with other interfaces
+type FuelType = { name: string; description: string };
 type Supplier = Pick<Counterparty, 'code' | 'name'>;
 type VehicleMaker = { name: string };
 type Color = { color: string };
@@ -56,6 +59,7 @@ export type PurchaseFormData = {
   gear_type: string;
   purchase_cost: number;
   auction_fee: number;
+  tax: number; // Added GST tax field
   commission: number;
   recycle_fee: number;
   road_tax: number;
@@ -67,7 +71,7 @@ export type PurchaseFormData = {
 export default function PurchaseEntryForm({
   isEditing = false,
   initialData = null,
-  onClose
+  onClose,
 }: {
   isEditing?: boolean;
   initialData?: Partial<PurchaseFormData> | null;
@@ -77,35 +81,41 @@ export default function PurchaseEntryForm({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  // Add to the state declarations
+  const [fuelTypes, setFuelTypes] = useState<FuelType[]>([]);
   const [makers, setMakers] = useState<VehicleMaker[]>([]);
   const [colors, setColors] = useState<Color[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [supplierSearch, setSupplierSearch] = useState("");
+  const [supplierSearch, setSupplierSearch] = useState('');
   const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
   
+  // Get company info for tax percentage
+  const { company } = useCompany();
+  const taxPercent = company?.taxpercent || 0;
+
   // Default form data
   const defaultFormData: PurchaseFormData = {
     purchase_date: formatDateYYYYMMDD(new Date()),
-    supplier_code: "",
-    supplier_name: "",
-    chassis_no: "",
-    vehicle_name: "",
-    maker: "",
-    grade: "",
-    model: "",
-    color: "",
+    supplier_code: '',
+    supplier_name: '',
+    chassis_no: '',
+    vehicle_name: '',
+    maker: 'TOYOTA', // Set default maker to TOYOTA
+    grade: '',
+    model: '',
+    color: '',
     seats: 0,
     doors: 0,
     mileage: 0,
-    engine_no: "",
-    vehicle_type: "",
-    auction_ref_no: "",
+    engine_no: '',
+    vehicle_type: '',
+    auction_ref_no: '',
     rank: 0,
-    target_country: "",
-    stock_location: "",
-    payment_date: "",
-    fuel_type: "",
+    target_country: '',
+    stock_location: '',
+    payment_date: '',
+    fuel_type: '',
     cc: 0,
     is_auto: false,
     is_ac: false,
@@ -119,15 +129,16 @@ export default function PurchaseEntryForm({
     is_alloy_wheel: false,
     is_full_option: false,
     is_active: true,
-    gear_type: "",
+    gear_type: '',
     purchase_cost: 0,
     auction_fee: 0,
+    tax: 0, // Added GST tax field
     commission: 0,
     recycle_fee: 0,
     road_tax: 0,
     total_vehicle_fee: 0,
-    currency: "JPY",
-    purchase_remarks: ""
+    currency: 'JPY',
+    purchase_remarks: '',
   };
   
   // Initialize form data
@@ -150,6 +161,12 @@ export default function PurchaseEntryForm({
       if (suppliersRes.ok) {
         const data = await suppliersRes.json();
         setSuppliers(data.counterparties?.filter((c: Counterparty) => c.is_supplier) || []);
+      }
+
+      const fuelTypesRes = await fetch('/api/fuel-types');
+      if (fuelTypesRes.ok) {
+        const data = await fuelTypesRes.json();
+        setFuelTypes(data.fuelTypes || []);
       }
       
       // Makers
@@ -198,11 +215,29 @@ export default function PurchaseEntryForm({
     }
   }, []);
   
+  // Auto-calculate GST tax
+  useEffect(() => {
+    if (taxPercent) {
+      const purchaseCost = Number(formData.purchase_cost || 0);
+      const auctionFee = Number(formData.auction_fee || 0);
+      
+      const calculatedTax = 
+        (purchaseCost * (taxPercent / 100)) + 
+        (auctionFee * (taxPercent / 100));
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        tax: Math.round(calculatedTax) // Round to nearest whole number
+      }));
+    }
+  }, [formData.purchase_cost, formData.auction_fee, taxPercent]);
+
   // Auto-calculate total cost
   useEffect(() => {
     const total = (
       Number(formData.purchase_cost || 0) +
       Number(formData.auction_fee || 0) +
+      Number(formData.tax || 0) + // Include tax in total
       Number(formData.commission || 0) +
       Number(formData.recycle_fee || 0) +
       Number(formData.road_tax || 0)
@@ -212,6 +247,7 @@ export default function PurchaseEntryForm({
   }, [
     formData.purchase_cost,
     formData.auction_fee,
+    formData.tax, // Add tax to dependencies
     formData.commission,
     formData.recycle_fee,
     formData.road_tax
@@ -352,7 +388,9 @@ export default function PurchaseEntryForm({
     <div className="bg-white rounded-lg overflow-auto max-h-[85vh]">
       {/* Header */}
       <div className="sticky top-0 z-10 flex justify-between items-center p-2 bg-gray-100 border-b">
-        <h2 className="text-base font-semibold">{isEditing ? "Edit Purchase" : "New Vehicle Purchase"}</h2>
+        <h2 className="text-base font-semibold">
+          {isEditing ? 'Edit Purchase' : 'New Vehicle Purchase'}
+        </h2>
         <div className="flex gap-2">
           <button
             onClick={handleSave}
@@ -360,7 +398,7 @@ export default function PurchaseEntryForm({
             className="flex items-center gap-1 bg-maroon-600 hover:bg-maroon-700 text-white px-2 py-1 rounded-md text-xs"
           >
             {saving ? <RefreshCw className="animate-spin" size={14} /> : <Save size={14} />}
-            {isEditing ? "Update" : "Save"}
+            {isEditing ? 'Update' : 'Save'}
           </button>
           <button
             onClick={onClose}
@@ -371,7 +409,7 @@ export default function PurchaseEntryForm({
           </button>
         </div>
       </div>
-      
+
       <div className="p-2">
         {/* Purchase Info - All in one line with labels inline */}
         <div className="flex items-center gap-2 mb-4">
@@ -386,9 +424,12 @@ export default function PurchaseEntryForm({
               onChange={handleInputChange}
               className="pl-6 pr-2 py-1 w-full border border-gray-300 rounded-md text-xs"
             />
-            <Calendar className="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400" size={12} />
+            <Calendar
+              className="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={12}
+            />
           </div>
-          
+
           <label className="text-xs font-medium ml-4 whitespace-nowrap">
             <span className="text-red-600">Supplier *</span>
           </label>
@@ -400,36 +441,53 @@ export default function PurchaseEntryForm({
               placeholder="Search supplier..."
               className="pl-6 pr-2 py-1 w-full border border-gray-300 rounded-md text-xs"
             />
-            <Search className="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400" size={12} />
-            
+            <Search
+              className="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={12}
+            />
+
             {supplierSearch && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-auto">
-                {filteredSuppliers.length > 0 ? 
+                {filteredSuppliers.length > 0 ? (
                   filteredSuppliers.map((supplier) => (
                     <div
                       key={supplier.code}
                       className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         handleSupplierSelect(supplier.code);
-                        setSupplierSearch("");
+                        setSupplierSearch('');
                       }}
                     >
-                      <div className="font-medium text-xs">{supplier.code}{supplier.name ? `: ${supplier.name}` : ''}</div>
+                      <div className="font-medium text-xs">
+                        {supplier.code}
+                        {supplier.name ? `: ${supplier.name}` : ''}
+                      </div>
                     </div>
-                  )) : 
+                  ))
+                ) : (
                   <div className="px-2 py-1 text-gray-500 text-xs">No matches found</div>
-                }
+                )}
               </div>
             )}
           </div>
-          
+
           {formData.supplier_name && (
-            <span className="text-xs text-gray-600 truncate ml-1">
-              {formData.supplier_name}
-            </span>
+            <span className="text-xs text-gray-600 truncate ml-1">{formData.supplier_name}</span>
           )}
+
+          <div className="ml-auto">
+            <label className="text-xs font-medium whitespace-nowrap">Payment Date</label>
+            &nbsp;
+            <input
+              type="date"
+              name="payment_date"
+              value={formData.payment_date}
+              onChange={handleInputChange}
+              className="py-1 px-2 border border-gray-300 rounded-md text-xs"
+            />
+          </div>
         </div>
-      
+
         {/* Tabs */}
         <div className="border-b border-gray-200 mb-2">
           <ul className="flex -mb-px">
@@ -456,23 +514,9 @@ export default function PurchaseEntryForm({
                 Pictures
               </button>
             </li>
-
-            <li>
-            <div>
-                <label className="text-xs font-medium ml-4 whitespace-nowrap">Payment Date</label>&nbsp;
-                <input
-                    type="date"
-                    name="payment_date"
-                    value={formData.payment_date}
-                    onChange={handleInputChange}
-                    className="py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  />
-              </div>
-              </li>
-
           </ul>
         </div>
-        
+
         {/* Vehicle Form - True 2-column layout */}
         <div className="space-y-3">
           {/* Row 1: Left - Chassis No, Vehicle Name | Right - Maker, Grade */}
@@ -492,7 +536,7 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Vehicle Name</label>
                   <input
@@ -505,7 +549,7 @@ export default function PurchaseEntryForm({
                 </div>
               </div>
             </div>
-            
+
             {/* Right column */}
             <div className="w-1/2">
               <div className="grid grid-cols-2 gap-2">
@@ -518,12 +562,14 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   >
                     <option value="">Select</option>
-                    {makers.map(m => (
-                      <option key={m.name} value={m.name}>{m.name}</option>
+                    {makers.map((m) => (
+                      <option key={m.name} value={m.name}>
+                        {m.name}
+                      </option>
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Grade</label>
                   <input
@@ -537,7 +583,7 @@ export default function PurchaseEntryForm({
               </div>
             </div>
           </div>
-          
+
           {/* Row 2: Left - Mileage, Engine (cc) | Right - Model, Color */}
           <div className="flex gap-5">
             {/* Left column */}
@@ -553,7 +599,7 @@ export default function PurchaseEntryForm({
                     className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Engine (cc)</label>
                   <input
@@ -565,24 +611,22 @@ export default function PurchaseEntryForm({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1">Model (YYYYMM)</label>
+                  <label className="block text-xs font-medium mb-1">Model (YYYY/MM)</label>
                   <input
                     type="text"
                     name="model"
                     value={formData.model}
                     onChange={handleInputChange}
-                    placeholder="YYYYMM"
+                    placeholder="YYYY/MM"
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   />
                 </div>
-
               </div>
             </div>
-            
+
             {/* Right column */}
             <div className="w-1/2">
               <div className="grid grid-cols-2 gap-2">
-                
                 <div>
                   <label className="block text-xs font-medium mb-1">Color</label>
                   <select
@@ -592,34 +636,34 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   >
                     <option value="">Select</option>
-                    {colors.map(c => (
-                      <option key={c.color} value={c.color}>{c.color}</option>
+                    {colors.map((c) => (
+                      <option key={c.color} value={c.color}>
+                        {c.color}
+                      </option>
                     ))}
                   </select>
                 </div>
-                
-              <div>
-                <label className="block text-xs font-medium mb-1">Fuel Type</label>
-                <select
-                  name="fuel_type"
-                  value={formData.fuel_type}
-                  onChange={handleInputChange}
-                  className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                >
-                  <option value="">Select</option>
-                  <option value="GAS">Gasoline</option>
-                  <option value="DIE">Diesel</option>
-                  <option value="HYB">Hybrid</option>
-                  <option value="EV">Electric</option>
-                  <option value="LPG">LPG</option>
-                  <option value="CNG">CNG</option>
-                </select>
-              </div>
 
+                <div>
+                  <label className="block text-xs font-medium mb-1">Fuel Type</label>
+                  <select
+                    name="fuel_type"
+                    value={formData.fuel_type}
+                    onChange={handleInputChange}
+                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                  >
+                    <option value="">Select</option>
+                    {fuelTypes.map((ft) => (
+                      <option key={ft.name} value={ft.name}>
+                        {ft.name + ' : ' + ft.description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-          
+
           {/* Row 3: Left - Seats, Doors | Right - Gear Type, Engine No */}
           <div className="flex gap-5">
             {/* Left column */}
@@ -636,7 +680,7 @@ export default function PurchaseEntryForm({
                     className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Doors</label>
                   <input
@@ -649,22 +693,24 @@ export default function PurchaseEntryForm({
                   />
                 </div>
                 <div>
-                <label className="block text-xs font-medium mb-1">Vehicle Type</label>
-                <select
-                  name="vehicle_type"
-                  value={formData.vehicle_type}
-                  onChange={handleInputChange}
-                  className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                >
-                  <option value="">Select</option>
-                  {vehicleTypes.map(vt => (
-                    <option key={vt.vehicle_type} value={vt.vehicle_type}>{vt.vehicle_type}</option>
-                  ))}
-                </select>
-              </div>
+                  <label className="block text-xs font-medium mb-1">Vehicle Type</label>
+                  <select
+                    name="vehicle_type"
+                    value={formData.vehicle_type}
+                    onChange={handleInputChange}
+                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                  >
+                    <option value="">Select</option>
+                    {vehicleTypes.map((vt) => (
+                      <option key={vt.vehicle_type} value={vt.vehicle_type}>
+                        {vt.vehicle_type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-            
+
             {/* Right column */}
             <div className="w-1/2">
               <div className="grid grid-cols-2 gap-2">
@@ -683,7 +729,7 @@ export default function PurchaseEntryForm({
                     <option value="DCT">Dual Clutch</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Engine No.</label>
                   <input
@@ -697,7 +743,7 @@ export default function PurchaseEntryForm({
               </div>
             </div>
           </div>
-          
+
           {/* Row 4: Left - Inspection Rank, Auction No | Right - Stock Location, Target Country */}
           <div className="flex gap-5">
             {/* Left column */}
@@ -716,7 +762,7 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Auction No.</label>
                   <input
@@ -729,7 +775,7 @@ export default function PurchaseEntryForm({
                 </div>
               </div>
             </div>
-            
+
             {/* Right column */}
             <div className="w-1/2">
               <div className="grid grid-cols-2 gap-2">
@@ -742,12 +788,14 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   >
                     <option value="">Select</option>
-                    {locations.map(loc => (
-                      <option key={loc.name} value={loc.name}>{loc.name}</option>
+                    {locations.map((loc) => (
+                      <option key={loc.name} value={loc.name}>
+                        {loc.name}
+                      </option>
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-xs font-medium mb-1">Target Country</label>
                   <select
@@ -757,157 +805,20 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   >
                     <option value="">Select</option>
-                    {countries.map(c => (
-                      <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
+                    {countries.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} - {c.name}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
             </div>
           </div>
-        
-          {/* Features */}
-          <div className="mt-2">
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-1">
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_auto"
-                  checked={formData.is_auto}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">AT</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_ac"
-                  checked={formData.is_ac}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">AC</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_power_steering"
-                  checked={formData.is_power_steering}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">PS</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_power_windows"
-                  checked={formData.is_power_windows}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">PW</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_power_lock"
-                  checked={formData.is_power_lock}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">PL</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_power_mirror"
-                  checked={formData.is_power_mirror}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">PM</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_sun_roof"
-                  checked={formData.is_sun_roof}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">SR</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_high_roof"
-                  checked={formData.is_high_roof}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">HR</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_4wd"
-                  checked={formData.is_4wd}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">4WD</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_alloy_wheel"
-                  checked={formData.is_alloy_wheel}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">AW</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_full_option"
-                  checked={formData.is_full_option}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">Full</span>
-              </label>
-              
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={handleInputChange}
-                  className="rounded h-3 w-3"
-                />
-                <span className="ml-1 text-xs">Is Active?</span>
-              </label>
 
-            </div>
-          </div>
-          
           {/* Financial Section */}
           <div>
-     
-              <div className="grid grid-cols-1 md:grid-cols-7 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-8 gap-2">
               <div>
                 <label className="block text-xs mb-1">Currency</label>
                 <select
@@ -916,7 +827,9 @@ export default function PurchaseEntryForm({
                   onChange={handleInputChange}
                   className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                 >
-                  <option value="JPY">JPY</option>
+                  <option value={company?.base_currency || 'JPY'}>
+                  {company?.base_currency || 'JPY'}
+                  </option>
                   <option value="USD">USD</option>
                 </select>
               </div>
@@ -931,7 +844,7 @@ export default function PurchaseEntryForm({
                   className="w-full py-1 px-2 border text-right rounded-md text-xs"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-xs mb-1">Auction Fee</label>
                 <input
@@ -942,7 +855,18 @@ export default function PurchaseEntryForm({
                   className="w-full py-1 px-2 border text-right rounded-md text-xs"
                 />
               </div>
-              
+
+              <div>
+                <label className="block text-xs mb-1">GST ({taxPercent}%)</label>
+                <input
+                  type="number"
+                  name="tax"
+                  value={formData.tax}
+                  onChange={(e) => handleNumberChange(e)}
+                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs mb-1">Commission</label>
                 <input
@@ -953,7 +877,7 @@ export default function PurchaseEntryForm({
                   className="w-full py-1 px-2 border text-right rounded-md text-xs"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-xs mb-1">Recycle Fee</label>
                 <input
@@ -964,7 +888,7 @@ export default function PurchaseEntryForm({
                   className="w-full py-1 px-2 border text-right rounded-md text-xs"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-xs mb-1">Road Tax</label>
                 <input
@@ -975,7 +899,7 @@ export default function PurchaseEntryForm({
                   className="w-full py-1 px-2 border text-right rounded-md text-xs"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-xs mb-1">Total Cost</label>
                 <input
@@ -987,19 +911,19 @@ export default function PurchaseEntryForm({
               </div>
             </div>
           </div>
-          
+
           {/* Remarks */}
-          <div>
-            <h3 className="text-xs font-medium mb-1">Remarks</h3>
-            <textarea
-              name="purchase_remarks"
-              value={formData.purchase_remarks}
-              onChange={handleInputChange}
-              rows={2}
-              className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-              placeholder="Additional information or comments"
-            />
-          </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-600 whitespace-nowrap">Remarks</span>
+              <input
+                type="text"
+                name="purchase_remarks"
+                value={formData.purchase_remarks}
+                onChange={handleInputChange}
+                className="flex-1 py-1 px-2 border border-gray-300 rounded-md text-xs"
+                placeholder="Additional information or comments"
+              />
+            </div>
         </div>
       </div>
     </div>

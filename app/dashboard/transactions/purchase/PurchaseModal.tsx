@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import PurchaseEntryForm from "./PurchaseEntryForm";
-import { X } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 
 // Using same Purchase data structure from the form
-import { PurchaseFormData } from "./PurchaseEntryForm";
+import PurchaseEntryForm, { PurchaseFormData } from './PurchaseEntryForm';
 
 type PurchaseModalProps = {
   isOpen: boolean;
@@ -14,11 +13,11 @@ type PurchaseModalProps = {
   initialData?: Partial<PurchaseFormData>;
 };
 
-export default function PurchaseModal({ 
-  isOpen, 
-  onClose, 
+export default function PurchaseModal({
+  isOpen,
+  onClose,
   isEditing = false,
-  initialData = {} 
+  initialData = {},
 }: PurchaseModalProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -28,7 +27,7 @@ export default function PurchaseModal({
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     }
-    
+
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -45,13 +44,9 @@ export default function PurchaseModal({
         >
           <X size={20} />
         </button>
-        
+
         <div className="p-1">
-          <PurchaseEntryForm 
-            isEditing={isEditing}
-            initialData={initialData} 
-            onClose={onClose} 
-          />
+          <PurchaseEntryForm isEditing={isEditing} initialData={initialData} onClose={onClose} />
         </div>
       </div>
     </div>
