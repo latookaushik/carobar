@@ -31,10 +31,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="bg-background min-h-screen max-w-[95%] flex flex-col">
+    <div className="bg-background min-h-screen w-full flex flex-col">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-4 max-w-[95%]">{children}</main>
-
+      <main className="flex-grow px-0 py-4 w-full">{children}</main>
       <Footer />
     </div>
   );

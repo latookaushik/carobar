@@ -35,8 +35,8 @@ export default function PageTemplate({ children, requiredRoles = [] }: PageTempl
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-[1600px]">
-      <div className="bg-white rounded-lg shadow-md p-6">{children}</div>
+    <div className="w-full px-0 py-2">
+      <div className="bg-white rounded-lg shadow-md p-4 w-full">{children}</div>
     </div>
   );
 }
