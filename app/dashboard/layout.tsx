@@ -1,26 +1,22 @@
-"use client"
+'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from "@/app/components/Layout/Header";
-import Footer from "@/app/components/Layout/Footer";
+import Header from '@/app/components/Layout/Header';
+import Footer from '@/app/components/Layout/Footer';
 import { useAuth } from '@/app/contexts/AuthContext';
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { loading, isAuthenticated } = useAuth();
   const router = useRouter();
-  
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, loading, router]);
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -28,19 +24,17 @@ export default function DashboardLayout({
       </div>
     );
   }
-  
+
   // Only render the layout if the user is authenticated
   if (!isAuthenticated) {
     return null;
   }
-  
+
   return (
     <div className="bg-background min-h-screen max-w-[95%] flex flex-col">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-4 max-w-[95%]">
-        {children}
-      </main>
-      
+      <main className="flex-grow container mx-auto px-4 py-4 max-w-[95%]">{children}</main>
+
       <Footer />
     </div>
   );

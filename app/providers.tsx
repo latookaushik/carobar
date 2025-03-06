@@ -1,11 +1,11 @@
 /**
  * Client-side Providers Component
- * 
+ *
  * Wraps the application with all required client-side context providers.
  * This component is imported in the root layout.
  */
 
-"use client";
+'use client';
 
 import { ReactNode } from 'react';
 import { AuthProvider } from '@/app/contexts/AuthContext';

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function TransactionsRedirect() {
   const router = useRouter();
 
   useEffect(() => {
     // Redirect to the transactions dashboard
-    router.push("/dashboard/transactions/index");
+    router.push('/dashboard/transactions/index');
   }, [router]);
 
   return (

@@ -1,6 +1,6 @@
 /**
  * Country Management API Routes
- * 
+ *
  * Handles CRUD operations for country management in Carobar.
  * Countries are company-specific and used in geographic reference.
  */
@@ -17,7 +17,7 @@ import { HttpStatus, Role } from '@/app/lib/enums';
 const countrySchema = z.object({
   code: z.string().min(2).max(3),
   name: z.string().min(1).max(100),
-  is_targetcountry: z.boolean().optional().default(false)
+  is_targetcountry: z.boolean().optional().default(false),
 });
 
 /**
@@ -30,14 +30,14 @@ function createSuccessResponse<T>(data: T, status: number = HttpStatus.OK) {
 // GET /api/countries - Get all countries for the authenticated user's company
 export const GET = withUser(async (request: NextRequest) => {
   logInfo('GET /api/countries - Fetching countries');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
     const companyId = user!.companyId;
-    
+
     logDebug(`Fetching countries for company: ${companyId}`);
-    
+
     // Query countries for this company using Prisma
     const countries = await prisma.ref_country.findMany({
       where: {
@@ -47,24 +47,23 @@ export const GET = withUser(async (request: NextRequest) => {
         name: 'asc',
       },
     });
-    
+
     logInfo(`Found ${countries.length} countries for company ${companyId}`);
-    
+
     // Return the countries
     return createSuccessResponse({ countries });
   } catch (error) {
-    logError(`Error fetching countries: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to fetch countries',
-      HttpStatus.INTERNAL_SERVER_ERROR
+    logError(
+      `Error fetching countries: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+    return createErrorResponse('Failed to fetch countries', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 // POST /api/countries - Create a new country
 export const POST = withUser(async (request: NextRequest) => {
   logInfo('POST /api/countries - Creating new country');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
@@ -73,21 +72,15 @@ export const POST = withUser(async (request: NextRequest) => {
     // Check role permissions
     const allowedRoles = [Role.ADMIN, Role.MANAGER, Role.STAFF];
     if (!allowedRoles.includes(roleId as Role)) {
-      return createErrorResponse(
-        'Permission denied',
-        HttpStatus.FORBIDDEN
-      );
+      return createErrorResponse('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     // Parse and validate request body
     const body = await request.json();
     const validationResult = countrySchema.safeParse(body);
-    
+
     if (!validationResult.success) {
-      return createErrorResponse(
-        'Validation failed',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Validation failed', HttpStatus.BAD_REQUEST);
     }
 
     const { code, name, is_targetcountry } = validationResult.data;
@@ -122,7 +115,7 @@ export const POST = withUser(async (request: NextRequest) => {
         updated_by: userId,
       },
     });
-    
+
     logInfo(`Country created: ${formattedCode} for company ${companyId}`);
 
     return createSuccessResponse(
@@ -131,17 +124,14 @@ export const POST = withUser(async (request: NextRequest) => {
     );
   } catch (error) {
     logError(`Error creating country: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to create country',
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+    return createErrorResponse('Failed to create country', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 // PUT /api/countries - Update an existing country
 export const PUT = withUser(async (request: NextRequest) => {
   logInfo('PUT /api/countries - Updating country');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
@@ -150,40 +140,31 @@ export const PUT = withUser(async (request: NextRequest) => {
     // Check role permissions
     const allowedRoles = [Role.ADMIN, Role.MANAGER, Role.STAFF];
     if (!allowedRoles.includes(roleId as Role)) {
-      return createErrorResponse(
-        'Permission denied',
-        HttpStatus.FORBIDDEN
-      );
+      return createErrorResponse('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     // Parse and validate request body
-    const body: { 
-      code: string; 
-      name: string; 
+    const body: {
+      code: string;
+      name: string;
       is_targetcountry?: boolean;
     } = await request.json();
-    
+
     const { code, name, is_targetcountry } = body;
 
     if (!code || !name) {
-      return createErrorResponse(
-        'Both code and name are required',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Both code and name are required', HttpStatus.BAD_REQUEST);
     }
 
     // Validate country data
-    const validationResult = countrySchema.safeParse({ 
-      code, 
-      name, 
-      is_targetcountry: is_targetcountry !== undefined ? is_targetcountry : false 
+    const validationResult = countrySchema.safeParse({
+      code,
+      name,
+      is_targetcountry: is_targetcountry !== undefined ? is_targetcountry : false,
     });
-    
+
     if (!validationResult.success) {
-      return createErrorResponse(
-        'Validation failed',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Validation failed', HttpStatus.BAD_REQUEST);
     }
 
     const formattedCode = code.trim().toUpperCase();
@@ -200,10 +181,7 @@ export const PUT = withUser(async (request: NextRequest) => {
     });
 
     if (!existingCountry) {
-      return createErrorResponse(
-        'Country does not exist',
-        HttpStatus.NOT_FOUND
-      );
+      return createErrorResponse('Country does not exist', HttpStatus.NOT_FOUND);
     }
 
     // Update country using Prisma
@@ -216,31 +194,29 @@ export const PUT = withUser(async (request: NextRequest) => {
       },
       data: {
         name: formattedName,
-        is_targetcountry: is_targetcountry !== undefined ? is_targetcountry : existingCountry.is_targetcountry,
+        is_targetcountry:
+          is_targetcountry !== undefined ? is_targetcountry : existingCountry.is_targetcountry,
         updated_by: userId,
         updated_at: new Date(),
       },
     });
-    
+
     logInfo(`Country updated: ${formattedCode} for company ${companyId}`);
 
-    return createSuccessResponse({ 
-      message: 'Country updated successfully', 
-      country: updatedCountry 
+    return createSuccessResponse({
+      message: 'Country updated successfully',
+      country: updatedCountry,
     });
   } catch (error) {
     logError(`Error updating country: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to update country',
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+    return createErrorResponse('Failed to update country', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 // DELETE /api/countries - Delete a country
 export const DELETE = withUser(async (request: NextRequest) => {
   logInfo('DELETE /api/countries - Deleting country');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
@@ -249,10 +225,7 @@ export const DELETE = withUser(async (request: NextRequest) => {
     // Check role permissions
     const allowedRoles = [Role.ADMIN, Role.MANAGER];
     if (!allowedRoles.includes(roleId as Role)) {
-      return createErrorResponse(
-        'Permission denied',
-        HttpStatus.FORBIDDEN
-      );
+      return createErrorResponse('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     // Get country code from URL parameters
@@ -260,10 +233,7 @@ export const DELETE = withUser(async (request: NextRequest) => {
     const code = url.searchParams.get('code');
 
     if (!code) {
-      return createErrorResponse(
-        'Country code parameter is required',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Country code parameter is required', HttpStatus.BAD_REQUEST);
     }
 
     const formattedCode = code.trim().toUpperCase();
@@ -279,10 +249,7 @@ export const DELETE = withUser(async (request: NextRequest) => {
     });
 
     if (!existingCountry) {
-      return createErrorResponse(
-        'Country does not exist',
-        HttpStatus.NOT_FOUND
-      );
+      return createErrorResponse('Country does not exist', HttpStatus.NOT_FOUND);
     }
 
     // Delete country using Prisma
@@ -294,15 +261,12 @@ export const DELETE = withUser(async (request: NextRequest) => {
         },
       },
     });
-    
+
     logInfo(`Country deleted: ${formattedCode} for company ${companyId}`);
 
     return createSuccessResponse({ message: 'Country deleted successfully' });
   } catch (error) {
     logError(`Error deleting country: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to delete country',
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+    return createErrorResponse('Failed to delete country', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });

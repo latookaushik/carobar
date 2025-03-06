@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/contexts/AuthContext";
-import PageTemplate from "@/app/components/PageTemplate";
-import DataTable from "@/app/components/ui/DataTable";
-import { toast } from "@/app/components/ui/use-toast";
-import { 
-  ShoppingCart, 
-  CreditCard, 
-  Wrench, 
-  Ship, 
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
+import PageTemplate from '@/app/components/PageTemplate';
+import DataTable from '@/app/components/ui/DataTable';
+import { toast } from '@/app/components/ui/use-toast';
+import {
+  ShoppingCart,
+  CreditCard,
+  Wrench,
+  Ship,
   Download,
   Search,
   ChevronDown,
-  RefreshCw
-} from "lucide-react";
+  RefreshCw,
+} from 'lucide-react';
 
 // Define types
 type VehicleOverview = {
@@ -31,12 +31,14 @@ type VehicleOverview = {
 };
 
 export default function VehicleTransactionsDashboard() {
-  const { /* user */ } = useAuth();
+  const {
+    /* user */
+  } = useAuth();
   const router = useRouter();
   const [filteredVehicles, setFilteredVehicles] = useState<VehicleOverview[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,24 +49,24 @@ export default function VehicleTransactionsDashboard() {
     try {
       // Build API query parameters
       const queryParams = new URLSearchParams();
-      
-      if (searchTerm.trim() !== "") {
+
+      if (searchTerm.trim() !== '') {
         queryParams.append('search', searchTerm);
       }
-      
+
       queryParams.append('page', currentPage.toString());
       queryParams.append('pageSize', itemsPerPage.toString());
-      
+
       // Make API request to fetch all vehicles that have purchase records
       const response = await fetch(`/api/transactions/purchases?${queryParams.toString()}`);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch vehicles');
       }
-      
+
       const data = await response.json();
-      
+
       // Define purchase data structure
       type PurchaseData = {
         chassis_no: string;
@@ -77,25 +79,27 @@ export default function VehicleTransactionsDashboard() {
         manufacture_yyyymm?: string;
         status?: 'In Stock' | 'Sold' | 'Shipped';
       };
-      
+
       // Transform purchase data to vehicle overview format
-      const vehicleData: VehicleOverview[] = (data.purchases || []).map((purchase: PurchaseData) => ({
-        chassis_no: purchase.chassis_no,
-        vehicle_name: purchase.vehicle_name,
-        maker: purchase.maker,
-        manufacture_yyyymm: purchase.manufacture_yyyymm || '',
-        color: purchase.color || '',
-        purchase_date: purchase.purchase_date,
-        purchase_cost: purchase.purchase_cost,
-        supplier_name: purchase.supplier_name,
-        // Determine status based on sales/shipment data (this would be from the real API)
-        // In a future implementation, this status would come from a proper API
-        status: purchase.status || 'In Stock' as 'In Stock' | 'Sold' | 'Shipped',
-      }));
-      
+      const vehicleData: VehicleOverview[] = (data.purchases || []).map(
+        (purchase: PurchaseData) => ({
+          chassis_no: purchase.chassis_no,
+          vehicle_name: purchase.vehicle_name,
+          maker: purchase.maker,
+          manufacture_yyyymm: purchase.manufacture_yyyymm || '',
+          color: purchase.color || '',
+          purchase_date: purchase.purchase_date,
+          purchase_cost: purchase.purchase_cost,
+          supplier_name: purchase.supplier_name,
+          // Determine status based on sales/shipment data (this would be from the real API)
+          // In a future implementation, this status would come from a proper API
+          status: purchase.status || ('In Stock' as 'In Stock' | 'Sold' | 'Shipped'),
+        })
+      );
+
       // Set filtered vehicles
       setFilteredVehicles(vehicleData);
-      
+
       // If pagination data is returned, update state
       if (data.pagination) {
         setCurrentPage(data.pagination.page);
@@ -105,11 +109,11 @@ export default function VehicleTransactionsDashboard() {
         }
       }
     } catch (error) {
-      console.error("Error fetching vehicles:", error);
+      console.error('Error fetching vehicles:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch vehicles. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to fetch vehicles. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -120,7 +124,6 @@ export default function VehicleTransactionsDashboard() {
   useEffect(() => {
     fetchVehicles();
   }, [fetchVehicles]);
-
 
   // Format YYYYMMDD to YYYY-MM-DD
   const formatDate = (dateInt: number) => {
@@ -135,15 +138,13 @@ export default function VehicleTransactionsDashboard() {
 
   // Function to handle status display with appropriate color
   const renderStatus = (status: string) => {
-    let bgColor = "bg-gray-100 text-gray-800";
-    if (status === "In Stock") bgColor = "bg-green-100 text-green-800";
-    if (status === "Sold") bgColor = "bg-blue-100 text-blue-800";
-    if (status === "Shipped") bgColor = "bg-purple-100 text-purple-800";
+    let bgColor = 'bg-gray-100 text-gray-800';
+    if (status === 'In Stock') bgColor = 'bg-green-100 text-green-800';
+    if (status === 'Sold') bgColor = 'bg-blue-100 text-blue-800';
+    if (status === 'Shipped') bgColor = 'bg-purple-100 text-purple-800';
 
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${bgColor}`}>
-        {status}
-      </span>
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${bgColor}`}>{status}</span>
     );
   };
 
@@ -163,8 +164,8 @@ export default function VehicleTransactionsDashboard() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Vehicle Transactions</h1>
           <div className="flex gap-2">
-            <button 
-              onClick={() => navigateTo("/dashboard/transactions/purchase")}
+            <button
+              onClick={() => navigateTo('/dashboard/transactions/purchase')}
               className="flex items-center gap-2 bg-maroon-600 hover:bg-maroon-700 text-white px-4 py-2 rounded-md"
             >
               <ShoppingCart size={18} />
@@ -183,8 +184,8 @@ export default function VehicleTransactionsDashboard() {
 
         {/* Transaction Type Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div 
-            onClick={() => navigateTo("/dashboard/transactions/purchase")}
+          <div
+            onClick={() => navigateTo('/dashboard/transactions/purchase')}
             className="bg-white p-4 rounded-lg shadow-md border-l-4 border-maroon-500 hover:shadow-lg cursor-pointer transition-all"
           >
             <div className="flex items-center">
@@ -198,8 +199,8 @@ export default function VehicleTransactionsDashboard() {
             </div>
           </div>
 
-          <div 
-            onClick={() => navigateTo("/dashboard/transactions/sales")}
+          <div
+            onClick={() => navigateTo('/dashboard/transactions/sales')}
             className="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg cursor-pointer transition-all"
           >
             <div className="flex items-center">
@@ -213,8 +214,8 @@ export default function VehicleTransactionsDashboard() {
             </div>
           </div>
 
-          <div 
-            onClick={() => navigateTo("/dashboard/transactions/repair")}
+          <div
+            onClick={() => navigateTo('/dashboard/transactions/repair')}
             className="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg cursor-pointer transition-all"
           >
             <div className="flex items-center">
@@ -228,8 +229,8 @@ export default function VehicleTransactionsDashboard() {
             </div>
           </div>
 
-          <div 
-            onClick={() => navigateTo("/dashboard/transactions/shipment")}
+          <div
+            onClick={() => navigateTo('/dashboard/transactions/shipment')}
             className="bg-white p-4 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg cursor-pointer transition-all"
           >
             <div className="flex items-center">
@@ -260,7 +261,10 @@ export default function VehicleTransactionsDashboard() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-maroon-500 focus:border-transparent"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
               </div>
             </div>
 
@@ -282,7 +286,10 @@ export default function VehicleTransactionsDashboard() {
             </div>
 
             <div>
-              <label htmlFor="items-per-page" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="items-per-page"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Items Per Page
               </label>
               <select
@@ -301,7 +308,7 @@ export default function VehicleTransactionsDashboard() {
               </select>
             </div>
           </div>
-          
+
           <div className="mt-4 flex justify-end">
             <button
               onClick={fetchVehicles}
@@ -316,13 +323,13 @@ export default function VehicleTransactionsDashboard() {
         {/* Vehicle Data Table */}
         <DataTable
           headers={[
-            "Chassis No.",
-            "Vehicle",
-            "Purchase Date",
-            "Cost",
-            "Supplier",
-            "Status",
-            "Actions",
+            'Chassis No.',
+            'Vehicle',
+            'Purchase Date',
+            'Cost',
+            'Supplier',
+            'Status',
+            'Actions',
           ]}
           data={getPaginatedData()}
           loading={loading}
@@ -333,7 +340,9 @@ export default function VehicleTransactionsDashboard() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm">
                 <div className="font-medium text-gray-900">{vehicle.vehicle_name}</div>
-                <div className="text-xs text-gray-500">{vehicle.maker} • {vehicle.color}</div>
+                <div className="text-xs text-gray-500">
+                  {vehicle.maker} • {vehicle.color}
+                </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {formatDate(vehicle.purchase_date)}
@@ -344,9 +353,7 @@ export default function VehicleTransactionsDashboard() {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {vehicle.supplier_name}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {renderStatus(vehicle.status)}
-              </td>
+              <td className="px-6 py-4 whitespace-nowrap">{renderStatus(vehicle.status)}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                 <button
                   onClick={() => handleViewVehicle(vehicle.chassis_no)}
@@ -363,17 +370,11 @@ export default function VehicleTransactionsDashboard() {
         {filteredVehicles.length > 0 && (
           <div className="mt-4 flex justify-between items-center">
             <div className="text-sm text-gray-700">
-              Showing{" "}
-              <span className="font-medium">
-                {(currentPage - 1) * itemsPerPage + 1}
-              </span>{" "}
-              to{" "}
+              Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
               <span className="font-medium">
                 {Math.min(currentPage * itemsPerPage, filteredVehicles.length)}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium">{filteredVehicles.length}</span>{" "}
-              results
+              </span>{' '}
+              of <span className="font-medium">{filteredVehicles.length}</span> results
             </div>
 
             <div className="flex space-x-2">

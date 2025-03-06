@@ -1,17 +1,17 @@
 /**
  * StatCard Component
- * 
+ *
  * A reusable card component for displaying statistics with a title, value, and change indicator.
  * Used throughout the application for dashboards and report summaries.
- * 
+ *
  * @component
  * @example
  * ```tsx
- * <StatCard 
- *   title="Total Vehicles" 
- *   value="245" 
- *   change="+12% from last month" 
- *   bgColor="blue" 
+ * <StatCard
+ *   title="Total Vehicles"
+ *   value="245"
+ *   change="+12% from last month"
+ *   bgColor="blue"
  * />
  * ```
  */
@@ -23,13 +23,13 @@ type ColorType = 'blue' | 'green' | 'purple' | 'amber' | 'red' | 'gray';
 interface StatCardProps {
   /** The title of the statistic */
   title: string;
-  
+
   /** The primary value to display */
   value: string | number;
-  
+
   /** Optional text describing the change (e.g., "+12% from last month") */
   change?: string;
-  
+
   /** Base color for the card (affects background and text colors) */
   bgColor: ColorType;
 }
@@ -48,7 +48,7 @@ const colorMap: Record<ColorType, { bg: string; text: string; textSecondary: str
 
 export default function StatCard({ title, value, change, bgColor }: StatCardProps) {
   const colors = colorMap[bgColor] || colorMap.gray;
-  
+
   return (
     <div className={`${colors.bg} p-4 rounded-lg shadow-sm`}>
       <h3 className={`text-lg font-medium ${colors.text}`}>{title}</h3>

@@ -1,11 +1,11 @@
 // app/components/Auth/AuthStatus.tsx
 
-"use client";
-import Link from "next/link";
-import { User, LogOut, LogIn } from "lucide-react";
+'use client';
+import Link from 'next/link';
+import { User, LogOut, LogIn } from 'lucide-react';
 import { useAuth } from '@/app/contexts/AuthContext';
 
-// Purpose: React component to display authentication status and user information 
+// Purpose: React component to display authentication status and user information
 // in application header.
 export default function AuthStatus() {
   const { user, loading, logout } = useAuth();

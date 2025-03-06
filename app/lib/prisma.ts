@@ -1,4 +1,3 @@
-
 // lib/prisma.ts
 // Single instance of Prisma Client to be used across the application
 
@@ -6,12 +5,11 @@ import { PrismaClient } from '@prisma/client';
 
 // Enable query logging
 const prismaClientSingleton = () => {
-if (process.env.NODE_ENV === 'production') {
-  return new PrismaClient({ log: ['warn', 'error'] });
-} else {
-  return new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
-}
-
+  if (process.env.NODE_ENV === 'production') {
+    return new PrismaClient({ log: ['warn', 'error'] });
+  } else {
+    return new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
+  }
 };
 
 // Create a singleton instance

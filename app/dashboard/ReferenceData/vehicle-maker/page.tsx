@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 /**
  * Vehicle Maker Management Page
- * 
+ *
  * Provides UI for viewing, adding, editing, and deleting vehicle makers
  * for the authenticated user's company.
  */
@@ -23,16 +23,16 @@ interface Maker {
 }
 
 export default function VehicleMakerPage() {
-  const { } = useAuth();
-  
+  const {} = useAuth();
+
   const [makers, setMakers] = useState<Maker[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<Record<string, {first_name: string, last_name: string}>>({});
-  
+  const [users, setUsers] = useState<Record<string, { first_name: string; last_name: string }>>({});
+
   const [newMaker, setNewMaker] = useState('');
   const [addingMaker, setAddingMaker] = useState(false);
-  
+
   const [editMakerId, setEditMakerId] = useState<string | null>(null);
   const [editMakerValue, setEditMakerValue] = useState('');
 
@@ -46,21 +46,21 @@ export default function VehicleMakerPage() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch users');
       }
-      
+
       const data = await response.json();
-      
+
       // Create a lookup object with user_id as key and name info as value
-      const userMap: Record<string, {first_name: string, last_name: string}> = {};
+      const userMap: Record<string, { first_name: string; last_name: string }> = {};
       if (data.users) {
-        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
-            last_name: user.last_name
+            last_name: user.last_name,
           };
         });
       }
@@ -74,23 +74,23 @@ export default function VehicleMakerPage() {
   const fetchMakers = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/makers');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch vehicle makers');
       }
-      
+
       const data = await response.json();
       setMakers(data.makers || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -101,13 +101,13 @@ export default function VehicleMakerPage() {
   const handleAddMaker = async () => {
     if (!newMaker.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Maker name cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Maker name cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/makers', {
         method: 'POST',
@@ -116,26 +116,26 @@ export default function VehicleMakerPage() {
         },
         body: JSON.stringify({ name: newMaker.trim() }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to add vehicle maker');
       }
-      
+
       // Refresh makers list and reset form
       await fetchMakers();
       setNewMaker('');
       setAddingMaker(false);
-      
+
       toast({
-        title: "Success",
-        description: "Vehicle maker added successfully",
+        title: 'Success',
+        description: 'Vehicle maker added successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -144,44 +144,44 @@ export default function VehicleMakerPage() {
   const handleUpdateMaker = async (oldName: string) => {
     if (!editMakerValue.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Maker name cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Maker name cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/makers', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          oldName, 
-          newName: editMakerValue.trim() 
+        body: JSON.stringify({
+          oldName,
+          newName: editMakerValue.trim(),
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update vehicle maker');
       }
-      
+
       // Refresh makers list and reset edit state
       await fetchMakers();
       setEditMakerId(null);
       setEditMakerValue('');
-      
+
       toast({
-        title: "Success",
-        description: "Vehicle maker updated successfully",
+        title: 'Success',
+        description: 'Vehicle maker updated successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -191,29 +191,29 @@ export default function VehicleMakerPage() {
     if (!window.confirm(`Are you sure you want to delete the vehicle maker &quot;${name}&quot;?`)) {
       return;
     }
-    
+
     try {
       const response = await fetch(`/api/makers?name=${encodeURIComponent(name)}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete vehicle maker');
       }
-      
+
       // Refresh makers list
       await fetchMakers();
-      
+
       toast({
-        title: "Success",
-        description: "Vehicle maker deleted successfully",
+        title: 'Success',
+        description: 'Vehicle maker deleted successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -231,8 +231,8 @@ export default function VehicleMakerPage() {
   };
 
   return (
-    <PageTemplate 
-      title="Vehicle Maker Management" 
+    <PageTemplate
+      title="Vehicle Maker Management"
       requiredRoles={[Role.ADMIN, Role.MANAGER, Role.STAFF]}
     >
       <div className="w-full">
@@ -258,7 +258,7 @@ export default function VehicleMakerPage() {
             )}
           </div>
         </div>
-        
+
         {/* Add new maker form */}
         {addingMaker && (
           <div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50">
@@ -277,7 +277,7 @@ export default function VehicleMakerPage() {
                 />
               </div>
             </div>
-            
+
             <div className="mt-4 flex gap-2 justify-end">
               <button
                 onClick={() => setAddingMaker(false)}
@@ -294,14 +294,14 @@ export default function VehicleMakerPage() {
             </div>
           </div>
         )}
-        
+
         {/* Error message */}
         {error && (
           <div className="p-4 my-4 bg-red-50 text-red-600 rounded-md border border-red-200">
             {error}
           </div>
         )}
-        
+
         {/* Makers table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border rounded-lg">
@@ -326,7 +326,8 @@ export default function VehicleMakerPage() {
               ) : makers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No vehicle makers found. Add your first maker by clicking the &quot;Add New Maker&quot; button.
+                    No vehicle makers found. Add your first maker by clicking the &quot;Add New
+                    Maker&quot; button.
                   </td>
                 </tr>
               ) : (
@@ -349,19 +350,23 @@ export default function VehicleMakerPage() {
                       )}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {users[maker.updated_by] 
+                      {users[maker.updated_by]
                         ? `${users[maker.updated_by].first_name} ${users[maker.updated_by].last_name}`
                         : maker.updated_by}
                     </td>
-                    <td className="py-2 px-4 border-b">{new Date(maker.updated_at).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false
-                    }).replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}</td>
+                    <td className="py-2 px-4 border-b">
+                      {new Date(maker.updated_at)
+                        .toLocaleString('en-GB', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: false,
+                        })
+                        .replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}
+                    </td>
                     <td className="py-2 px-4 border-b text-center">
                       {editMakerId === maker.name ? (
                         <div className="flex justify-center gap-2">

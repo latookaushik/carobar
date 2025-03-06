@@ -1,11 +1,11 @@
 /**
  * Authentication Context
- * 
+ *
  * Centralized authentication state management for the Carobar application.
  * Provides login, logout, and auth state functionality throughout the app.
  */
 
-"use client";
+'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
@@ -26,7 +26,11 @@ export interface AuthUser {
 export interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
-  login: (companyId: string, userId: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    companyId: string,
+    userId: string,
+    password: string
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isAuthenticated: boolean;
   hasRole: (roles: string[]) => boolean;
@@ -57,16 +61,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         // Check if a token exists
         const storedToken = Cookies.get('token');
-        
+
         if (!storedToken) {
           setUser(null);
           setToken(null);
           setLoading(false);
           return;
         }
-        
+
         setToken(storedToken);
-        
+
         // Use the original API endpoint for now
         const response = await fetch('/api/verifyToken', {
           method: 'POST',
@@ -108,9 +112,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
-        return { 
-          success: false, 
-          error: data.error || 'Login failed' 
+        return {
+          success: false,
+          error: data.error || 'Login failed',
         };
       }
 
@@ -126,13 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Set user data from the API response
       setUser(data.user);
       setToken(token);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
-        error: 'An unexpected error occurred'
+      return {
+        success: false,
+        error: 'An unexpected error occurred',
       };
     }
   };
@@ -162,11 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     token,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 // Custom hook to use the auth context

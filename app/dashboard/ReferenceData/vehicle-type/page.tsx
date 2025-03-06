@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 /**
  * Vehicle Type Management Page
- * 
+ *
  * Provides UI for viewing, adding, editing, and deleting vehicle types
  * for the authenticated user's company.
  */
@@ -23,16 +23,16 @@ interface VehicleType {
 }
 
 export default function VehicleTypePage() {
-  const { } = useAuth();
-  
+  const {} = useAuth();
+
   const [vehicleTypes, setVehicleTypes] = useState<VehicleType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<Record<string, {first_name: string, last_name: string}>>({});
-  
+  const [users, setUsers] = useState<Record<string, { first_name: string; last_name: string }>>({});
+
   const [newType, setNewType] = useState('');
   const [addingType, setAddingType] = useState(false);
-  
+
   const [editTypeId, setEditTypeId] = useState<string | null>(null);
   const [editTypeValue, setEditTypeValue] = useState('');
 
@@ -46,21 +46,21 @@ export default function VehicleTypePage() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch users');
       }
-      
+
       const data = await response.json();
-      
+
       // Create a lookup object with user_id as key and name info as value
-      const userMap: Record<string, {first_name: string, last_name: string}> = {};
+      const userMap: Record<string, { first_name: string; last_name: string }> = {};
       if (data.users) {
-        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
-            last_name: user.last_name
+            last_name: user.last_name,
           };
         });
       }
@@ -74,23 +74,23 @@ export default function VehicleTypePage() {
   const fetchVehicleTypes = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/vehicle-types');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch vehicle types');
       }
-      
+
       const data = await response.json();
       setVehicleTypes(data.vehicleTypes || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -101,13 +101,13 @@ export default function VehicleTypePage() {
   const handleAddType = async () => {
     if (!newType.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Vehicle type cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Vehicle type cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/vehicle-types', {
         method: 'POST',
@@ -116,26 +116,26 @@ export default function VehicleTypePage() {
         },
         body: JSON.stringify({ vehicle_type: newType.trim() }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to add vehicle type');
       }
-      
+
       // Refresh vehicle types list and reset form
       await fetchVehicleTypes();
       setNewType('');
       setAddingType(false);
-      
+
       toast({
-        title: "Success",
-        description: "Vehicle type added successfully",
+        title: 'Success',
+        description: 'Vehicle type added successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -144,44 +144,44 @@ export default function VehicleTypePage() {
   const handleUpdateType = async (oldType: string) => {
     if (!editTypeValue.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Vehicle type cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Vehicle type cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/vehicle-types', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          oldType, 
-          newType: editTypeValue.trim() 
+        body: JSON.stringify({
+          oldType,
+          newType: editTypeValue.trim(),
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update vehicle type');
       }
-      
+
       // Refresh vehicle types list and reset edit state
       await fetchVehicleTypes();
       setEditTypeId(null);
       setEditTypeValue('');
-      
+
       toast({
-        title: "Success",
-        description: "Vehicle type updated successfully",
+        title: 'Success',
+        description: 'Vehicle type updated successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -191,29 +191,29 @@ export default function VehicleTypePage() {
     if (!window.confirm(`Are you sure you want to delete the vehicle type &quot;${type}&quot;?`)) {
       return;
     }
-    
+
     try {
       const response = await fetch(`/api/vehicle-types?type=${encodeURIComponent(type)}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete vehicle type');
       }
-      
+
       // Refresh vehicle types list
       await fetchVehicleTypes();
-      
+
       toast({
-        title: "Success",
-        description: "Vehicle type deleted successfully",
+        title: 'Success',
+        description: 'Vehicle type deleted successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -231,8 +231,8 @@ export default function VehicleTypePage() {
   };
 
   return (
-    <PageTemplate 
-      title="Vehicle Type Management" 
+    <PageTemplate
+      title="Vehicle Type Management"
       requiredRoles={[Role.ADMIN, Role.MANAGER, Role.STAFF]}
     >
       <div className="w-full">
@@ -258,14 +258,16 @@ export default function VehicleTypePage() {
             )}
           </div>
         </div>
-        
+
         {/* Add new vehicle type form */}
         {addingType && (
           <div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50">
             <h2 className="text-xl font-semibold mb-3">Add New Vehicle Type</h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Vehicle Type *
+                </label>
                 <input
                   type="text"
                   placeholder="Enter vehicle type"
@@ -277,7 +279,7 @@ export default function VehicleTypePage() {
                 />
               </div>
             </div>
-            
+
             <div className="mt-4 flex gap-2 justify-end">
               <button
                 onClick={() => setAddingType(false)}
@@ -294,14 +296,14 @@ export default function VehicleTypePage() {
             </div>
           </div>
         )}
-        
+
         {/* Error message */}
         {error && (
           <div className="p-4 my-4 bg-red-50 text-red-600 rounded-md border border-red-200">
             {error}
           </div>
         )}
-        
+
         {/* Vehicle types table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border rounded-lg">
@@ -326,7 +328,8 @@ export default function VehicleTypePage() {
               ) : vehicleTypes.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No vehicle types found. Add your first type by clicking the &quot;Add New Type&quot; button.
+                    No vehicle types found. Add your first type by clicking the &quot;Add New
+                    Type&quot; button.
                   </td>
                 </tr>
               ) : (
@@ -349,19 +352,23 @@ export default function VehicleTypePage() {
                       )}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {users[type.updated_by] 
+                      {users[type.updated_by]
                         ? `${users[type.updated_by].first_name} ${users[type.updated_by].last_name}`
                         : type.updated_by}
                     </td>
-                    <td className="py-2 px-4 border-b">{new Date(type.updated_at).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false
-                    }).replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}</td>
+                    <td className="py-2 px-4 border-b">
+                      {new Date(type.updated_at)
+                        .toLocaleString('en-GB', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: false,
+                        })
+                        .replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}
+                    </td>
                     <td className="py-2 px-4 border-b text-center">
                       {editTypeId === type.vehicle_type ? (
                         <div className="flex justify-center gap-2">

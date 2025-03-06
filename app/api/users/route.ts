@@ -1,6 +1,6 @@
 /**
  * Users API Route Handler
- * 
+ *
  * Provides operations to retrieve user information from the database.
  * All operations are secured and company-specific, ensuring proper data isolation.
  */
@@ -25,14 +25,14 @@ function createSuccessResponse<T>(data: T, status: number = HttpStatus.OK) {
  */
 export const GET = withUser(async (request: NextRequest) => {
   logInfo('GET /api/users - Fetching users');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
     const companyId = user!.companyId;
-    
+
     logDebug(`Fetching users for company: ${companyId}`);
-    
+
     // Query the database for users
     const users = await prisma.ref_users.findMany({
       where: { company_id: companyId },
@@ -45,20 +45,17 @@ export const GET = withUser(async (request: NextRequest) => {
         is_active: true,
         created_at: true,
         updated_at: true,
-        last_login_date: true
+        last_login_date: true,
       },
-      orderBy: { user_id: 'asc' }
+      orderBy: { user_id: 'asc' },
     });
-    
+
     logInfo(`Found ${users.length} users for company ${companyId}`);
-    
+
     // Return the users
     return createSuccessResponse({ users });
   } catch (error) {
     logError(`Error fetching users: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to fetch users',
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+    return createErrorResponse('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });

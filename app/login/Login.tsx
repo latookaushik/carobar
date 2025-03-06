@@ -1,40 +1,40 @@
 /**
  * Login Component
- * 
+ *
  * This component provides a login interface for users to authenticate into the Carobar application.
  * It allows users to enter their Company ID, User ID, and Password to gain access to their dashboard.
- * 
+ *
  * Features:
  * - State management for form inputs and error handling.
  * - Loading state to indicate when the login process is ongoing.
  * - Redirects users to their intended destination upon successful login.
  * - Displays error messages for invalid credentials or unexpected errors.
- * 
+ *
  * Usage:
  * - This component should be used within a client-side rendered page in Next.js.
  * - It utilizes the `useAuth` context for handling authentication logic.
- * 
+ *
  * Props:
  * - None, as it manages its own internal state.
- * 
+ *
  * Example:
  * ```jsx
  * <Login />
  * ```
  */
 
-"use client"
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+'use client';
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 export function Login() {
-  const [companyId, setCompanyId] = useState("");
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [companyId, setCompanyId] = useState('');
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,20 +42,23 @@ export function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
-    
+
     try {
       const result = await login(companyId, userId, password);
-      
+
       if (result.success) {
         router.push(from);
       } else {
-        setError(result.error || "Invalid credentials. Please check your Company ID, User ID, and Password.");
+        setError(
+          result.error ||
+            'Invalid credentials. Please check your Company ID, User ID, and Password.'
+        );
       }
     } catch (err) {
       console.error(err);
-      setError("An unexpected error occurred. Please try again later.");
+      setError('An unexpected error occurred. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +80,7 @@ export function Login() {
             onChange={(e) => setCompanyId(e.target.value)}
           />
         </div>
-        
+
         <div className="mb-4">
           <label htmlFor="user-id" className="block text-sm font-medium text-gray-700">
             User ID
@@ -111,9 +114,7 @@ export function Login() {
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
           <div className="flex">
             <div>
-              <p className="text-sm text-red-700">
-                {error}
-              </p>
+              <p className="text-sm text-red-700">{error}</p>
             </div>
           </div>
         </div>

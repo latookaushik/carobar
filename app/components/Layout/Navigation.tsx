@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -77,32 +77,32 @@ export default function Navigation({ user }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const dropdownRefs = useRef<Record<string, HTMLElement | null>>({});
-  
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (openCategory && !event.target) return;
-      
+
       const target = event.target as Node;
       const dropdown = dropdownRefs.current[openCategory || ''];
-      
+
       if (dropdown && !dropdown.contains(target)) {
         setOpenCategory(null);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [openCategory]);
-  
+
   // Close dropdowns when route changes
   useEffect(() => {
     setOpenCategory(null);
     setIsMobileMenuOpen(false);
   }, [pathname]);
-  
+
   const toggleCategory = (category: string) => {
     if (openCategory === category) {
       setOpenCategory(null);
@@ -114,37 +114,39 @@ export default function Navigation({ user }: NavigationProps) {
   // Filter menu items based on user role
   const getFilteredMenu = () => {
     if (!user) return [];
-    
+
     const { roleId } = user;
-    
+
     // Check if user is a super admin
     const isSuperAdmin = roleId === 'SA';
-    
+
     // If super admin, return all menu items
     if (isSuperAdmin) {
       return menuStructure;
     }
-    
+
     // Filter menu items for company users (CA or CU)
-    return menuStructure.map(category => ({
-      ...category,
-      items: category.items.filter(item => {
-        // If the item has specific roles defined, check if user's role is included
-        if (item.roles && !item.roles.includes(roleId)) {
-          return false;
-        }
-        
-        return true;
-      })
-    })).filter(category => category.items.length > 0); // Only show categories with items
+    return menuStructure
+      .map((category) => ({
+        ...category,
+        items: category.items.filter((item) => {
+          // If the item has specific roles defined, check if user's role is included
+          if (item.roles && !item.roles.includes(roleId)) {
+            return false;
+          }
+
+          return true;
+        }),
+      }))
+      .filter((category) => category.items.length > 0); // Only show categories with items
   };
 
   const filteredMenu = getFilteredMenu();
 
   // Find active category based on current path
-  const activeCategory = filteredMenu.find(category => 
-    category.items.some(item => pathname.startsWith(item.href))
-  )?.label || null;
+  const activeCategory =
+    filteredMenu.find((category) => category.items.some((item) => pathname.startsWith(item.href)))
+      ?.label || null;
 
   return (
     <>
@@ -169,11 +171,13 @@ export default function Navigation({ user }: NavigationProps) {
                 aria-expanded={openCategory === category.label}
               >
                 <span>{category.label}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform ${
-                  openCategory === category.label ? 'rotate-180' : ''
-                }`} />
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform ${
+                    openCategory === category.label ? 'rotate-180' : ''
+                  }`}
+                />
               </button>
-              
+
               {openCategory === category.label && (
                 <div className="absolute left-0 top-full z-50 w-56 bg-white shadow-lg rounded-b-md py-2 border border-gray-200">
                   {category.items.map((item) => (
@@ -199,15 +203,11 @@ export default function Navigation({ user }: NavigationProps) {
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-1 rounded-md text-white hover:bg-maroon-700"
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
-        
+
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
           <div className="absolute left-0 right-0 top-14 z-50 bg-maroon-600 border-t border-maroon-700 shadow-md">
@@ -220,11 +220,13 @@ export default function Navigation({ user }: NavigationProps) {
                   }`}
                 >
                   <span>{category.label}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${
-                    openCategory === category.label ? 'rotate-180' : ''
-                  }`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      openCategory === category.label ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
-                
+
                 {openCategory === category.label && (
                   <div className="bg-maroon-700 py-1">
                     {category.items.map((item) => (

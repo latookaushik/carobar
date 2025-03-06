@@ -69,21 +69,24 @@ const defaultNewCounterparty: EditingCounterparty = {
   is_repair: false,
   is_localtransport: false,
   is_shipper: false,
-  is_journal: false
+  is_journal: false,
 };
 
 export default function CounterpartyManagement() {
-  const { /* user */ } = useAuth();
+  const {
+    /* user */
+  } = useAuth();
   const [counterparties, setCounterparties] = useState<Counterparty[]>([]);
   const [filteredCounterparties, setFilteredCounterparties] = useState<Counterparty[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentCounterparty, setCurrentCounterparty] = useState<EditingCounterparty>(defaultNewCounterparty);
+  const [currentCounterparty, setCurrentCounterparty] =
+    useState<EditingCounterparty>(defaultNewCounterparty);
   const [oldCode, setOldCode] = useState<string>('');
   const modalRef = useRef<HTMLDivElement>(null);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -93,7 +96,7 @@ export default function CounterpartyManagement() {
     try {
       setLoading(true);
       console.log('Fetching counterparties...');
-      
+
       const response = await fetch('/api/counterparties');
       console.log('Response status:', response.status);
 
@@ -109,9 +112,9 @@ export default function CounterpartyManagement() {
     } catch (error) {
       console.error('Error fetching counterparties:', error);
       toast({
-        title: "Error",
-        description: "Failed to load counterparties. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load counterparties. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -130,36 +133,37 @@ export default function CounterpartyManagement() {
     }
 
     if (isAddEditModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isAddEditModalOpen]);
 
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (searchTerm.trim() === '') {
       setFilteredCounterparties(counterparties);
     } else {
       const term = searchTerm.toLowerCase();
       const filtered = counterparties.filter(
-        cp => 
-          (cp.code?.toLowerCase().includes(term) || 
-          cp.name?.toLowerCase().includes(term) || 
+        (cp) =>
+          cp.code?.toLowerCase().includes(term) ||
+          cp.name?.toLowerCase().includes(term) ||
           cp.email?.toLowerCase().includes(term) ||
-          cp.phone?.toLowerCase().includes(term))
+          cp.phone?.toLowerCase().includes(term)
       );
       setFilteredCounterparties(filtered);
     }
-    
+
     // Reset to first page when search results change
     setCurrentPage(1);
     // Calculate total pages
     const total = Math.ceil(
-      (searchTerm.trim() === "" ? counterparties.length : filteredCounterparties.length) / itemsPerPage
+      (searchTerm.trim() === '' ? counterparties.length : filteredCounterparties.length) /
+        itemsPerPage
     );
     setTotalPages(total || 1); // Ensure at least 1 page
   }, [searchTerm, counterparties, itemsPerPage, filteredCounterparties.length]);
@@ -188,7 +192,7 @@ export default function CounterpartyManagement() {
       is_repair: counterparty.is_repair || false,
       is_localtransport: counterparty.is_localtransport || false,
       is_shipper: counterparty.is_shipper || false,
-      is_journal: counterparty.is_journal || false
+      is_journal: counterparty.is_journal || false,
     });
     setOldCode(counterparty.code);
     setIsEditing(true);
@@ -213,9 +217,9 @@ export default function CounterpartyManagement() {
     try {
       if (!currentCounterparty.code || !currentCounterparty.name) {
         toast({
-          title: "Validation Error",
-          description: "Code and Name are required fields.",
-          variant: "destructive"
+          title: 'Validation Error',
+          description: 'Code and Name are required fields.',
+          variant: 'destructive',
         });
         return;
       }
@@ -223,9 +227,9 @@ export default function CounterpartyManagement() {
       const response = await fetch('/api/counterparties', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(currentCounterparty)
+        body: JSON.stringify(currentCounterparty),
       });
 
       if (!response.ok) {
@@ -234,19 +238,20 @@ export default function CounterpartyManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Counterparty added successfully."
+        title: 'Success',
+        description: 'Counterparty added successfully.',
       });
 
       closeModal();
       fetchCounterparties();
     } catch (error: unknown) {
       console.error('Error adding counterparty:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to add counterparty. Please try again.";
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to add counterparty. Please try again.';
       toast({
-        title: "Error",
+        title: 'Error',
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -255,9 +260,9 @@ export default function CounterpartyManagement() {
     try {
       if (!currentCounterparty.code || !currentCounterparty.name) {
         toast({
-          title: "Validation Error",
-          description: "Code and Name are required fields.",
-          variant: "destructive"
+          title: 'Validation Error',
+          description: 'Code and Name are required fields.',
+          variant: 'destructive',
         });
         return;
       }
@@ -265,13 +270,13 @@ export default function CounterpartyManagement() {
       const response = await fetch('/api/counterparties', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           oldCode: oldCode,
           newCode: currentCounterparty.code,
-          ...currentCounterparty
-        })
+          ...currentCounterparty,
+        }),
       });
 
       if (!response.ok) {
@@ -280,19 +285,20 @@ export default function CounterpartyManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Counterparty updated successfully."
+        title: 'Success',
+        description: 'Counterparty updated successfully.',
       });
 
       closeModal();
       fetchCounterparties();
     } catch (error: unknown) {
       console.error('Error updating counterparty:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to update counterparty. Please try again.";
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to update counterparty. Please try again.';
       toast({
-        title: "Error",
+        title: 'Error',
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -304,7 +310,7 @@ export default function CounterpartyManagement() {
 
     try {
       const response = await fetch(`/api/counterparties?code=${encodeURIComponent(code)}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
 
       if (!response.ok) {
@@ -313,18 +319,19 @@ export default function CounterpartyManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Counterparty deleted successfully."
+        title: 'Success',
+        description: 'Counterparty deleted successfully.',
       });
 
       fetchCounterparties();
     } catch (error: unknown) {
       console.error('Error deleting counterparty:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete counterparty. Please try again.";
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to delete counterparty. Please try again.';
       toast({
-        title: "Error",
+        title: 'Error',
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -334,24 +341,21 @@ export default function CounterpartyManagement() {
     const addressParts = [cp.address1, cp.address2, cp.address3].filter(Boolean);
     return addressParts.join(', ');
   };
-  
+
   // Get paginated data
   const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filteredCounterparties.slice(startIndex, endIndex);
   };
-  
+
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
   return (
-    <PageTemplate
-      title="Counterparty Management"
-      requiredRoles={CheckRoles.allRoles}
-    >
+    <PageTemplate title="Counterparty Management" requiredRoles={CheckRoles.allRoles}>
       <div className="w-full">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Counterparty Management</h1>
@@ -407,11 +411,15 @@ export default function CounterpartyManagement() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="py-4 text-center">Loading counterparties...</td>
+                  <td colSpan={13} className="py-4 text-center">
+                    Loading counterparties...
+                  </td>
                 </tr>
               ) : filteredCounterparties.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="py-4 text-center">No counterparties found.</td>
+                  <td colSpan={13} className="py-4 text-center">
+                    No counterparties found.
+                  </td>
                 </tr>
               ) : (
                 getPaginatedData().map((cp) => (
@@ -423,22 +431,46 @@ export default function CounterpartyManagement() {
                     <td className="py-2 px-4 border-b">{cp.phone || '-'}</td>
                     <td className="py-2 px-4 border-b">{cp.mobile || '-'}</td>
                     <td className="py-2 px-4 border-b text-center">
-                      {cp.is_supplier ? <span className="text-green-600">Yes</span> : <span className="text-red-600">No</span>}
+                      {cp.is_supplier ? (
+                        <span className="text-green-600">Yes</span>
+                      ) : (
+                        <span className="text-red-600">No</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
-                      {cp.is_buyer ? <span className="text-green-600">Yes</span> : <span className="text-red-600">No</span>}
+                      {cp.is_buyer ? (
+                        <span className="text-green-600">Yes</span>
+                      ) : (
+                        <span className="text-red-600">No</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
-                      {cp.is_repair ? <span className="text-green-600">Yes</span> : <span className="text-red-600">No</span>}
+                      {cp.is_repair ? (
+                        <span className="text-green-600">Yes</span>
+                      ) : (
+                        <span className="text-red-600">No</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
-                      {cp.is_localtransport ? <span className="text-green-600">Yes</span> : <span className="text-red-600">No</span>}
+                      {cp.is_localtransport ? (
+                        <span className="text-green-600">Yes</span>
+                      ) : (
+                        <span className="text-red-600">No</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
-                      {cp.is_shipper ? <span className="text-green-600">Yes</span> : <span className="text-red-600">No</span>}
+                      {cp.is_shipper ? (
+                        <span className="text-green-600">Yes</span>
+                      ) : (
+                        <span className="text-red-600">No</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
-                      {cp.is_journal ? <span className="text-green-600">Yes</span> : <span className="text-red-600">No</span>}
+                      {cp.is_journal ? (
+                        <span className="text-green-600">Yes</span>
+                      ) : (
+                        <span className="text-red-600">No</span>
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       <div className="flex justify-center gap-2">
@@ -464,15 +496,17 @@ export default function CounterpartyManagement() {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {filteredCounterparties.length > 0 && (
           <div className="mt-4 flex justify-between items-center py-3 bg-gray-50 border rounded-md px-4">
             <div className="flex items-center">
               <span className="text-sm text-gray-700">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCounterparties.length)} of {filteredCounterparties.length} counterparties
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                {Math.min(currentPage * itemsPerPage, filteredCounterparties.length)} of{' '}
+                {filteredCounterparties.length} counterparties
               </span>
-              <select 
+              <select
                 className="ml-4 p-1 border rounded text-sm"
                 value={itemsPerPage}
                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
@@ -483,7 +517,7 @@ export default function CounterpartyManagement() {
                 <option value={100}>100 per page</option>
               </select>
             </div>
-            
+
             <div className="flex space-x-1">
               <button
                 onClick={() => handlePageChange(1)}
@@ -499,7 +533,7 @@ export default function CounterpartyManagement() {
               >
                 Previous
               </button>
-              
+
               {/* Page numbers */}
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 // Calculate which page numbers to show
@@ -513,22 +547,20 @@ export default function CounterpartyManagement() {
                 } else {
                   pageNum = currentPage - 2 + i;
                 }
-                
+
                 return (
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-3 py-1 border rounded text-sm ${
-                      currentPage === pageNum
-                        ? 'bg-blue-600 text-white'
-                        : 'hover:bg-gray-100'
+                      currentPage === pageNum ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'
                     }`}
                   >
                     {pageNum}
                   </button>
                 );
               })}
-              
+
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
@@ -554,7 +586,7 @@ export default function CounterpartyManagement() {
               <h2 className="text-lg font-semibold mb-3">
                 {isEditing ? 'Edit Counterparty' : 'Add New Counterparty'}
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Code *</label>
@@ -568,7 +600,7 @@ export default function CounterpartyManagement() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                   <input
@@ -581,7 +613,7 @@ export default function CounterpartyManagement() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input
@@ -593,7 +625,7 @@ export default function CounterpartyManagement() {
                     maxLength={50}
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                   <input
@@ -605,7 +637,7 @@ export default function CounterpartyManagement() {
                     maxLength={25}
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
                   <input
@@ -617,7 +649,7 @@ export default function CounterpartyManagement() {
                     maxLength={25}
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Fax</label>
                   <input
@@ -629,7 +661,7 @@ export default function CounterpartyManagement() {
                     maxLength={25}
                   />
                 </div>
-                
+
                 <div className="md:col-span-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                   <div className="space-y-2">
@@ -663,7 +695,7 @@ export default function CounterpartyManagement() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                 <div className="flex items-center">
                   <input
@@ -674,9 +706,11 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_supplier" className="text-sm font-medium text-gray-700">Supplier</label>
+                  <label htmlFor="is_supplier" className="text-sm font-medium text-gray-700">
+                    Supplier
+                  </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -686,9 +720,11 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_buyer" className="text-sm font-medium text-gray-700">Buyer</label>
+                  <label htmlFor="is_buyer" className="text-sm font-medium text-gray-700">
+                    Buyer
+                  </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -698,9 +734,11 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_repair" className="text-sm font-medium text-gray-700">Shuriya</label>
+                  <label htmlFor="is_repair" className="text-sm font-medium text-gray-700">
+                    Shuriya
+                  </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -710,9 +748,11 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_localtransport" className="text-sm font-medium text-gray-700">Riksoya</label>
+                  <label htmlFor="is_localtransport" className="text-sm font-medium text-gray-700">
+                    Riksoya
+                  </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -722,9 +762,11 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_shipper" className="text-sm font-medium text-gray-700">Shipper</label>
+                  <label htmlFor="is_shipper" className="text-sm font-medium text-gray-700">
+                    Shipper
+                  </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -734,9 +776,11 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_journal" className="text-sm font-medium text-gray-700">Journal AC</label>
+                  <label htmlFor="is_journal" className="text-sm font-medium text-gray-700">
+                    Journal AC
+                  </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -746,10 +790,12 @@ export default function CounterpartyManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
+                  <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                    Active
+                  </label>
                 </div>
               </div>
-              
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
                 <textarea
@@ -761,7 +807,7 @@ export default function CounterpartyManagement() {
                   maxLength={255}
                 ></textarea>
               </div>
-              
+
               <div className="flex justify-end gap-2">
                 <button
                   onClick={closeModal}

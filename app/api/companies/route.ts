@@ -1,6 +1,6 @@
 /**
  * Company API Routes
- * 
+ *
  * Handles fetching company data for the authenticated user.
  */
 
@@ -21,18 +21,18 @@ function createSuccessResponse<T>(data: T, status: number = HttpStatus.OK) {
 // GET /api/companies - Get the authenticated user's company data
 export const GET = withUser(async (request: NextRequest) => {
   logInfo('GET /api/companies - fetching company data');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
     const companyId = user!.companyId;
-    
+
     logDebug(`Fetching company data for company ID: ${companyId}`);
 
     // Query company data using Prisma
     const company = await prisma.ref_companies.findUnique({
       where: {
-        company_id: companyId
+        company_id: companyId,
       },
       select: {
         company_id: true,
@@ -53,27 +53,23 @@ export const GET = withUser(async (request: NextRequest) => {
         report_prefix: true,
         last_login_date: true,
         created_at: true,
-        updated_at: true
-      }
+        updated_at: true,
+      },
     });
-    
+
     if (!company) {
       logError(`Company with ID ${companyId} not found`);
-      return createErrorResponse(
-        'Company not found',
-        HttpStatus.NOT_FOUND
-      );
+      return createErrorResponse('Company not found', HttpStatus.NOT_FOUND);
     }
-    
+
     logInfo(`Successfully fetched company data for company ID: ${companyId}`);
-    
+
     // Return the company data
     return createSuccessResponse({ company });
   } catch (error) {
-    logError(`Error fetching company data: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to fetch company data',
-      HttpStatus.INTERNAL_SERVER_ERROR
+    logError(
+      `Error fetching company data: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+    return createErrorResponse('Failed to fetch company data', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });

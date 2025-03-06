@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -10,17 +10,14 @@ interface PageTemplateProps {
   requiredRoles?: string[];
 }
 
-export default function PageTemplate({ 
-  children,
-  requiredRoles = [] 
-}: PageTemplateProps) {
+export default function PageTemplate({ children, requiredRoles = [] }: PageTemplateProps) {
   const { loading, isAuthenticated, hasRole } = useAuth();
-  
+
   // Check if user is authenticated
   if (!loading && !isAuthenticated) {
     redirect('/login');
   }
-  
+
   // Check if user has required role (if specified)
   if (!loading && isAuthenticated && requiredRoles.length > 0) {
     if (!hasRole(requiredRoles)) {
@@ -28,7 +25,7 @@ export default function PageTemplate({
       redirect('/unauthorized');
     }
   }
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -36,12 +33,10 @@ export default function PageTemplate({
       </div>
     );
   }
-  
+
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1600px]">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        {children}
-      </div>
+      <div className="bg-white rounded-lg shadow-md p-6">{children}</div>
     </div>
   );
 }

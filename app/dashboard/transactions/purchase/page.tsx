@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
-import PurchaseModal from "./PurchaseModal";
-import PageTemplate from "@/app/components/PageTemplate";
+import { useState } from 'react';
+import { Plus } from 'lucide-react';
+import PurchaseModal from './PurchaseModal';
+import PageTemplate from '@/app/components/PageTemplate';
 
 export default function PurchasePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,16 +33,18 @@ export default function PurchasePage() {
             Add New Purchase
           </button>
         </div>
-        
+
         <div className="overflow-hidden border border-gray-200 rounded-lg">
           {/* Placeholder for purchase list - will be implemented in the future */}
           <div className="p-8 text-center text-gray-500">
             <p>Purchase data will be displayed here.</p>
-            <p className="text-sm mt-2">Click the &quot;Add New Purchase&quot; button to create a purchase.</p>
+            <p className="text-sm mt-2">
+              Click the &quot;Add New Purchase&quot; button to create a purchase.
+            </p>
           </div>
         </div>
       </div>
-      
+
       <PurchaseModal
         isOpen={isModalOpen}
         onClose={closeModal}

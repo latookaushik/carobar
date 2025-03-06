@@ -1,11 +1,11 @@
 /**
  * Protected Route Component
- * 
+ *
  * Wraps routes that require authentication or specific roles.
  * Redirects to login or unauthorized page as needed.
  */
 
-"use client";
+'use client';
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -21,7 +21,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({
   children,
   requiredRoles = [],
-  redirectTo = '/login'
+  redirectTo = '/login',
 }: ProtectedRouteProps) {
   const { isAuthenticated, loading, hasRole } = useAuth();
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function ProtectedRoute({
       sessionStorage.setItem('redirectAfterLogin', pathname);
       router.push(`${redirectTo}?from=${encodeURIComponent(pathname)}`);
     }
-    
+
     // Check role requirements if authenticated
     if (isAuthenticated && requiredRoles.length > 0) {
       if (!hasRole(requiredRoles)) {

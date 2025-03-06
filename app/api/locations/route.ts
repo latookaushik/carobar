@@ -1,6 +1,6 @@
 /**
  * Location Management API Routes
- * 
+ *
  * Handles CRUD operations for vehicle location management in Carobar.
  * Locations are company-specific and used in various vehicle-related forms.
  */
@@ -15,7 +15,7 @@ import { HttpStatus, Role } from '@/app/lib/enums';
 
 // Define validation schema for location data
 const locationSchema = z.object({
-  name: z.string().min(1).max(100)
+  name: z.string().min(1).max(100),
 });
 
 /**
@@ -28,14 +28,14 @@ function createSuccessResponse<T>(data: T, status: number = HttpStatus.OK) {
 // GET /api/locations - Get all locations for the authenticated user's company
 export const GET = withUser(async (request: NextRequest) => {
   logInfo('GET /api/locations - Fetching locations');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
     const companyId = user!.companyId;
-    
+
     logDebug(`Fetching locations for company: ${companyId}`);
-    
+
     // Query locations for this company using Prisma
     const locations = await prisma.ref_location.findMany({
       where: {
@@ -45,24 +45,23 @@ export const GET = withUser(async (request: NextRequest) => {
         name: 'asc',
       },
     });
-    
+
     logInfo(`Found ${locations.length} locations for company ${companyId}`);
-    
+
     // Return the locations
     return createSuccessResponse({ locations });
   } catch (error) {
-    logError(`Error fetching locations: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to fetch locations',
-      HttpStatus.INTERNAL_SERVER_ERROR
+    logError(
+      `Error fetching locations: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+    return createErrorResponse('Failed to fetch locations', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 // POST /api/locations - Create a new location
 export const POST = withUser(async (request: NextRequest) => {
   logInfo('POST /api/locations - Creating new location');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
@@ -71,21 +70,15 @@ export const POST = withUser(async (request: NextRequest) => {
     // Check role permissions
     const allowedRoles = [Role.ADMIN, Role.MANAGER, Role.STAFF];
     if (!allowedRoles.includes(roleId as Role)) {
-      return createErrorResponse(
-        'Permission denied',
-        HttpStatus.FORBIDDEN
-      );
+      return createErrorResponse('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     // Parse and validate request body
     const body = await request.json();
     const validationResult = locationSchema.safeParse(body);
-    
+
     if (!validationResult.success) {
-      return createErrorResponse(
-        'Validation failed',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Validation failed', HttpStatus.BAD_REQUEST);
     }
 
     const locationName = validationResult.data.name.trim().toUpperCase();
@@ -101,10 +94,7 @@ export const POST = withUser(async (request: NextRequest) => {
     });
 
     if (existingLocation) {
-      return createErrorResponse(
-        'Location already exists for this company',
-        HttpStatus.CONFLICT
-      );
+      return createErrorResponse('Location already exists for this company', HttpStatus.CONFLICT);
     }
 
     // Insert new location using Prisma
@@ -116,7 +106,7 @@ export const POST = withUser(async (request: NextRequest) => {
         updated_by: userId,
       },
     });
-    
+
     logInfo(`Location created: ${locationName} for company ${companyId}`);
 
     return createSuccessResponse(
@@ -124,18 +114,17 @@ export const POST = withUser(async (request: NextRequest) => {
       HttpStatus.CREATED
     );
   } catch (error) {
-    logError(`Error creating location: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to create location',
-      HttpStatus.INTERNAL_SERVER_ERROR
+    logError(
+      `Error creating location: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+    return createErrorResponse('Failed to create location', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 // PUT /api/locations - Update an existing location
 export const PUT = withUser(async (request: NextRequest) => {
   logInfo('PUT /api/locations - Updating location');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
@@ -144,10 +133,7 @@ export const PUT = withUser(async (request: NextRequest) => {
     // Check role permissions
     const allowedRoles = [Role.ADMIN, Role.MANAGER, Role.STAFF];
     if (!allowedRoles.includes(roleId as Role)) {
-      return createErrorResponse(
-        'Permission denied',
-        HttpStatus.FORBIDDEN
-      );
+      return createErrorResponse('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     // Parse and validate request body
@@ -155,19 +141,13 @@ export const PUT = withUser(async (request: NextRequest) => {
     const { oldName, newName } = body;
 
     if (!oldName || !newName) {
-      return createErrorResponse(
-        'Both oldName and newName are required',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Both oldName and newName are required', HttpStatus.BAD_REQUEST);
     }
 
     // Validate new location name
     const validationResult = locationSchema.safeParse({ name: newName });
     if (!validationResult.success) {
-      return createErrorResponse(
-        'Validation failed',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Validation failed', HttpStatus.BAD_REQUEST);
     }
 
     const formattedOldName = oldName.trim();
@@ -184,10 +164,7 @@ export const PUT = withUser(async (request: NextRequest) => {
     });
 
     if (!existingLocation) {
-      return createErrorResponse(
-        'Location does not exist',
-        HttpStatus.NOT_FOUND
-      );
+      return createErrorResponse('Location does not exist', HttpStatus.NOT_FOUND);
     }
 
     // Check if new location name already exists (if different from old name)
@@ -233,26 +210,27 @@ export const PUT = withUser(async (request: NextRequest) => {
         },
       }),
     ]);
-    
-    logInfo(`Location updated: ${formattedOldName} -> ${formattedNewName} for company ${companyId}`);
 
-    return createSuccessResponse({ 
-      message: 'Location updated successfully', 
-      name: formattedNewName 
+    logInfo(
+      `Location updated: ${formattedOldName} -> ${formattedNewName} for company ${companyId}`
+    );
+
+    return createSuccessResponse({
+      message: 'Location updated successfully',
+      name: formattedNewName,
     });
   } catch (error) {
-    logError(`Error updating location: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to update location',
-      HttpStatus.INTERNAL_SERVER_ERROR
+    logError(
+      `Error updating location: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+    return createErrorResponse('Failed to update location', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });
 
 // DELETE /api/locations - Delete a location
 export const DELETE = withUser(async (request: NextRequest) => {
   logInfo('DELETE /api/locations - Deleting location');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
@@ -261,10 +239,7 @@ export const DELETE = withUser(async (request: NextRequest) => {
     // Check role permissions
     const allowedRoles = [Role.ADMIN, Role.MANAGER];
     if (!allowedRoles.includes(roleId as Role)) {
-      return createErrorResponse(
-        'Permission denied',
-        HttpStatus.FORBIDDEN
-      );
+      return createErrorResponse('Permission denied', HttpStatus.FORBIDDEN);
     }
 
     // Get location name from URL parameters
@@ -272,10 +247,7 @@ export const DELETE = withUser(async (request: NextRequest) => {
     const name = url.searchParams.get('name');
 
     if (!name) {
-      return createErrorResponse(
-        'Location name parameter is required',
-        HttpStatus.BAD_REQUEST
-      );
+      return createErrorResponse('Location name parameter is required', HttpStatus.BAD_REQUEST);
     }
 
     // Check if location exists
@@ -289,10 +261,7 @@ export const DELETE = withUser(async (request: NextRequest) => {
     });
 
     if (!existingLocation) {
-      return createErrorResponse(
-        'Location does not exist',
-        HttpStatus.NOT_FOUND
-      );
+      return createErrorResponse('Location does not exist', HttpStatus.NOT_FOUND);
     }
 
     // Delete location using Prisma
@@ -304,15 +273,14 @@ export const DELETE = withUser(async (request: NextRequest) => {
         },
       },
     });
-    
+
     logInfo(`Location deleted: ${name} for company ${companyId}`);
 
     return createSuccessResponse({ message: 'Location deleted successfully' });
   } catch (error) {
-    logError(`Error deleting location: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return createErrorResponse(
-      'Failed to delete location',
-      HttpStatus.INTERNAL_SERVER_ERROR
+    logError(
+      `Error deleting location: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+    return createErrorResponse('Failed to delete location', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 });

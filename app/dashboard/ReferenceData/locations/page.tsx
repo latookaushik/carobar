@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 /**
  * Location Management Page
- * 
+ *
  * Provides UI for viewing, adding, editing, and deleting vehicle locations
  * for the authenticated user's company.
  */
@@ -23,16 +23,16 @@ interface Location {
 }
 
 export default function LocationsPage() {
-  const { } = useAuth();
-  
+  const {} = useAuth();
+
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<Record<string, {first_name: string, last_name: string}>>({});
-  
+  const [users, setUsers] = useState<Record<string, { first_name: string; last_name: string }>>({});
+
   const [newLocation, setNewLocation] = useState('');
   const [addingLocation, setAddingLocation] = useState(false);
-  
+
   const [editLocationId, setEditLocationId] = useState<string | null>(null);
   const [editLocationValue, setEditLocationValue] = useState('');
 
@@ -46,21 +46,21 @@ export default function LocationsPage() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch users');
       }
-      
+
       const data = await response.json();
-      
+
       // Create a lookup object with user_id as key and name info as value
-      const userMap: Record<string, {first_name: string, last_name: string}> = {};
+      const userMap: Record<string, { first_name: string; last_name: string }> = {};
       if (data.users) {
-        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
-            last_name: user.last_name
+            last_name: user.last_name,
           };
         });
       }
@@ -74,23 +74,23 @@ export default function LocationsPage() {
   const fetchLocations = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/locations');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch locations');
       }
-      
+
       const data = await response.json();
       setLocations(data.locations || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -101,13 +101,13 @@ export default function LocationsPage() {
   const handleAddLocation = async () => {
     if (!newLocation.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Location name cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Location name cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/locations', {
         method: 'POST',
@@ -116,26 +116,26 @@ export default function LocationsPage() {
         },
         body: JSON.stringify({ name: newLocation.trim() }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to add location');
       }
-      
+
       // Refresh locations list and reset form
       await fetchLocations();
       setNewLocation('');
       setAddingLocation(false);
-      
+
       toast({
-        title: "Success",
-        description: "Location added successfully",
+        title: 'Success',
+        description: 'Location added successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -144,44 +144,44 @@ export default function LocationsPage() {
   const handleUpdateLocation = async (oldName: string) => {
     if (!editLocationValue.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Location name cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Location name cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/locations', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          oldName, 
-          newName: editLocationValue.trim() 
+        body: JSON.stringify({
+          oldName,
+          newName: editLocationValue.trim(),
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update location');
       }
-      
+
       // Refresh locations list and reset edit state
       await fetchLocations();
       setEditLocationId(null);
       setEditLocationValue('');
-      
+
       toast({
-        title: "Success",
-        description: "Location updated successfully",
+        title: 'Success',
+        description: 'Location updated successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -191,29 +191,29 @@ export default function LocationsPage() {
     if (!window.confirm(`Are you sure you want to delete the location &quot;${name}&quot;?`)) {
       return;
     }
-    
+
     try {
       const response = await fetch(`/api/locations?name=${encodeURIComponent(name)}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete location');
       }
-      
+
       // Refresh locations list
       await fetchLocations();
-      
+
       toast({
-        title: "Success",
-        description: "Location deleted successfully",
+        title: 'Success',
+        description: 'Location deleted successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -231,8 +231,8 @@ export default function LocationsPage() {
   };
 
   return (
-    <PageTemplate 
-      title="Vehicle Location Management" 
+    <PageTemplate
+      title="Vehicle Location Management"
       requiredRoles={[Role.ADMIN, Role.MANAGER, Role.STAFF]}
     >
       <div className="w-full">
@@ -258,14 +258,16 @@ export default function LocationsPage() {
             )}
           </div>
         </div>
-        
+
         {/* Add new location form */}
         {addingLocation && (
           <div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50">
             <h2 className="text-xl font-semibold mb-3">Add New Location</h2>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location Name *
+                </label>
                 <input
                   type="text"
                   placeholder="Enter location name"
@@ -277,7 +279,7 @@ export default function LocationsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="mt-4 flex gap-2 justify-end">
               <button
                 onClick={() => setAddingLocation(false)}
@@ -294,14 +296,14 @@ export default function LocationsPage() {
             </div>
           </div>
         )}
-        
+
         {/* Error message */}
         {error && (
           <div className="p-4 my-4 bg-red-50 text-red-600 rounded-md border border-red-200">
             {error}
           </div>
         )}
-        
+
         {/* Locations table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border rounded-lg">
@@ -326,7 +328,8 @@ export default function LocationsPage() {
               ) : locations.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No locations found. Add your first location by clicking the &quot;Add New Location&quot; button.
+                    No locations found. Add your first location by clicking the &quot;Add New
+                    Location&quot; button.
                   </td>
                 </tr>
               ) : (
@@ -349,19 +352,23 @@ export default function LocationsPage() {
                       )}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {users[location.updated_by] 
+                      {users[location.updated_by]
                         ? `${users[location.updated_by].first_name} ${users[location.updated_by].last_name}`
                         : location.updated_by}
                     </td>
-                    <td className="py-2 px-4 border-b">{new Date(location.updated_at).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false
-                    }).replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}</td>
+                    <td className="py-2 px-4 border-b">
+                      {new Date(location.updated_at)
+                        .toLocaleString('en-GB', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: false,
+                        })
+                        .replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}
+                    </td>
                     <td className="py-2 px-4 border-b text-center">
                       {editLocationId === location.name ? (
                         <div className="flex justify-center gap-2">

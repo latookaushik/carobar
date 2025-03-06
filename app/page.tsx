@@ -1,7 +1,7 @@
-import Head from "next/head";
-import Header from "@/app/components/Layout/Header";
-import MainContent from "@/app/components/Layout/MainContent";
-import Footer from "@/app/components/Layout/Footer";
+import Head from 'next/head';
+import Header from '@/app/components/Layout/Header';
+import MainContent from '@/app/components/Layout/MainContent';
+import Footer from '@/app/components/Layout/Footer';
 
 export default function HomePage() {
   return (
@@ -17,7 +17,7 @@ export default function HomePage() {
 
       <Header />
 
-      <MainContent className="flex-grow"/>
+      <MainContent className="flex-grow" />
 
       <Footer />
     </div>

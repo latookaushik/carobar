@@ -8,18 +8,18 @@ import { RoleType } from './roleUtils';
 export const CheckRoles = {
   // All authenticated users
   allRoles: ['SA', 'CA', 'CU'] as RoleType[],
-  
+
   // Admin users only
   adminOnly: ['SA'] as RoleType[],
-  
+
   // Admin and company managers
   management: ['SA', 'CA'] as RoleType[],
-  
+
   // Company managers and staff
   companyUsers: ['CA', 'CU'] as RoleType[],
-  
+
   // All users including public
-  public: ['SA', 'CA', 'CU', 'PUBLIC'] as RoleType[]
+  public: ['SA', 'CA', 'CU', 'PUBLIC'] as RoleType[],
 };
 
 /**
@@ -41,7 +41,7 @@ export function parseDateToYYYYMMDD(date: Date | string): number {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  
+
   return parseInt(`${year}${month}${day}`);
 }
 
@@ -52,10 +52,10 @@ export function parseDateToYYYYMMDD(date: Date | string): number {
  */
 export function formatIntDateToString(dateInt: number): string {
   if (!dateInt) return '';
-  
+
   const dateStr = dateInt.toString();
   if (dateStr.length !== 8) return '';
-  
+
   return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
 }
 

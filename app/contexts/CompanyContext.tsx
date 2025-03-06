@@ -1,13 +1,20 @@
 /**
  * Company Context
- * 
+ *
  * Centralized company data cache for the Carobar application.
  * Provides company information throughout the app during user sessions.
  */
 
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from 'react';
 import { useAuth } from './AuthContext';
 import { logError } from '@/app/lib/logger';
 
@@ -72,7 +79,7 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
       const response = await fetch('/api/companies', {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -83,7 +90,8 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
       setCompany(data.company);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error fetching company data';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error fetching company data';
       logError(errorMessage);
       setError(errorMessage);
     } finally {
@@ -109,20 +117,16 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
     refreshCompanyData,
   };
 
-  return (
-    <CompanyContext.Provider value={value}>
-      {children}
-    </CompanyContext.Provider>
-  );
+  return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>;
 }
 
 // Custom hook to use the company context
 export function useCompany() {
   const context = useContext(CompanyContext);
-  
+
   if (context === undefined) {
     throw new Error('useCompany must be used within a CompanyProvider');
   }
-  
+
   return context;
 }

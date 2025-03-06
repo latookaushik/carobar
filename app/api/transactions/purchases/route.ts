@@ -1,6 +1,6 @@
 /**
  * Purchases API Route Handler
- * 
+ *
  * Provides operations for vehicle purchases in the Carobar application.
  * All operations are secured and company-specific, ensuring proper data isolation.
  */
@@ -40,18 +40,18 @@ export const POST = withUser(async (request: NextRequest) => {
     if (!user) {
       return createErrorResponse('User not authenticated', HttpStatus.UNAUTHORIZED);
     }
-    
+
     const { companyId, userId } = user;
     logDebug(`Processing purchase for company: ${companyId}`);
-    
+
     // Parse request body
     const data = await request.json();
-    
+
     // Validate required fields
     if (!data.purchase_date || !data.supplier_code || !data.chassis_no) {
       return createErrorResponse('Missing required fields', HttpStatus.BAD_REQUEST);
     }
-    
+
     // Prepare vehicle data
     const vehicleData = {
       company_id: companyId,
@@ -79,7 +79,7 @@ export const POST = withUser(async (request: NextRequest) => {
       is_4wd: data.is_4wd || false,
       is_alloy_wheel: data.is_alloy_wheel || false,
       is_full_option: data.is_full_option || false,
-      is_active:  data.is_active || false,
+      is_active: data.is_active || false,
       gear_type: data.gear_type || '',
       auction_ref_no: data.auction_no || '',
       inspection_rank: data.rank || 0,
@@ -88,27 +88,27 @@ export const POST = withUser(async (request: NextRequest) => {
       created_by: userId,
       created_at: new Date(),
       updated_by: userId,
-      updated_at: new Date()
+      updated_at: new Date(),
     };
-    
+
     // Use upsert to create or update the vehicle
     await prisma.vehicle.upsert({
       where: {
         company_id_chassis_no: {
           company_id: companyId,
-          chassis_no: data.chassis_no
-        }
+          chassis_no: data.chassis_no,
+        },
       },
       update: {
         ...vehicleData,
         updated_at: new Date(),
-        updated_by: userId
+        updated_by: userId,
       },
-      create: vehicleData
+      create: vehicleData,
     });
-    
+
     logInfo(`Vehicle record created/updated for chassis: ${data.chassis_no}`);
-    
+
     // Create purchase record after ensuring vehicle exists
     const purchaseRecord = await prisma.vehicle_purchase.create({
       data: {
@@ -127,17 +127,19 @@ export const POST = withUser(async (request: NextRequest) => {
         payment_date: data.payment_date,
         purchase_remarks: data.purchase_remarks || '',
         created_by: userId,
-        created_at: new Date()
-      }
+        created_at: new Date(),
+      },
     });
-    
+
     logInfo(`Purchase record created for chassis: ${data.chassis_no}`);
-    
-    return createSuccessResponse({ 
-      message: 'Purchase created successfully',
-      purchase: purchaseRecord
-    }, HttpStatus.CREATED);
-    
+
+    return createSuccessResponse(
+      {
+        message: 'Purchase created successfully',
+        purchase: purchaseRecord,
+      },
+      HttpStatus.CREATED
+    );
   } catch (error) {
     return handleApiError(error, 'Failed to create purchase');
   }
@@ -149,16 +151,16 @@ export const POST = withUser(async (request: NextRequest) => {
  */
 export const GET = withUser(async (request: NextRequest) => {
   logInfo('GET /api/transactions/purchases - Fetching purchases');
-  
+
   try {
     // Get the authenticated user from the request
     const user = getAuthUser(request);
     if (!user) {
       return createErrorResponse('User not authenticated', HttpStatus.UNAUTHORIZED);
     }
-    
+
     const { companyId } = user;
-    
+
     // Parse any filter parameters from the URL
     const { searchParams } = new URL(request.url);
     const chassisNo = searchParams.get('chassis');
@@ -166,55 +168,56 @@ export const GET = withUser(async (request: NextRequest) => {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const skip = (page - 1) * pageSize;
-    
-    logDebug(`Fetching purchases for company: ${companyId} with filters: chassis=${chassisNo}, supplier=${supplierCode}`);
-    
+
+    logDebug(
+      `Fetching purchases for company: ${companyId} with filters: chassis=${chassisNo}, supplier=${supplierCode}`
+    );
+
     // Build where clause based on filters
     const whereCondition: Record<string, unknown> = { company_id: companyId };
-    
+
     if (chassisNo) {
       whereCondition.chassis_no = chassisNo;
     }
-    
+
     if (supplierCode) {
       whereCondition.supplier_code = supplierCode;
     }
-    
+
     // Get purchases with vehicle info
     const purchases = await prisma.vehicle_purchase.findMany({
       where: whereCondition,
       orderBy: {
-        created_at: 'desc'
+        created_at: 'desc',
       },
       include: {
         vehicle: {
           select: {
             vehicle_name: true,
             maker: true,
-            color: true
-          }
-        }
+            color: true,
+          },
+        },
       },
       skip,
-      take: pageSize
+      take: pageSize,
     });
-    
+
     // Get total count for pagination
     const total = await prisma.vehicle_purchase.count({ where: whereCondition });
     const totalPages = Math.ceil(total / pageSize);
-    
+
     logInfo(`Found ${purchases.length} purchases for company ${companyId}`);
-    
+
     return createSuccessResponse({
       purchases,
       pagination: {
         total,
         page,
         pageSize,
-        totalPages
-      }
+        totalPages,
+      },
     });
-    
   } catch (error) {
     return handleApiError(error, 'Failed to fetch purchases');
   }

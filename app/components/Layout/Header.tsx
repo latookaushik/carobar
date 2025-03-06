@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import AuthStatus from '@/app/components/Auth/AuthStatus';
 import Navigation from '@/app/components/Layout/Navigation';
@@ -8,7 +8,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function Header() {
   const { user, loading, isAuthenticated } = useAuth();
-  
+
   return (
     <header className="bg-maroon-500 shadow-md">
       <div className="mx-auto flex items-center h-14 p-[2px]">
@@ -36,9 +36,30 @@ export default function Header() {
             /* Public Navigation */
             <nav>
               <ul className="flex space-x-6">
-                <li><a href="#features" className="text-white hover:text-gray-200 font-medium text-sm uppercase tracking-wide">Features</a></li>
-                <li><a href="#subscription" className="text-white hover:text-gray-200 font-medium text-sm uppercase tracking-wide">Subscription</a></li>
-                <li><a href="#contact" className="text-white hover:text-gray-200 font-medium text-sm uppercase tracking-wide">Contact Us</a></li>
+                <li>
+                  <a
+                    href="#features"
+                    className="text-white hover:text-gray-200 font-medium text-sm uppercase tracking-wide"
+                  >
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#subscription"
+                    className="text-white hover:text-gray-200 font-medium text-sm uppercase tracking-wide"
+                  >
+                    Subscription
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#contact"
+                    className="text-white hover:text-gray-200 font-medium text-sm uppercase tracking-wide"
+                  >
+                    Contact Us
+                  </a>
+                </li>
               </ul>
             </nav>
           ) : null}

@@ -1,10 +1,10 @@
 /**
  * StatusBadge Component
- * 
+ *
  * A reusable badge component for displaying status information consistently
  * throughout the application. Automatically applies appropriate colors based
  * on status type.
- * 
+ *
  * @component
  * @example
  * ```tsx
@@ -17,10 +17,10 @@
 import React from 'react';
 
 // Common status types used across the application
-export type CommonStatusType = 
-  | 'Completed' 
-  | 'Pending' 
-  | 'Processing' 
+export type CommonStatusType =
+  | 'Completed'
+  | 'Pending'
+  | 'Processing'
   | 'Cancelled'
   | 'Failed'
   | 'Shipped'
@@ -33,27 +33,27 @@ export type CommonStatusType =
   | string;
 
 // Predefined color variants
-export type StatusVariant = 
-  | 'success'   // Green - positive outcomes
-  | 'warning'   // Yellow - requires attention
-  | 'info'      // Blue - informational
-  | 'error'     // Red - errors or problems
-  | 'default'   // Gray - neutral
-  | 'custom';   // Use custom colors defined in customColors
+export type StatusVariant =
+  | 'success' // Green - positive outcomes
+  | 'warning' // Yellow - requires attention
+  | 'info' // Blue - informational
+  | 'error' // Red - errors or problems
+  | 'default' // Gray - neutral
+  | 'custom'; // Use custom colors defined in customColors
 
 interface StatusBadgeProps {
   /** The status text to display */
   status: CommonStatusType;
-  
+
   /** Optional predefined color variant */
   variant?: StatusVariant;
-  
+
   /** Optional custom background color class (Tailwind) */
   customBgColor?: string;
-  
+
   /** Optional custom text color class (Tailwind) */
   customTextColor?: string;
-  
+
   /** Optional additional CSS classes */
   className?: string;
 }
@@ -64,21 +64,21 @@ interface StatusBadgeProps {
 function getVariantForStatus(status: CommonStatusType): StatusVariant {
   // Map common statuses to their appropriate variants
   const statusMap: Record<string, StatusVariant> = {
-    'Completed': 'success',
-    'Delivered': 'success',
-    'Active': 'success',
+    Completed: 'success',
+    Delivered: 'success',
+    Active: 'success',
     'In Stock': 'success',
-    
-    'Pending': 'warning',
-    'Processing': 'info',
+
+    Pending: 'warning',
+    Processing: 'info',
     'In Transit': 'info',
-    'Reserved': 'info',
-    
-    'Cancelled': 'error',
-    'Failed': 'error',
-    'Inactive': 'error'
+    Reserved: 'info',
+
+    Cancelled: 'error',
+    Failed: 'error',
+    Inactive: 'error',
   };
-  
+
   return statusMap[status] || 'default';
 }
 
@@ -87,14 +87,14 @@ function getVariantForStatus(status: CommonStatusType): StatusVariant {
  */
 function getColorsForVariant(variant: StatusVariant): { bg: string; text: string } {
   const variantMap: Record<StatusVariant, { bg: string; text: string }> = {
-    'success': { bg: 'bg-green-100', text: 'text-green-800' },
-    'warning': { bg: 'bg-yellow-100', text: 'text-yellow-800' },
-    'info': { bg: 'bg-blue-100', text: 'text-blue-800' },
-    'error': { bg: 'bg-red-100', text: 'text-red-800' },
-    'default': { bg: 'bg-gray-100', text: 'text-gray-800' },
-    'custom': { bg: '', text: '' } // Will be overridden by custom colors
+    success: { bg: 'bg-green-100', text: 'text-green-800' },
+    warning: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+    info: { bg: 'bg-blue-100', text: 'text-blue-800' },
+    error: { bg: 'bg-red-100', text: 'text-red-800' },
+    default: { bg: 'bg-gray-100', text: 'text-gray-800' },
+    custom: { bg: '', text: '' }, // Will be overridden by custom colors
   };
-  
+
   return variantMap[variant];
 }
 
@@ -103,25 +103,22 @@ export default function StatusBadge({
   variant,
   customBgColor,
   customTextColor,
-  className = ''
+  className = '',
 }: StatusBadgeProps) {
   // Determine the variant if not explicitly provided
   const effectiveVariant = variant || getVariantForStatus(status);
-  
+
   // Get the appropriate colors
   const colors = getColorsForVariant(effectiveVariant);
-  
+
   // Use custom colors if provided and variant is custom
-  const bgColor = (effectiveVariant === 'custom' && customBgColor) 
-    ? customBgColor 
-    : colors.bg;
-    
-  const textColor = (effectiveVariant === 'custom' && customTextColor) 
-    ? customTextColor 
-    : colors.text;
-  
+  const bgColor = effectiveVariant === 'custom' && customBgColor ? customBgColor : colors.bg;
+
+  const textColor =
+    effectiveVariant === 'custom' && customTextColor ? customTextColor : colors.text;
+
   return (
-    <span 
+    <span
       className={`px-2 py-1 text-xs font-semibold rounded-full ${bgColor} ${textColor} ${className}`}
     >
       {status}

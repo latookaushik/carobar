@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 /**
  * Color Management Page
- * 
+ *
  * Provides UI for viewing, adding, editing, and deleting colors
  * for the authenticated user's company.
  */
@@ -33,7 +33,7 @@ const isValidColor = (color: string): boolean => {
 const isLightColor = (color: string): boolean => {
   // If not valid color, return true (we'll treat as light)
   if (!isValidColor(color)) return true;
-  
+
   try {
     // Convert to RGB then calculate luminance
     const s = new Option().style;
@@ -44,19 +44,19 @@ const isLightColor = (color: string): boolean => {
     document.body.appendChild(tempDiv);
     const computedColor = getComputedStyle(tempDiv).color;
     document.body.removeChild(tempDiv);
-    
+
     // Extract RGB values if format is "rgb(r, g, b)"
     const rgbMatch = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
     if (rgbMatch) {
       const r = parseInt(rgbMatch[1], 10) / 255;
       const g = parseInt(rgbMatch[2], 10) / 255;
       const b = parseInt(rgbMatch[3], 10) / 255;
-      
+
       // Calculate luminance
       const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
       return luminance > 0.5;
     }
-    
+
     return true; // Default to light if we can't determine
   } catch (error) {
     console.error('Error determining color brightness:', error);
@@ -65,16 +65,16 @@ const isLightColor = (color: string): boolean => {
 };
 
 export default function ColorsPage() {
-  const { } = useAuth();
-  
+  const {} = useAuth();
+
   const [colors, setColors] = useState<Color[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<Record<string, {first_name: string, last_name: string}>>({});
-  
+  const [users, setUsers] = useState<Record<string, { first_name: string; last_name: string }>>({});
+
   const [newColor, setNewColor] = useState('');
   const [addingColor, setAddingColor] = useState(false);
-  
+
   const [editColorId, setEditColorId] = useState<string | null>(null);
   const [editColorValue, setEditColorValue] = useState('');
 
@@ -88,21 +88,21 @@ export default function ColorsPage() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch users');
       }
-      
+
       const data = await response.json();
-      
+
       // Create a lookup object with user_id as key and name info as value
-      const userMap: Record<string, {first_name: string, last_name: string}> = {};
+      const userMap: Record<string, { first_name: string; last_name: string }> = {};
       if (data.users) {
-        data.users.forEach((user: { user_id: string; first_name: string; last_name: string; }) => {
+        data.users.forEach((user: { user_id: string; first_name: string; last_name: string }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
-            last_name: user.last_name
+            last_name: user.last_name,
           };
         });
       }
@@ -116,23 +116,23 @@ export default function ColorsPage() {
   const fetchColors = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/colors');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch colors');
       }
-      
+
       const data = await response.json();
       setColors(data.colors || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -143,13 +143,13 @@ export default function ColorsPage() {
   const handleAddColor = async () => {
     if (!newColor.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Color name cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Color name cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/colors', {
         method: 'POST',
@@ -158,26 +158,26 @@ export default function ColorsPage() {
         },
         body: JSON.stringify({ color: newColor.trim() }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to add color');
       }
-      
+
       // Refresh colors list and reset form
       await fetchColors();
       setNewColor('');
       setAddingColor(false);
-      
+
       toast({
-        title: "Success",
-        description: "Color added successfully",
+        title: 'Success',
+        description: 'Color added successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -186,44 +186,44 @@ export default function ColorsPage() {
   const handleUpdateColor = async (oldColor: string) => {
     if (!editColorValue.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Color name cannot be empty",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Color name cannot be empty',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     try {
       const response = await fetch('/api/colors', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          oldColor, 
-          newColor: editColorValue.trim() 
+        body: JSON.stringify({
+          oldColor,
+          newColor: editColorValue.trim(),
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update color');
       }
-      
+
       // Refresh colors list and reset edit state
       await fetchColors();
       setEditColorId(null);
       setEditColorValue('');
-      
+
       toast({
-        title: "Success",
-        description: "Color updated successfully",
+        title: 'Success',
+        description: 'Color updated successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -233,29 +233,29 @@ export default function ColorsPage() {
     if (!window.confirm(`Are you sure you want to delete the color "${color}"?`)) {
       return;
     }
-    
+
     try {
       const response = await fetch(`/api/colors?color=${encodeURIComponent(color)}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete color');
       }
-      
+
       // Refresh colors list
       await fetchColors();
-      
+
       toast({
-        title: "Success",
-        description: "Color deleted successfully",
+        title: 'Success',
+        description: 'Color deleted successfully',
       });
     } catch (err) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: err instanceof Error ? err.message : 'An unknown error occurred',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -277,15 +277,15 @@ export default function ColorsPage() {
     const isValid = isValidColor(colorName);
     const displayColor = isValid ? colorName : '#e5e7eb'; // Use gray if invalid
     const textColor = isValid && !isLightColor(colorName) ? 'white' : 'black';
-    
+
     return (
       <div className="flex items-center space-x-2">
-        <div 
+        <div
           className="w-6 h-6 rounded border shadow-sm flex items-center justify-center"
-          style={{ 
+          style={{
             backgroundColor: displayColor,
             borderColor: '#ddd',
-            color: textColor
+            color: textColor,
           }}
         >
           {!isValid && '?'}
@@ -296,10 +296,7 @@ export default function ColorsPage() {
   };
 
   return (
-    <PageTemplate 
-      title="Color Management" 
-      requiredRoles={[Role.ADMIN, Role.MANAGER, Role.STAFF]}
-    >
+    <PageTemplate title="Color Management" requiredRoles={[Role.ADMIN, Role.MANAGER, Role.STAFF]}>
       <div className="w-full">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Color Management</h1>
@@ -323,7 +320,7 @@ export default function ColorsPage() {
             )}
           </div>
         </div>
-        
+
         {/* Add new color form */}
         {addingColor && (
           <div className="mb-6 p-4 border rounded-lg shadow-sm bg-gray-50">
@@ -342,7 +339,7 @@ export default function ColorsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="mt-4 flex gap-2 justify-end">
               <button
                 onClick={() => setAddingColor(false)}
@@ -359,14 +356,14 @@ export default function ColorsPage() {
             </div>
           </div>
         )}
-        
+
         {/* Error message */}
         {error && (
           <div className="p-4 my-4 bg-red-50 text-red-600 rounded-md border border-red-200">
             {error}
           </div>
         )}
-        
+
         {/* Colors table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border rounded-lg">
@@ -391,7 +388,8 @@ export default function ColorsPage() {
               ) : colors.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-4 text-center">
-                    No colors found. Add your first color by clicking the &quot;Add New Color&quot; button.
+                    No colors found. Add your first color by clicking the &quot;Add New Color&quot;
+                    button.
                   </td>
                 </tr>
               ) : (
@@ -411,19 +409,23 @@ export default function ColorsPage() {
                       )}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {users[color.updated_by] 
+                      {users[color.updated_by]
                         ? `${users[color.updated_by].first_name} ${users[color.updated_by].last_name}`
                         : color.updated_by}
                     </td>
-                    <td className="py-2 px-4 border-b">{new Date(color.updated_at).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false
-                    }).replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}</td>
+                    <td className="py-2 px-4 border-b">
+                      {new Date(color.updated_at)
+                        .toLocaleString('en-GB', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: false,
+                        })
+                        .replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')}
+                    </td>
                     <td className="py-2 px-4 border-b text-center">
                       {editColorId === color.color ? (
                         <div className="flex justify-center gap-2">

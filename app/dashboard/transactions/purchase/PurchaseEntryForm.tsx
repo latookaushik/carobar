@@ -89,7 +89,7 @@ export default function PurchaseEntryForm({
   const [countries, setCountries] = useState<Country[]>([]);
   const [supplierSearch, setSupplierSearch] = useState('');
   const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
-  
+
   // Get company info for tax percentage
   const { company } = useCompany();
   const taxPercent = company?.taxpercent || 0;
@@ -140,18 +140,18 @@ export default function PurchaseEntryForm({
     currency: 'JPY',
     purchase_remarks: '',
   };
-  
+
   // Initialize form data
   const [formData, setFormData] = useState<PurchaseFormData>(
     initialData ? { ...defaultFormData, ...initialData } : defaultFormData
   );
-  
+
   // Format number with commas
   const formatNumber = (num: number) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
-  
-  const [vehicleTypes, setVehicleTypes] = useState<{vehicle_type: string}[]>([]);
+
+  const [vehicleTypes, setVehicleTypes] = useState<{ vehicle_type: string }[]>([]);
 
   // Fetch all reference data
   const fetchReferenceData = useCallback(async () => {
@@ -168,35 +168,35 @@ export default function PurchaseEntryForm({
         const data = await fuelTypesRes.json();
         setFuelTypes(data.fuelTypes || []);
       }
-      
+
       // Makers
       const makersRes = await fetch('/api/makers');
       if (makersRes.ok) {
         const data = await makersRes.json();
         setMakers(data.makers || []);
       }
-      
+
       // Colors
       const colorsRes = await fetch('/api/colors');
       if (colorsRes.ok) {
         const data = await colorsRes.json();
         setColors(data.colors || []);
       }
-      
+
       // Locations
       const locationsRes = await fetch('/api/locations');
       if (locationsRes.ok) {
         const data = await locationsRes.json();
         setLocations(data.locations || []);
       }
-      
+
       // Countries
       const countriesRes = await fetch('/api/countries');
       if (countriesRes.ok) {
         const data = await countriesRes.json();
         setCountries(data.countries || []);
       }
-      
+
       // Vehicle Types
       const vehicleTypesRes = await fetch('/api/vehicle-types');
       if (vehicleTypesRes.ok) {
@@ -204,60 +204,57 @@ export default function PurchaseEntryForm({
         setVehicleTypes(data.vehicleTypes || []);
       }
     } catch (error) {
-      console.error("Error fetching reference data:", error);
+      console.error('Error fetching reference data:', error);
       toast({
-        title: "Error",
-        description: "Failed to load reference data",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load reference data',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   }, []);
-  
+
   // Auto-calculate GST tax
   useEffect(() => {
     if (taxPercent) {
       const purchaseCost = Number(formData.purchase_cost || 0);
       const auctionFee = Number(formData.auction_fee || 0);
-      
-      const calculatedTax = 
-        (purchaseCost * (taxPercent / 100)) + 
-        (auctionFee * (taxPercent / 100));
-      
-      setFormData(prev => ({ 
-        ...prev, 
-        tax: Math.round(calculatedTax) // Round to nearest whole number
+
+      const calculatedTax = purchaseCost * (taxPercent / 100) + auctionFee * (taxPercent / 100);
+
+      setFormData((prev) => ({
+        ...prev,
+        tax: Math.round(calculatedTax), // Round to nearest whole number
       }));
     }
   }, [formData.purchase_cost, formData.auction_fee, taxPercent]);
 
   // Auto-calculate total cost
   useEffect(() => {
-    const total = (
+    const total =
       Number(formData.purchase_cost || 0) +
       Number(formData.auction_fee || 0) +
       Number(formData.tax || 0) + // Include tax in total
       Number(formData.commission || 0) +
       Number(formData.recycle_fee || 0) +
-      Number(formData.road_tax || 0)
-    );
-    
-    setFormData(prev => ({ ...prev, total_vehicle_fee: total }));
+      Number(formData.road_tax || 0);
+
+    setFormData((prev) => ({ ...prev, total_vehicle_fee: total }));
   }, [
     formData.purchase_cost,
     formData.auction_fee,
     formData.tax, // Add tax to dependencies
     formData.commission,
     formData.recycle_fee,
-    formData.road_tax
+    formData.road_tax,
   ]);
-  
+
   // Load data on mount
   useEffect(() => {
     fetchReferenceData();
   }, [fetchReferenceData]);
-  
+
   // Filter suppliers based on search
   useEffect(() => {
     if (supplierSearch.trim() === '') {
@@ -266,124 +263,129 @@ export default function PurchaseEntryForm({
       const searchLower = supplierSearch.toLowerCase();
       setFilteredSuppliers(
         suppliers.filter(
-          s => s.code.toLowerCase().includes(searchLower) || 
-               (s.name && s.name.toLowerCase().includes(searchLower))
+          (s) =>
+            s.code.toLowerCase().includes(searchLower) ||
+            (s.name && s.name.toLowerCase().includes(searchLower))
         )
       );
     }
   }, [supplierSearch, suppliers]);
-  
+
   // Event handlers
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checkbox = e.target as HTMLInputElement;
-      setFormData(prev => ({ ...prev, [name]: checkbox.checked }));
+      setFormData((prev) => ({ ...prev, [name]: checkbox.checked }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
-  
+
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>, decimalPlaces = 0) => {
     const { name, value } = e.target;
     let numValue = value.trim() === '' ? 0 : parseFloat(value);
-    
+
     if (!isNaN(numValue)) {
       if (decimalPlaces > 0) {
         numValue = parseFloat(numValue.toFixed(decimalPlaces));
       } else {
         numValue = Math.round(numValue);
       }
-      
-      setFormData(prev => ({ ...prev, [name]: numValue }));
+
+      setFormData((prev) => ({ ...prev, [name]: numValue }));
     }
   };
-  
+
   const handleSupplierSelect = (supplierCode: string) => {
-    const supplier = suppliers.find(s => s.code === supplierCode);
+    const supplier = suppliers.find((s) => s.code === supplierCode);
     if (supplier) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         supplier_code: supplier.code,
-        supplier_name: supplier.name || ''
+        supplier_name: supplier.name || '',
       }));
     }
   };
-  
+
   const openDocumentUpload = () => {
     toast({
-      title: "Feature Coming Soon",
-      description: "Document upload functionality is under development."
+      title: 'Feature Coming Soon',
+      description: 'Document upload functionality is under development.',
     });
   };
-  
+
   const openPictureUpload = () => {
     toast({
-      title: "Feature Coming Soon",
-      description: "Picture upload functionality is under development."
+      title: 'Feature Coming Soon',
+      description: 'Picture upload functionality is under development.',
     });
   };
-  
+
   const handleSave = async () => {
     if (!formData.purchase_date || !formData.supplier_code || !formData.chassis_no) {
       toast({
-        title: "Validation Error",
-        description: "Please fill all required fields",
-        variant: "destructive"
+        title: 'Validation Error',
+        description: 'Please fill all required fields',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     setSaving(true);
-    
+
     try {
       const formattedData = {
         ...formData,
         purchase_date: parseDateToYYYYMMDD(new Date(formData.purchase_date)),
-        payment_date: formData.payment_date ? parseDateToYYYYMMDD(new Date(formData.payment_date)) : undefined
+        payment_date: formData.payment_date
+          ? parseDateToYYYYMMDD(new Date(formData.payment_date))
+          : undefined,
       };
-      
+
       const response = await fetch('/api/transactions/purchases', {
         method: isEditing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formattedData)
+        body: JSON.stringify(formattedData),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to save purchase');
       }
-      
+
       toast({
-        title: "Success",
-        description: `Vehicle purchase ${isEditing ? 'updated' : 'created'} successfully.`
+        title: 'Success',
+        description: `Vehicle purchase ${isEditing ? 'updated' : 'created'} successfully.`,
       });
-      
+
       onClose();
     } catch (error) {
-      console.error("Error saving purchase:", error);
+      console.error('Error saving purchase:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description: `Failed to save purchase. Please try again.`,
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
     }
   };
-  
+
   if (loading) {
     return (
       <div className="flex justify-center p-4">
-        <div className="animate-spin mr-2"><RefreshCw size={16} /></div>
+        <div className="animate-spin mr-2">
+          <RefreshCw size={16} />
+        </div>
         <span>Loading...</span>
       </div>
     );
   }
-  
+
   return (
     <div className="bg-white rounded-lg overflow-auto max-h-[85vh]">
       {/* Header */}
@@ -828,7 +830,7 @@ export default function PurchaseEntryForm({
                   className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                 >
                   <option value={company?.base_currency || 'JPY'}>
-                  {company?.base_currency || 'JPY'}
+                    {company?.base_currency || 'JPY'}
                   </option>
                   <option value="USD">USD</option>
                 </select>
@@ -913,17 +915,17 @@ export default function PurchaseEntryForm({
           </div>
 
           {/* Remarks */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600 whitespace-nowrap">Remarks</span>
-              <input
-                type="text"
-                name="purchase_remarks"
-                value={formData.purchase_remarks}
-                onChange={handleInputChange}
-                className="flex-1 py-1 px-2 border border-gray-300 rounded-md text-xs"
-                placeholder="Additional information or comments"
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-600 whitespace-nowrap">Remarks</span>
+            <input
+              type="text"
+              name="purchase_remarks"
+              value={formData.purchase_remarks}
+              onChange={handleInputChange}
+              className="flex-1 py-1 px-2 border border-gray-300 rounded-md text-xs"
+              placeholder="Additional information or comments"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -39,7 +39,7 @@ const defaultNewBank: EditingBank = {
   currency: '',
   description: '',
   is_default: false,
-  is_active: true
+  is_active: true,
 };
 
 export default function BankManagement() {
@@ -55,7 +55,7 @@ export default function BankManagement() {
     try {
       setLoading(true);
       console.log('Fetching banks...');
-      
+
       const response = await fetch('/api/banks');
       console.log('Response status:', response.status);
 
@@ -70,9 +70,9 @@ export default function BankManagement() {
     } catch (error) {
       console.error('Error fetching banks:', error);
       toast({
-        title: "Error",
-        description: "Failed to load banks. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load banks. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -89,9 +89,9 @@ export default function BankManagement() {
     try {
       if (!newBank.account_number || !newBank.bank_name) {
         toast({
-          title: "Validation Error",
-          description: "Account number and bank name are required.",
-          variant: "destructive"
+          title: 'Validation Error',
+          description: 'Account number and bank name are required.',
+          variant: 'destructive',
         });
         return;
       }
@@ -99,9 +99,9 @@ export default function BankManagement() {
       const response = await fetch('/api/banks', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newBank)
+        body: JSON.stringify(newBank),
       });
 
       if (!response.ok) {
@@ -110,8 +110,8 @@ export default function BankManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Bank added successfully.",
+        title: 'Success',
+        description: 'Bank added successfully.',
       });
 
       setNewBank(defaultNewBank);
@@ -120,9 +120,10 @@ export default function BankManagement() {
     } catch (error) {
       console.error('Error adding bank:', error);
       toast({
-        title: "Error",
-        description: (error instanceof Error ? error.message : "Failed to add bank. Please try again."),
-        variant: "destructive"
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to add bank. Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -131,9 +132,9 @@ export default function BankManagement() {
     try {
       if (!editingBank.account_number || !editingBank.bank_name) {
         toast({
-          title: "Validation Error",
-          description: "Account number and bank name are required.",
-          variant: "destructive"
+          title: 'Validation Error',
+          description: 'Account number and bank name are required.',
+          variant: 'destructive',
         });
         return;
       }
@@ -141,9 +142,9 @@ export default function BankManagement() {
       const response = await fetch('/api/banks', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editingBank)
+        body: JSON.stringify(editingBank),
       });
 
       if (!response.ok) {
@@ -152,8 +153,8 @@ export default function BankManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Bank updated successfully.",
+        title: 'Success',
+        description: 'Bank updated successfully.',
       });
 
       setEditingBankId(null);
@@ -161,9 +162,10 @@ export default function BankManagement() {
     } catch (error: unknown) {
       console.error('Error updating bank:', error);
       toast({
-        title: "Error",
-        description: (error instanceof Error ? error.message : "Failed to update bank. Please try again."),
-        variant: "destructive"
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to update bank. Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -175,7 +177,7 @@ export default function BankManagement() {
 
     try {
       const response = await fetch(`/api/banks?account_number=${accountNumber}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
 
       if (!response.ok) {
@@ -184,17 +186,18 @@ export default function BankManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Bank deleted successfully.",
+        title: 'Success',
+        description: 'Bank deleted successfully.',
       });
 
       fetchBanks();
     } catch (error: unknown) {
       console.error('Error deleting bank:', error);
       toast({
-        title: "Error",
-        description: (error instanceof Error ? error.message : "Failed to delete bank. Please try again."),
-        variant: "destructive"
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to delete bank. Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -206,20 +209,20 @@ export default function BankManagement() {
     }
 
     try {
-      const bankToUpdate = banks.find(bank => bank.account_number === accountNumber);
+      const bankToUpdate = banks.find((bank) => bank.account_number === accountNumber);
       if (!bankToUpdate) return;
 
-      const updatedBank = { 
-        ...bankToUpdate, 
-        is_default: true 
+      const updatedBank = {
+        ...bankToUpdate,
+        is_default: true,
       };
 
       const response = await fetch('/api/banks', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedBank)
+        body: JSON.stringify(updatedBank),
       });
 
       if (!response.ok) {
@@ -227,17 +230,17 @@ export default function BankManagement() {
       }
 
       await fetchBanks();
-      
+
       toast({
-        title: "Success",
-        description: "Default bank updated successfully.",
+        title: 'Success',
+        description: 'Default bank updated successfully.',
       });
     } catch (error) {
       console.error('Error updating default bank:', error);
       toast({
-        title: "Error",
-        description: "Failed to update default bank.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to update default bank.',
+        variant: 'destructive',
       });
     }
   };
@@ -250,7 +253,7 @@ export default function BankManagement() {
       currency: bank.currency || '',
       description: bank.description || '',
       is_default: bank.is_default || false,
-      is_active: bank.is_active || true
+      is_active: bank.is_active || true,
     });
     setEditingBankId(bank.account_number);
   };
@@ -265,10 +268,7 @@ export default function BankManagement() {
   };
 
   return (
-    <PageTemplate
-      title="Bank Management"
-      requiredRoles={CheckRoles.allRoles}
-    >
+    <PageTemplate title="Bank Management" requiredRoles={CheckRoles.allRoles}>
       <div className="w-full">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Bank Management</h1>
@@ -299,7 +299,9 @@ export default function BankManagement() {
             <h2 className="text-xl font-semibold mb-3">Add New Bank</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Account Number *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Account Number *
+                </label>
                 <input
                   type="text"
                   value={newBank.account_number}
@@ -360,7 +362,9 @@ export default function BankManagement() {
                     onChange={(e) => setNewBank({ ...newBank, is_default: e.target.checked })}
                     className="mr-2"
                   />
-                  <label htmlFor="is_default_new" className="text-sm font-medium text-gray-700">Default Bank</label>
+                  <label htmlFor="is_default_new" className="text-sm font-medium text-gray-700">
+                    Default Bank
+                  </label>
                 </div>
                 <div className="flex items-center">
                   <input
@@ -370,11 +374,13 @@ export default function BankManagement() {
                     onChange={(e) => setNewBank({ ...newBank, is_active: e.target.checked })}
                     className="mr-2"
                   />
-                  <label htmlFor="is_active_new" className="text-sm font-medium text-gray-700">Active</label>
+                  <label htmlFor="is_active_new" className="text-sm font-medium text-gray-700">
+                    Active
+                  </label>
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-4 flex gap-2 justify-end">
               <button
                 onClick={cancelAdding}
@@ -408,11 +414,15 @@ export default function BankManagement() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-4 text-center">Loading banks...</td>
+                  <td colSpan={6} className="py-4 text-center">
+                    Loading banks...
+                  </td>
                 </tr>
               ) : banks.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-4 text-center">No banks found. Add your first bank.</td>
+                  <td colSpan={6} className="py-4 text-center">
+                    No banks found. Add your first bank.
+                  </td>
                 </tr>
               ) : (
                 banks.map((bank) => (
@@ -427,7 +437,9 @@ export default function BankManagement() {
                           <input
                             type="text"
                             value={editingBank.bank_name}
-                            onChange={(e) => setEditingBank({ ...editingBank, bank_name: e.target.value })}
+                            onChange={(e) =>
+                              setEditingBank({ ...editingBank, bank_name: e.target.value })
+                            }
                             className="w-full p-1 border rounded"
                             maxLength={100}
                           />
@@ -436,7 +448,9 @@ export default function BankManagement() {
                           <input
                             type="text"
                             value={editingBank.bank_branch}
-                            onChange={(e) => setEditingBank({ ...editingBank, bank_branch: e.target.value })}
+                            onChange={(e) =>
+                              setEditingBank({ ...editingBank, bank_branch: e.target.value })
+                            }
                             className="w-full p-1 border rounded"
                             maxLength={100}
                           />
@@ -445,7 +459,9 @@ export default function BankManagement() {
                           <input
                             type="text"
                             value={editingBank.currency}
-                            onChange={(e) => setEditingBank({ ...editingBank, currency: e.target.value })}
+                            onChange={(e) =>
+                              setEditingBank({ ...editingBank, currency: e.target.value })
+                            }
                             className="w-full p-1 border rounded"
                             maxLength={3}
                           />
@@ -457,20 +473,34 @@ export default function BankManagement() {
                                 type="checkbox"
                                 id={`is_default_${bank.account_number}`}
                                 checked={editingBank.is_default}
-                                onChange={(e) => setEditingBank({ ...editingBank, is_default: e.target.checked })}
+                                onChange={(e) =>
+                                  setEditingBank({ ...editingBank, is_default: e.target.checked })
+                                }
                                 className="mr-1"
                               />
-                              <label htmlFor={`is_default_${bank.account_number}`} className="text-xs">Default</label>
+                              <label
+                                htmlFor={`is_default_${bank.account_number}`}
+                                className="text-xs"
+                              >
+                                Default
+                              </label>
                             </div>
                             <div className="flex items-center">
                               <input
                                 type="checkbox"
                                 id={`is_active_${bank.account_number}`}
                                 checked={editingBank.is_active}
-                                onChange={(e) => setEditingBank({ ...editingBank, is_active: e.target.checked })}
+                                onChange={(e) =>
+                                  setEditingBank({ ...editingBank, is_active: e.target.checked })
+                                }
                                 className="mr-1"
                               />
-                              <label htmlFor={`is_active_${bank.account_number}`} className="text-xs">Active</label>
+                              <label
+                                htmlFor={`is_active_${bank.account_number}`}
+                                className="text-xs"
+                              >
+                                Active
+                              </label>
                             </div>
                           </div>
                         </td>
@@ -533,10 +563,15 @@ export default function BankManagement() {
                               title="Delete"
                               disabled={!!bank.is_default}
                             >
-                              <Trash2 size={18} className={bank.is_default ? 'opacity-30 cursor-not-allowed' : ''} />
+                              <Trash2
+                                size={18}
+                                className={bank.is_default ? 'opacity-30 cursor-not-allowed' : ''}
+                              />
                             </button>
                             <button
-                              onClick={() => handleToggleDefault(bank.account_number, !!bank.is_default)}
+                              onClick={() =>
+                                handleToggleDefault(bank.account_number, !!bank.is_default)
+                              }
                               className="text-yellow-500 hover:text-yellow-700"
                               title="Toggle Default"
                             >

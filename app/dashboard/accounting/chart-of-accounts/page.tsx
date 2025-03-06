@@ -42,35 +42,31 @@ type ApiError = Error & {
 };
 
 // Account type options for dropdown
-const ACCOUNT_TYPES = [
-  "Asset",
-  "Liability",
-  "Equity",
-  "Revenue",
-  "Expense"
-];
+const ACCOUNT_TYPES = ['Asset', 'Liability', 'Equity', 'Revenue', 'Expense'];
 
 const defaultNewAccount: EditingAccount = {
   account_code: '',
   account_name: '',
   account_type: ACCOUNT_TYPES[0],
   description: '',
-  is_active: true
+  is_active: true,
 };
 
 export default function ChartOfAccountsManagement() {
-  const { /* user */ } = useAuth();
+  const {
+    /* user */
+  } = useAuth();
   const [, setAccounts] = useState<ChartOfAccount[]>([]);
   const [filteredAccounts, setFilteredAccounts] = useState<ChartOfAccount[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<EditingAccount>(defaultNewAccount);
   const [oldCode, setOldCode] = useState<string>('');
   const modalRef = useRef<HTMLDivElement>(null);
-  const [users, setUsers] = useState<Record<string, {first_name: string, last_name: string}>>({});
-  
+  const [users, setUsers] = useState<Record<string, { first_name: string; last_name: string }>>({});
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -80,7 +76,7 @@ export default function ChartOfAccountsManagement() {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      
+
       // Build query parameters for pagination and search
       const queryParams = new URLSearchParams();
       queryParams.append('page', currentPage.toString());
@@ -88,7 +84,7 @@ export default function ChartOfAccountsManagement() {
       if (searchTerm.trim() !== '') {
         queryParams.append('search', searchTerm);
       }
-      
+
       const url = `/api/chart-of-accounts?${queryParams.toString()}`;
       const response = await fetch(url);
 
@@ -100,7 +96,7 @@ export default function ChartOfAccountsManagement() {
       const data = await response.json();
       setAccounts(data.coa || []);
       setFilteredAccounts(data.coa || []);
-      
+
       // Update pagination from server response
       if (data.pagination) {
         setPaginationData(data.pagination);
@@ -109,9 +105,9 @@ export default function ChartOfAccountsManagement() {
     } catch (error) {
       console.error('Error fetching chart of accounts:', error);
       toast({
-        title: "Error",
-        description: "Failed to load chart of accounts. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load chart of accounts. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -122,21 +118,21 @@ export default function ChartOfAccountsManagement() {
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch users');
       }
-      
+
       const data = await response.json();
-      
+
       // Create a lookup object with user_id as key and name info as value
-      const userMap: Record<string, {first_name: string, last_name: string}> = {};
+      const userMap: Record<string, { first_name: string; last_name: string }> = {};
       if (data.users) {
         data.users.forEach((user: { user_id: string; first_name: string; last_name: string }) => {
           userMap[user.user_id] = {
             first_name: user.first_name,
-            last_name: user.last_name
+            last_name: user.last_name,
           };
         });
       }
@@ -155,16 +151,16 @@ export default function ChartOfAccountsManagement() {
     }
 
     if (isAddEditModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isAddEditModalOpen]);
-  
+
   // Load accounts and users on component mount
   useEffect(() => {
     fetchAccounts();
@@ -184,7 +180,7 @@ export default function ChartOfAccountsManagement() {
       account_name: account.account_name,
       account_type: account.account_type,
       description: account.description || '',
-      is_active: account.is_active || true
+      is_active: account.is_active || true,
     });
     setOldCode(account.account_code);
     setIsEditing(true);
@@ -195,7 +191,9 @@ export default function ChartOfAccountsManagement() {
     setIsAddEditModalOpen(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setCurrentAccount({ ...currentAccount, [name]: value });
   };
@@ -207,11 +205,15 @@ export default function ChartOfAccountsManagement() {
 
   const handleAddAccount = async () => {
     try {
-      if (!currentAccount.account_code || !currentAccount.account_name || !currentAccount.account_type) {
+      if (
+        !currentAccount.account_code ||
+        !currentAccount.account_name ||
+        !currentAccount.account_type
+      ) {
         toast({
-          title: "Validation Error",
-          description: "Account Code, Name, and Type are required fields.",
-          variant: "destructive"
+          title: 'Validation Error',
+          description: 'Account Code, Name, and Type are required fields.',
+          variant: 'destructive',
         });
         return;
       }
@@ -219,9 +221,9 @@ export default function ChartOfAccountsManagement() {
       const response = await fetch('/api/chart-of-accounts', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(currentAccount)
+        body: JSON.stringify(currentAccount),
       });
 
       if (!response.ok) {
@@ -230,8 +232,8 @@ export default function ChartOfAccountsManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Account added successfully."
+        title: 'Success',
+        description: 'Account added successfully.',
       });
 
       closeModal();
@@ -240,20 +242,24 @@ export default function ChartOfAccountsManagement() {
       const err = error as ApiError;
       console.error('Error adding account:', err);
       toast({
-        title: "Error",
-        description: err.message || "Failed to add account. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: err.message || 'Failed to add account. Please try again.',
+        variant: 'destructive',
       });
     }
   };
 
   const handleUpdateAccount = async () => {
     try {
-      if (!currentAccount.account_code || !currentAccount.account_name || !currentAccount.account_type) {
+      if (
+        !currentAccount.account_code ||
+        !currentAccount.account_name ||
+        !currentAccount.account_type
+      ) {
         toast({
-          title: "Validation Error",
-          description: "Account Code, Name, and Type are required fields.",
-          variant: "destructive"
+          title: 'Validation Error',
+          description: 'Account Code, Name, and Type are required fields.',
+          variant: 'destructive',
         });
         return;
       }
@@ -261,12 +267,12 @@ export default function ChartOfAccountsManagement() {
       const response = await fetch('/api/chart-of-accounts', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           oldCode: oldCode,
-          ...currentAccount
-        })
+          ...currentAccount,
+        }),
       });
 
       if (!response.ok) {
@@ -275,8 +281,8 @@ export default function ChartOfAccountsManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Account updated successfully."
+        title: 'Success',
+        description: 'Account updated successfully.',
       });
 
       closeModal();
@@ -285,9 +291,9 @@ export default function ChartOfAccountsManagement() {
       const err = error as ApiError;
       console.error('Error updating account:', err);
       toast({
-        title: "Error",
-        description: err.message || "Failed to update account. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: err.message || 'Failed to update account. Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -299,7 +305,7 @@ export default function ChartOfAccountsManagement() {
 
     try {
       const response = await fetch(`/api/chart-of-accounts?code=${encodeURIComponent(code)}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
 
       if (!response.ok) {
@@ -308,8 +314,8 @@ export default function ChartOfAccountsManagement() {
       }
 
       toast({
-        title: "Success",
-        description: "Account deleted successfully."
+        title: 'Success',
+        description: 'Account deleted successfully.',
       });
 
       fetchAccounts();
@@ -317,23 +323,20 @@ export default function ChartOfAccountsManagement() {
       const err = error as ApiError;
       console.error('Error deleting account:', err);
       toast({
-        title: "Error",
-        description: err.message || "Failed to delete account. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: err.message || 'Failed to delete account. Please try again.',
+        variant: 'destructive',
       });
     }
   };
-  
+
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
   return (
-    <PageTemplate
-      title="Chart of Accounts"
-      requiredRoles={CheckRoles.allRoles}
-    >
+    <PageTemplate title="Chart of Accounts" requiredRoles={CheckRoles.allRoles}>
       <div className="w-full">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Chart of Accounts</h1>
@@ -384,11 +387,15 @@ export default function ChartOfAccountsManagement() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="py-4 text-center">Loading accounts...</td>
+                  <td colSpan={8} className="py-4 text-center">
+                    Loading accounts...
+                  </td>
                 </tr>
               ) : filteredAccounts.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-4 text-center">No accounts found.</td>
+                  <td colSpan={8} className="py-4 text-center">
+                    No accounts found.
+                  </td>
                 </tr>
               ) : (
                 filteredAccounts.map((account) => (
@@ -398,10 +405,10 @@ export default function ChartOfAccountsManagement() {
                     <td className="py-2 px-4 border-b">{account.account_type}</td>
                     <td className="py-2 px-4 border-b">{account.description || '-'}</td>
                     <td className="py-2 px-4 border-b text-center">
-                      <span 
+                      <span
                         className={`px-2 py-1 rounded-full text-xs ${
-                          account.is_active 
-                            ? 'bg-green-100 text-green-800' 
+                          account.is_active
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
@@ -409,20 +416,24 @@ export default function ChartOfAccountsManagement() {
                       </span>
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {users[account.updated_by || ''] 
+                      {users[account.updated_by || '']
                         ? `${users[account.updated_by || ''].first_name} ${users[account.updated_by || ''].last_name}`
                         : account.updated_by || '-'}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {account.updated_at ? new Date(account.updated_at).toLocaleString('en-GB', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false
-                      }).replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6') : '-'}
+                      {account.updated_at
+                        ? new Date(account.updated_at)
+                            .toLocaleString('en-GB', {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: false,
+                            })
+                            .replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$2-$1 $4:$5:$6')
+                        : '-'}
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       <div className="flex justify-center gap-2">
@@ -448,7 +459,7 @@ export default function ChartOfAccountsManagement() {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {filteredAccounts.length > 0 && paginationData && (
           <div className="mt-4 flex justify-between items-center py-3 bg-gray-50 border rounded-md px-4">
@@ -456,7 +467,7 @@ export default function ChartOfAccountsManagement() {
               <span className="text-sm text-gray-700">
                 Showing {filteredAccounts.length} of {paginationData.total} accounts
               </span>
-              <select 
+              <select
                 className="ml-4 p-1 border rounded text-sm"
                 value={itemsPerPage}
                 onChange={(e) => {
@@ -471,7 +482,7 @@ export default function ChartOfAccountsManagement() {
                 <option value={0}>All</option>
               </select>
             </div>
-            
+
             <div className="flex space-x-1">
               <button
                 onClick={() => handlePageChange(1)}
@@ -487,7 +498,7 @@ export default function ChartOfAccountsManagement() {
               >
                 Previous
               </button>
-              
+
               {/* Page numbers */}
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 // Calculate which page numbers to show
@@ -501,22 +512,20 @@ export default function ChartOfAccountsManagement() {
                 } else {
                   pageNum = currentPage - 2 + i;
                 }
-                
+
                 return (
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-3 py-1 border rounded text-sm ${
-                      currentPage === pageNum
-                        ? 'bg-blue-600 text-white'
-                        : 'hover:bg-gray-100'
+                      currentPage === pageNum ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'
                     }`}
                   >
                     {pageNum}
                   </button>
                 );
               })}
-              
+
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
@@ -542,10 +551,12 @@ export default function ChartOfAccountsManagement() {
               <h2 className="text-xl font-semibold mb-4">
                 {isEditing ? 'Edit Account' : 'Add New Account'}
               </h2>
-              
+
               <div className="grid grid-cols-1 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Code *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Account Code *
+                  </label>
                   <input
                     type="text"
                     name="account_code"
@@ -556,9 +567,11 @@ export default function ChartOfAccountsManagement() {
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Account Name *
+                  </label>
                   <input
                     type="text"
                     name="account_name"
@@ -569,9 +582,11 @@ export default function ChartOfAccountsManagement() {
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Type *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Account Type *
+                  </label>
                   <select
                     name="account_type"
                     value={currentAccount.account_type}
@@ -586,9 +601,11 @@ export default function ChartOfAccountsManagement() {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
                   <textarea
                     name="description"
                     value={currentAccount.description}
@@ -598,7 +615,7 @@ export default function ChartOfAccountsManagement() {
                     maxLength={250}
                   ></textarea>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -608,10 +625,12 @@ export default function ChartOfAccountsManagement() {
                     onChange={handleCheckboxChange}
                     className="mr-2"
                   />
-                  <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
+                  <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                    Active
+                  </label>
                 </div>
               </div>
-              
+
               <div className="flex justify-end gap-2">
                 <button
                   onClick={closeModal}
