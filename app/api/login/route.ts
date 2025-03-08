@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // Validate required fields
     if (!company_id || !user_id || !password) {
-      return createErrorResponse('All fields are required',HttpStatus.BAD_REQUEST);
+      return createErrorResponse('All fields are required', HttpStatus.BAD_REQUEST);
     }
 
     // Find user in database with joined company and role info
@@ -73,14 +73,11 @@ export async function POST(request: Request) {
     // Generate access token (short-lived)
     const accessToken = createToken({
       ...transformedUser,
-      tokenType: 'access'
+      tokenType: 'access',
     });
 
     // Generate refresh token (long-lived)
-    const refreshToken = createRefreshToken(
-      transformedUser.userId,
-      transformedUser.companyId
-    );
+    const refreshToken = createRefreshToken(transformedUser.userId, transformedUser.companyId);
 
     // Create response with user data
     const response = NextResponse.json(
@@ -126,6 +123,9 @@ export async function POST(request: Request) {
     }
 
     logError(`Login error: ${error instanceof Error ? error.message : error}`);
-    return createErrorResponse('An unexpected error occurred. Please try again later.', HttpStatus.INTERNAL_SERVER_ERROR);
+    return createErrorResponse(
+      'An unexpected error occurred. Please try again later.',
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
   }
 }

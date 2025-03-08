@@ -5,10 +5,11 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Enable source maps in development
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.devtool = 'eval-source-map';
+  // Configure development optimizations
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer) {
+      // Use recommended development source map
+      config.devtool = 'eval-cheap-module-source-map';
     }
     return config;
   },

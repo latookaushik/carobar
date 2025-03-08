@@ -3,14 +3,13 @@
  *
  * Provides operations for vehicle purchases in the Carobar application.
  * All operations are secured and company-specific, ensuring proper data isolation.
- * 
+ *
  * Endpoints:
  * - POST: Creates a new purchase record with associated vehicle data
  * - GET: Retrieves purchase records with filtering and pagination
- * 
+ *
  * Authentication: All endpoints require a valid JWT token with company context
  */
-
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
@@ -37,6 +36,129 @@ function handleApiError(error: unknown, message: string) {
  * POST /api/transactions/purchases
  * Creates a new purchase record
  */
+/**
+ * PUT /api/transactions/purchases
+ * Updates an existing purchase record
+ */
+export const PUT = withUser(async (request: NextRequest) => {
+  logInfo('PUT /api/transactions/purchases - Updating purchase record');
+
+  try {
+    // Get the authenticated user from the request
+    const user = getAuthUser(request);
+    if (!user) {
+      return createErrorResponse('User not authenticated', HttpStatus.UNAUTHORIZED);
+    }
+
+    const { companyId, userId } = user;
+    logDebug(`Processing purchase update for company: ${companyId}`);
+
+    // Parse request body
+    const data = await request.json();
+
+    // Validate required fields
+    if (!data.purchase_date || !data.supplier_code || !data.chassis_no) {
+      return createErrorResponse('Missing required fields', HttpStatus.BAD_REQUEST);
+    }
+
+    // Check if purchase exists
+    const existingPurchase = await prisma.vehicle_purchase.findFirst({
+      where: {
+        company_id: companyId,
+        chassis_no: data.chassis_no,
+      },
+    });
+
+    if (!existingPurchase) {
+      return createErrorResponse('Purchase record not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Prepare vehicle data
+    const vehicleData = {
+      company_id: companyId,
+      chassis_no: data.chassis_no,
+      vehicle_name: data.vehicle_name || '',
+      maker: data.maker || '',
+      grade: data.grade || '',
+      color: data.color || '',
+      seats: data.seats || 0,
+      doors: data.doors || 0,
+      manufacture_yyyymm: data.model || '', // Map model to manufacture_yyyymm
+      engine_no: data.engine_no || '',
+      mileage: data.mileage || 0,
+      cc: data.cc || 0,
+      fuel_type: data.fuel_type || '',
+      vehicle_type: data.vehicle_type || '',
+      is_auto: data.is_auto || false,
+      is_ac: data.is_ac || false,
+      is_power_steering: data.is_power_steering || false,
+      is_power_windows: data.is_power_windows || false,
+      is_power_lock: data.is_power_lock || false,
+      is_power_mirror: data.is_power_mirror || false,
+      is_sun_roof: data.is_sun_roof || false,
+      is_high_roof: data.is_high_roof || false,
+      is_4wd: data.is_4wd || false,
+      is_alloy_wheel: data.is_alloy_wheel || false,
+      is_full_option: data.is_full_option || false,
+      is_active: data.is_active !== undefined ? data.is_active : true,
+      gear_type: data.gear_type || '',
+      auction_ref_no: data.auction_ref_no || '',
+      inspection_rank: data.rank || 0,
+      target_country: data.target_country || '',
+      vehicle_location: data.stock_location || '',
+      updated_by: userId,
+      updated_at: new Date(),
+    };
+
+    // Update the vehicle data
+    await prisma.vehicle.update({
+      where: {
+        company_id_chassis_no: {
+          company_id: companyId,
+          chassis_no: data.chassis_no,
+        },
+      },
+      data: vehicleData,
+    });
+
+    logInfo(`Vehicle record updated for chassis: ${data.chassis_no}`);
+
+    // Update purchase record
+    const updatedPurchase = await prisma.vehicle_purchase.updateMany({
+      where: {
+        company_id: companyId,
+        chassis_no: data.chassis_no,
+      },
+      data: {
+        purchase_date: data.purchase_date,
+        supplier_code: data.supplier_code,
+        supplier_name: data.supplier_name || '',
+        currency: data.currency || 'JPY',
+        purchase_cost: data.purchase_cost || 0,
+        tax: data.tax || 0,
+        commission: data.commission || 0,
+        recycle_fee: data.recycle_fee || 0,
+        auction_fee: data.auction_fee || 0,
+        road_tax: data.road_tax || 0,
+        total_vehicle_fee: data.total_vehicle_fee || 0,
+        payment_date: data.payment_date,
+        purchase_remarks: data.purchase_remarks || '',
+        updated_by: userId,
+        updated_at: new Date(),
+      },
+    });
+
+    logInfo(`Purchase record updated for chassis: ${data.chassis_no}`);
+
+    return createSuccessResponse({
+      message: 'Purchase updated successfully',
+      purchase: updatedPurchase,
+    });
+  } catch (error) {
+    return handleApiError(error, 'Failed to update purchase');
+  }
+});
+
 export const POST = withUser(async (request: NextRequest) => {
   logInfo('POST /api/transactions/purchases - Creating purchase record');
 
@@ -125,6 +247,7 @@ export const POST = withUser(async (request: NextRequest) => {
         supplier_name: data.supplier_name || '',
         currency: data.currency || 'JPY',
         purchase_cost: data.purchase_cost || 0,
+        tax: data.tax || 0,
         commission: data.commission || 0,
         recycle_fee: data.recycle_fee || 0,
         auction_fee: data.auction_fee || 0,
@@ -197,13 +320,7 @@ export const GET = withUser(async (request: NextRequest) => {
         created_at: 'desc',
       },
       include: {
-        vehicle: {
-          select: {
-            vehicle_name: true,
-            maker: true,
-            color: true,
-          },
-        },
+        vehicle: true, // Include all vehicle fields when fetching by chassis number
       },
       skip,
       take: pageSize,

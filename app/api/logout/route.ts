@@ -11,7 +11,7 @@ export async function POST() {
     { message: 'Logged out successfully' },
     { status: HttpStatus.OK }
   );
-  
+
   // Clear the access token cookie
   response.cookies.set({
     name: 'token',
@@ -33,7 +33,7 @@ export async function POST() {
     path: '/',
     maxAge: 0, // Expire immediately
   });
-  
+
   logInfo('User logged out successfully');
   return response;
 }

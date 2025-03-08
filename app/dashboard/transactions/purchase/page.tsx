@@ -11,6 +11,7 @@ import PageTemplate from '@/app/components/PageTemplate';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { formatIntDateToString } from '@/app/lib/helpers';
 import { toast } from '@/app/components/ui/use-toast';
+import { logDebug, logError } from '@/app/lib/logger';
 
 // Helper for creating default date range (today - 30 days to today)
 const getDefaultDateRange = () => {
@@ -65,12 +66,12 @@ export default function PurchasePage() {
 
   // Column definitions for the data grid
   const columns: GridColDef[] = [
-    { 
-      field: 'chassis_no', 
-      headerName: 'Chassis No.', 
+    {
+      field: 'chassis_no',
+      headerName: 'Chassis No.',
       minWidth: 150,
       renderCell: (params) => (
-        <span 
+        <span
           className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
@@ -79,20 +80,20 @@ export default function PurchasePage() {
         >
           {params.value}
         </span>
-      )
+      ),
     },
     {
       field: 'purchase_date',
       headerName: 'Date',
       minWidth: 100,
-      valueFormatter: (param: number ) => {
+      valueFormatter: (param: number) => {
         return formatIntDateToString(Number(param));
       },
     },
     { field: 'supplier_name', headerName: 'Supplier', minWidth: 200 },
     { field: 'vehicle_name', headerName: 'Vehicle', minWidth: 240 },
     { field: 'grade', headerName: 'Grade', minWidth: 140 },
-    { field: 'model', headerName: 'Model', minWidth: 100,  headerAlign: 'center', align: 'center'},
+    { field: 'model', headerName: 'Model', minWidth: 100, headerAlign: 'center', align: 'center' },
     { field: 'color', headerName: 'Color', minWidth: 80 },
     { field: 'maker', headerName: 'Maker', minWidth: 150 },
     { field: 'vehicle_location', headerName: 'Location', minWidth: 200 },
@@ -123,16 +124,23 @@ export default function PurchasePage() {
       align: 'right',
       headerAlign: 'right',
       minWidth: 45,
-      valueFormatter: (param:number) => {
+      valueFormatter: (param: number) => {
         return Number(param).toLocaleString();
       },
     },
-    { field: 'currency', headerName: 'CUR', headerAlign: 'center', align: 'center', minWidth: 70, flex: 1 },
+    {
+      field: 'currency',
+      headerName: 'CUR',
+      headerAlign: 'center',
+      align: 'center',
+      minWidth: 70,
+      flex: 1,
+    },
     {
       field: 'payment_date',
       headerName: 'Pay-Date',
       minWidth: 50,
-      valueFormatter: (param:number) => {
+      valueFormatter: (param: number) => {
         return formatIntDateToString(Number(param));
       },
     },
@@ -157,7 +165,8 @@ export default function PurchasePage() {
           setCountries(data.countries || []);
         }
       } catch (error) {
-        console.error('Error fetching reference data:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logError('Error fetching reference data: ' + errorMessage);
       }
     };
 
@@ -207,9 +216,9 @@ export default function PurchasePage() {
         }
 
         const data = await response.json();
-        
+
         // Log received data for debugging
-        console.log('Raw API response:', data);
+        logDebug(`Raw API response: ${JSON.stringify(data)}`);
 
         // Define the interface for API response items
         interface PurchaseResponseItem {
@@ -250,17 +259,17 @@ export default function PurchasePage() {
             total_vehicle_fee: Number(item.total_vehicle_fee || 0),
             currency: item.currency || '',
             payment_date: item.payment_date ? Number(item.payment_date) : null,
-            purchase_remarks: item.purchase_remarks || ''
+            purchase_remarks: item.purchase_remarks || '',
           };
-          
-          console.log('Row data:', rowData);
+          logDebug(`Raw API response: ${JSON.stringify(rowData)}`);
           return rowData;
         });
-
-        console.log('Processed grid data:', gridData);
+        logDebug(`Processed grid data: ${JSON.stringify(gridData)}`);
         setPurchaseData(gridData);
       } catch (error) {
-        console.error('Error fetching purchase data:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logError(`Processed grid data: ${errorMessage}`);
+
         setPurchaseData([]); // Set empty array on error
       } finally {
         setLoading(false);
@@ -283,22 +292,28 @@ export default function PurchasePage() {
   // Handler for when chassis number is clicked
   const handleChassisClick = async (row: PurchaseData) => {
     try {
+      logDebug(`Clicked on chassis: :  ${row.chassis_no}`);
+
       // Fetch the complete purchase data using the chassis number
       const response = await fetch(`/api/transactions/purchases?chassis=${row.chassis_no}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch purchase data');
       }
-      
+
       const data = await response.json();
-      
+      logDebug(`Fetched purchase data:  ${JSON.stringify(data)}`);
+
       if (data.purchases && data.purchases.length > 0) {
+        const purchaseData = data.purchases[0];
+        logDebug(`Selected purchase data for editing:  ${JSON.stringify(purchaseData)}`);
+
         // Set editing mode and open modal with the first purchase found
         setIsEditing(true);
-        setSelectedPurchase(data.purchases[0]);
+        setSelectedPurchase(purchaseData);
         setIsModalOpen(true);
       } else {
-        console.error('No purchase data found for chassis number:', row.chassis_no);
+        logError(`No purchase data found for chassis number: ${row.chassis_no}`);
         toast({
           title: 'Error',
           description: 'Could not find purchase data for editing',
@@ -306,7 +321,8 @@ export default function PurchasePage() {
         });
       }
     } catch (error) {
-      console.error('Error fetching purchase data for editing:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logError(`Error fetching purchase data for editing: ${errorMessage}`);
       toast({
         title: 'Error',
         description: 'Failed to load purchase data for editing',
@@ -428,7 +444,7 @@ export default function PurchasePage() {
             '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: 1 },
             '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: 1.5 },
             '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: 2 },
-            '& .MuiDataGrid-columnHeaderTitle': {fontWeight: 'bold' },
+            '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold' },
             '& .MuiDataGrid-columnHeaders div[role="row"]': {
               backgroundColor: '#de9b9b',
             },

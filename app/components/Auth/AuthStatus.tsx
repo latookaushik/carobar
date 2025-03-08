@@ -10,14 +10,9 @@ import { useAuth } from '@/app/contexts/AuthContext';
 export default function AuthStatus() {
   const { user, loading, logout } = useAuth();
 
-
-  
   if (loading) {
     return <div className="text-white/80">Loading...</div>;
   }
-
-
-
 
   return (
     <div className="text-white flex items-left space-x-4 border-2 border-dotted border-white/70 rounded-lg p-2">

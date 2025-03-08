@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse,HttpStatus } from '@/app/lib/errorUtil';
+import { createErrorResponse, HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
 
 /**

@@ -4,5 +4,3 @@ export enum Role {
   MANAGER = 'CA', // Company Admin (Elevated role for company in charge)
   STAFF = 'CU', // Standard Company User
 }
-
-

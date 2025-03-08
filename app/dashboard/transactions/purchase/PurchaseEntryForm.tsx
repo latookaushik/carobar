@@ -1,16 +1,48 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCompany } from '@/app/contexts/CompanyContext';
 import { toast } from '@/app/components/ui/use-toast';
 import { Save, X, Search, Upload, Camera, Calendar, RefreshCw } from 'lucide-react';
 import { formatDateYYYYMMDD, parseDateToYYYYMMDD } from '@/app/lib/helpers';
-
+import { logDebug, logError } from '@/app/lib/logger';
 // Types
 interface Counterparty {
   code: string;
   name: string | null;
   is_supplier: boolean;
+}
+
+// Vehicle type for nested vehicle data in API response
+interface VehicleData {
+  vehicle_name?: string;
+  maker?: string;
+  grade?: string;
+  color?: string;
+  seats?: number;
+  doors?: number;
+  mileage?: number;
+  engine_no?: string;
+  vehicle_type?: string;
+  auction_ref_no?: string;
+  inspection_rank?: number;
+  target_country?: string;
+  vehicle_location?: string;
+  fuel_type?: string;
+  cc?: number;
+  is_auto?: boolean;
+  is_ac?: boolean;
+  is_power_steering?: boolean;
+  is_power_windows?: boolean;
+  is_power_lock?: boolean;
+  is_power_mirror?: boolean;
+  is_sun_roof?: boolean;
+  is_high_roof?: boolean;
+  is_4wd?: boolean;
+  is_alloy_wheel?: boolean;
+  is_full_option?: boolean;
+  gear_type?: string;
+  manufacture_yyyymm?: string;
 }
 
 // At the top with other interfaces
@@ -68,13 +100,19 @@ export type PurchaseFormData = {
   purchase_remarks: string;
 };
 
+// API response interface that includes vehicle data
+interface PurchaseApiResponse {
+  [key: string]: string | number | boolean | VehicleData | undefined;
+  vehicle?: VehicleData;
+}
+
 export default function PurchaseEntryForm({
   isEditing = false,
   initialData = null,
   onClose,
 }: {
   isEditing?: boolean;
-  initialData?: Partial<PurchaseFormData> | null;
+  initialData?: PurchaseApiResponse | null;
   onClose: () => void;
 }) {
   // State for data and UI
@@ -142,9 +180,167 @@ export default function PurchaseEntryForm({
   };
 
   // Initialize form data
-  const [formData, setFormData] = useState<PurchaseFormData>(
-    initialData ? { ...defaultFormData, ...initialData } : defaultFormData
-  );
+  const [formData, setFormData] = useState<PurchaseFormData>(() => {
+    if (!initialData) return defaultFormData;
+
+    logDebug('Init data before mapping = ' + JSON.stringify(initialData));
+    // Map the API response to form data, handling nested vehicle data
+    const mappedData: PurchaseFormData = { ...defaultFormData };
+
+    // Map purchase fields directly using type-safe approach
+    Object.keys(initialData).forEach((key) => {
+      if (key !== 'vehicle' && key in mappedData) {
+        const value = initialData[key as keyof PurchaseApiResponse];
+        if (value !== undefined) {
+          // Use type-safe approach to assign values
+          switch (key) {
+            case 'purchase_date':
+            case 'supplier_code':
+            case 'supplier_name':
+            case 'chassis_no':
+            case 'vehicle_name':
+            case 'maker':
+            case 'grade':
+            case 'model':
+            case 'color':
+            case 'engine_no':
+            case 'vehicle_type':
+            case 'auction_ref_no':
+            case 'target_country':
+            case 'stock_location':
+            case 'payment_date':
+            case 'fuel_type':
+            case 'gear_type':
+            case 'currency':
+            case 'purchase_remarks':
+              mappedData[key] = String(value);
+              break;
+            case 'seats':
+            case 'doors':
+            case 'mileage':
+            case 'rank':
+            case 'cc':
+            case 'purchase_cost':
+            case 'auction_fee':
+            case 'tax':
+            case 'commission':
+            case 'recycle_fee':
+            case 'road_tax':
+            case 'total_vehicle_fee':
+              mappedData[key] = Number(value);
+              break;
+            case 'is_auto':
+            case 'is_ac':
+            case 'is_power_steering':
+            case 'is_power_windows':
+            case 'is_power_lock':
+            case 'is_power_mirror':
+            case 'is_sun_roof':
+            case 'is_high_roof':
+            case 'is_4wd':
+            case 'is_alloy_wheel':
+            case 'is_full_option':
+            case 'is_active':
+              mappedData[key] = Boolean(value);
+              break;
+          }
+        }
+      }
+    });
+
+    // Map vehicle fields if present
+    if (initialData.vehicle) {
+      const vehicle = initialData.vehicle;
+
+      // Map each vehicle field to the corresponding form field
+      if (vehicle.vehicle_name !== undefined) mappedData.vehicle_name = vehicle.vehicle_name;
+      if (vehicle.maker !== undefined) mappedData.maker = vehicle.maker;
+      if (vehicle.grade !== undefined) mappedData.grade = vehicle.grade;
+      if (vehicle.color !== undefined) mappedData.color = vehicle.color;
+      if (vehicle.seats !== undefined) mappedData.seats = vehicle.seats;
+      if (vehicle.doors !== undefined) mappedData.doors = vehicle.doors;
+      if (vehicle.mileage !== undefined) mappedData.mileage = vehicle.mileage;
+      if (vehicle.engine_no !== undefined) mappedData.engine_no = vehicle.engine_no;
+      if (vehicle.vehicle_type !== undefined) mappedData.vehicle_type = vehicle.vehicle_type;
+      if (vehicle.auction_ref_no !== undefined) mappedData.auction_ref_no = vehicle.auction_ref_no;
+      if (vehicle.inspection_rank !== undefined) mappedData.rank = vehicle.inspection_rank;
+      if (vehicle.target_country !== undefined) mappedData.target_country = vehicle.target_country;
+      if (vehicle.vehicle_location !== undefined)
+        mappedData.stock_location = vehicle.vehicle_location;
+      if (vehicle.fuel_type !== undefined) mappedData.fuel_type = vehicle.fuel_type;
+      if (vehicle.cc !== undefined) mappedData.cc = vehicle.cc;
+      if (vehicle.is_auto !== undefined) mappedData.is_auto = vehicle.is_auto;
+      if (vehicle.is_ac !== undefined) mappedData.is_ac = vehicle.is_ac;
+      if (vehicle.is_power_steering !== undefined)
+        mappedData.is_power_steering = vehicle.is_power_steering;
+      if (vehicle.is_power_windows !== undefined)
+        mappedData.is_power_windows = vehicle.is_power_windows;
+      if (vehicle.is_power_lock !== undefined) mappedData.is_power_lock = vehicle.is_power_lock;
+      if (vehicle.is_power_mirror !== undefined)
+        mappedData.is_power_mirror = vehicle.is_power_mirror;
+      if (vehicle.is_sun_roof !== undefined) mappedData.is_sun_roof = vehicle.is_sun_roof;
+      if (vehicle.is_high_roof !== undefined) mappedData.is_high_roof = vehicle.is_high_roof;
+      if (vehicle.is_4wd !== undefined) mappedData.is_4wd = vehicle.is_4wd;
+      if (vehicle.is_alloy_wheel !== undefined) mappedData.is_alloy_wheel = vehicle.is_alloy_wheel;
+      if (vehicle.is_full_option !== undefined) mappedData.is_full_option = vehicle.is_full_option;
+      if (vehicle.gear_type !== undefined) mappedData.gear_type = vehicle.gear_type;
+      if (vehicle.manufacture_yyyymm !== undefined) mappedData.model = vehicle.manufacture_yyyymm;
+    }
+
+    // Format dates for the form
+    if (mappedData.purchase_date !== undefined) {
+      if (typeof mappedData.purchase_date === 'number') {
+        // Handle numeric format (YYYYMMDD)
+        const dateStr = String(mappedData.purchase_date);
+        const year = dateStr.substring(0, 4);
+        const month = dateStr.substring(4, 6);
+        const day = dateStr.substring(6, 8);
+        mappedData.purchase_date = `${year}-${month}-${day}`;
+      } else if (typeof mappedData.purchase_date === 'string') {
+        // If it's already a string, ensure it's in YYYY-MM-DD format
+        if (mappedData.purchase_date.length === 8 && !mappedData.purchase_date.includes('-')) {
+          // Convert YYYYMMDD string to YYYY-MM-DD
+          const year = mappedData.purchase_date.substring(0, 4);
+          const month = mappedData.purchase_date.substring(4, 6);
+          const day = mappedData.purchase_date.substring(6, 8);
+          mappedData.purchase_date = `${year}-${month}-${day}`;
+        } else if (mappedData.purchase_date.includes('T')) {
+          // Handle ISO date format
+          mappedData.purchase_date = mappedData.purchase_date.split('T')[0];
+        }
+      }
+      // If it's already in YYYY-MM-DD format, keep it as is
+    } else {
+      // Default to today if no date provided
+      mappedData.purchase_date = formatDateYYYYMMDD(new Date());
+    }
+
+    if (mappedData.payment_date !== undefined) {
+      if (typeof mappedData.payment_date === 'number') {
+        // Handle numeric format (YYYYMMDD)
+        const dateStr = String(mappedData.payment_date);
+        const year = dateStr.substring(0, 4);
+        const month = dateStr.substring(4, 6);
+        const day = dateStr.substring(6, 8);
+        mappedData.payment_date = `${year}-${month}-${day}`;
+      } else if (typeof mappedData.payment_date === 'string') {
+        // If it's already a string, ensure it's in YYYY-MM-DD format
+        if (mappedData.payment_date.length === 8 && !mappedData.payment_date.includes('-')) {
+          // Convert YYYYMMDD string to YYYY-MM-DD
+          const year = mappedData.payment_date.substring(0, 4);
+          const month = mappedData.payment_date.substring(4, 6);
+          const day = mappedData.payment_date.substring(6, 8);
+          mappedData.payment_date = `${year}-${month}-${day}`;
+        } else if (mappedData.payment_date.includes('T')) {
+          // Handle ISO date format
+          mappedData.payment_date = mappedData.payment_date.split('T')[0];
+        }
+      }
+      // If it's already in YYYY-MM-DD format, keep it as is
+    }
+    logDebug('Mapped form data = ' + JSON.stringify(mappedData));
+    return mappedData;
+  });
 
   // Format number with commas
   const formatNumber = (num: number) => {
@@ -153,58 +349,80 @@ export default function PurchaseEntryForm({
 
   const [vehicleTypes, setVehicleTypes] = useState<{ vehicle_type: string }[]>([]);
 
+  // Reference to track if data has been fetched to prevent duplicate calls
+  const dataFetchedRef = useRef(false);
+
   // Fetch all reference data
   const fetchReferenceData = useCallback(async () => {
+    // Skip fetching if data has already been fetched
+    if (dataFetchedRef.current) {
+      setLoading(false);
+      return;
+    }
+
     try {
+      // Common request options for all fetch calls
+      const requestOptions: RequestInit = {
+        credentials: 'include' as RequestCredentials, // Important for sending cookies with requests
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
       // Suppliers
-      const suppliersRes = await fetch('/api/counterparties');
+      const suppliersRes = await fetch('/api/counterparties', requestOptions);
       if (suppliersRes.ok) {
         const data = await suppliersRes.json();
         setSuppliers(data.counterparties?.filter((c: Counterparty) => c.is_supplier) || []);
       }
 
-      const fuelTypesRes = await fetch('/api/fuel-types');
+      const fuelTypesRes = await fetch('/api/fuel-types', requestOptions);
       if (fuelTypesRes.ok) {
         const data = await fuelTypesRes.json();
         setFuelTypes(data.fuelTypes || []);
       }
 
       // Makers
-      const makersRes = await fetch('/api/makers');
+      const makersRes = await fetch('/api/makers', requestOptions);
       if (makersRes.ok) {
         const data = await makersRes.json();
         setMakers(data.makers || []);
       }
 
       // Colors
-      const colorsRes = await fetch('/api/colors');
+      const colorsRes = await fetch('/api/colors', requestOptions);
       if (colorsRes.ok) {
         const data = await colorsRes.json();
         setColors(data.colors || []);
       }
 
       // Locations
-      const locationsRes = await fetch('/api/locations');
+      const locationsRes = await fetch('/api/locations', requestOptions);
       if (locationsRes.ok) {
         const data = await locationsRes.json();
         setLocations(data.locations || []);
       }
 
       // Countries
-      const countriesRes = await fetch('/api/countries');
+      const countriesRes = await fetch('/api/countries', requestOptions);
       if (countriesRes.ok) {
         const data = await countriesRes.json();
         setCountries(data.countries || []);
       }
 
       // Vehicle Types
-      const vehicleTypesRes = await fetch('/api/vehicle-types');
+      const vehicleTypesRes = await fetch('/api/vehicle-types', requestOptions);
       if (vehicleTypesRes.ok) {
         const data = await vehicleTypesRes.json();
         setVehicleTypes(data.vehicleTypes || []);
       }
+
+      // Mark data as fetched to prevent duplicate calls
+      dataFetchedRef.current = true;
     } catch (error) {
-      console.error('Error fetching reference data:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logError(`Error fetching reference data: ${errorMessage}`);
+
       toast({
         title: 'Error',
         description: 'Failed to load reference data',
@@ -254,6 +472,11 @@ export default function PurchaseEntryForm({
   useEffect(() => {
     fetchReferenceData();
   }, [fetchReferenceData]);
+
+  // Log form data for debugging
+  useEffect(() => {
+    logDebug(`Current form data: ${JSON.stringify(formData)}`);
+  }, [formData]);
 
   // Filter suppliers based on search
   useEffect(() => {
@@ -349,6 +572,7 @@ export default function PurchaseEntryForm({
       const response = await fetch('/api/transactions/purchases', {
         method: isEditing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include' as RequestCredentials, // Add credentials for JWT cookies
         body: JSON.stringify(formattedData),
       });
 
@@ -364,7 +588,8 @@ export default function PurchaseEntryForm({
 
       onClose();
     } catch (error) {
-      console.error('Error saving purchase:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logError(`Error saving purchase: ${errorMessage}`);
       toast({
         title: 'Error',
         description: `Failed to save purchase. Please try again.`,
@@ -387,9 +612,9 @@ export default function PurchaseEntryForm({
   }
 
   return (
-    <div className="bg-white rounded-lg overflow-auto max-h-[85vh]">
+    <div className="bg-white rounded-lg overflow-y-auto overflow-x-hidden max-h-[95vh]">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex justify-between items-center p-2 bg-gray-100 border-b">
+      <div className="sticky top-0 z-10 flex justify-between items-center p-2 bg-red-50 border-b">
         <h2 className="text-base font-semibold">
           {isEditing ? 'Edit Purchase' : 'New Vehicle Purchase'}
         </h2>
@@ -742,6 +967,197 @@ export default function PurchaseEntryForm({
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   />
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Vehicle Attributes Checkboxes */}
+          <div className="border border-gray-200 rounded-md p-1">
+            <div className="grid grid-cols-6 gap-2">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_auto"
+                  name="is_auto"
+                  checked={formData.is_auto}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, is_auto: e.target.checked }))}
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_auto" className="text-xs">
+                  Auto
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_ac"
+                  name="is_ac"
+                  checked={formData.is_ac}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, is_ac: e.target.checked }))}
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_ac" className="text-xs">
+                  AC
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_power_steering"
+                  name="is_power_steering"
+                  checked={formData.is_power_steering}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_power_steering: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_power_steering" className="text-xs">
+                  PS
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_power_lock"
+                  name="is_power_lock"
+                  checked={formData.is_power_lock}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_power_lock: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_power_lock" className="text-xs">
+                  PL
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_power_mirror"
+                  name="is_power_mirror"
+                  checked={formData.is_power_mirror}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_power_mirror: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_power_mirror" className="text-xs">
+                  PM
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_power_windows"
+                  name="is_power_windows"
+                  checked={formData.is_power_windows}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_power_windows: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_power_windows" className="text-xs">
+                  PW
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_sun_roof"
+                  name="is_sun_roof"
+                  checked={formData.is_sun_roof}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_sun_roof: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_sun_roof" className="text-xs">
+                  SR
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_high_roof"
+                  name="is_high_roof"
+                  checked={formData.is_high_roof}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_high_roof: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_high_roof" className="text-xs">
+                  HR
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_4wd"
+                  name="is_4wd"
+                  checked={formData.is_4wd}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, is_4wd: e.target.checked }))}
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_4wd" className="text-xs">
+                  4WD
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_alloy_wheel"
+                  name="is_alloy_wheel"
+                  checked={formData.is_alloy_wheel}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_alloy_wheel: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_alloy_wheel" className="text-xs">
+                  AW
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_full_option"
+                  name="is_full_option"
+                  checked={formData.is_full_option}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_full_option: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_full_option" className="text-xs">
+                  Full Opts
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  checked={formData.is_active}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, is_active: e.target.checked }))
+                  }
+                  className="mr-1 h-3 w-3"
+                />
+                <label htmlFor="is_active" className="text-xs">
+                  Active?
+                </label>
               </div>
             </div>
           </div>

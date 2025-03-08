@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { logInfo } from '@/app/lib/logger';
 
 // Using same Purchase data structure from the form
 import PurchaseEntryForm, { PurchaseFormData } from './PurchaseEntryForm';
@@ -19,6 +20,8 @@ export default function PurchaseModal({
   isEditing = false,
   initialData = {},
 }: PurchaseModalProps) {
+  // Log the initial data for debugging
+  logInfo(`PurchaseModal: initialData=${JSON.stringify(initialData)}`);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

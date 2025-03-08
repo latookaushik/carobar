@@ -55,10 +55,11 @@ export function formatIntDateToString(dateInt: number): string {
 
   const dateStr = dateInt.toString();
   if (dateStr.length !== 8) return '';
-  console.log(`dateStr = ${dateStr}  formattedDate = ${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`);
+  console.log(
+    `dateStr = ${dateStr}  formattedDate = ${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`
+  );
 
   return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
-  
 }
 
 /**

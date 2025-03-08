@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse , HttpStatus} from '@/app/lib/errorUtil';
+import { createErrorResponse, HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
 
 /**
@@ -32,7 +32,9 @@ function handleApiError(error: unknown, message: string) {
  * Supports filtering by date range, supplier, and target country
  */
 export const GET = withUser(async (request: NextRequest) => {
-  logInfo('GET /api/transactions/purchases/with-vehicle - Fetching purchase data with vehicle info');
+  logInfo(
+    'GET /api/transactions/purchases/with-vehicle - Fetching purchase data with vehicle info'
+  );
 
   try {
     // Get the authenticated user from the request
@@ -42,35 +44,38 @@ export const GET = withUser(async (request: NextRequest) => {
     }
 
     const { companyId } = user;
-    
+
     // Parse filter parameters from the URL
     const { searchParams } = new URL(request.url);
-    const fromDate = searchParams.get('fromDate') ? parseInt(searchParams.get('fromDate') as string) : null;
-    const toDate = searchParams.get('toDate') ? parseInt(searchParams.get('toDate') as string) : null;
+    const fromDate = searchParams.get('fromDate')
+      ? parseInt(searchParams.get('fromDate') as string)
+      : null;
+    const toDate = searchParams.get('toDate')
+      ? parseInt(searchParams.get('toDate') as string)
+      : null;
     const supplier = searchParams.get('supplier');
     const targetCountry = searchParams.get('targetCountry');
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '100');
-    
 
     logDebug(
       `Fetching purchases with vehicle data for company: ${companyId} with filters: fromDate=${fromDate}, toDate=${toDate}, supplier=${supplier}, targetCountry=${targetCountry}`
     );
 
-// Define types for query parameters
-interface PurchaseWhereCondition {
-  company_id: string;
-  purchase_date?: {
-    gte?: number;
-    lte?: number;
-  };
-  supplier_code?: string;
-}
+    // Define types for query parameters
+    interface PurchaseWhereCondition {
+      company_id: string;
+      purchase_date?: {
+        gte?: number;
+        lte?: number;
+      };
+      supplier_code?: string;
+    }
 
-// Build where condition for purchases
-const whereCondition: PurchaseWhereCondition = { 
-  company_id: companyId 
-};
+    // Build where condition for purchases
+    const whereCondition: PurchaseWhereCondition = {
+      company_id: companyId,
+    };
 
     if (fromDate) {
       whereCondition.purchase_date = whereCondition.purchase_date || {};
@@ -86,17 +91,17 @@ const whereCondition: PurchaseWhereCondition = {
       whereCondition.supplier_code = supplier;
     }
 
-// Vehicle where condition for target country filter
-interface VehicleWhereCondition {
-  company_id: string;
-  is_active: boolean;
-  target_country?: string;
-}
+    // Vehicle where condition for target country filter
+    interface VehicleWhereCondition {
+      company_id: string;
+      is_active: boolean;
+      target_country?: string;
+    }
 
-const vehicleWhereCondition: VehicleWhereCondition = {
-  company_id: companyId,
-  is_active: true
-};
+    const vehicleWhereCondition: VehicleWhereCondition = {
+      company_id: companyId,
+      is_active: true,
+    };
 
     if (targetCountry) {
       vehicleWhereCondition.target_country = targetCountry;
@@ -153,11 +158,13 @@ const vehicleWhereCondition: VehicleWhereCondition = {
       ${whereConditions}
       ORDER BY p.purchase_date DESC      
     `);
- 
-    const total:number=rawPurchases.length;
+
+    const total: number = rawPurchases.length;
     const totalPages = Math.ceil(total / pageSize);
 
-    logInfo(`Found ${rawPurchases.length} purchase records with vehicle info for company ${companyId}`);
+    logInfo(
+      `Found ${rawPurchases.length} purchase records with vehicle info for company ${companyId}`
+    );
 
     return createSuccessResponse({
       purchases: rawPurchases,
