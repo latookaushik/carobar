@@ -9,9 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { z } from 'zod';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createErrorResponse ,HttpStatus} from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
-import { HttpStatus } from '@/app/lib/enums';
 
 // Define validation schema for color data
 const colorSchema = z.object({

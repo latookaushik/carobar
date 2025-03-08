@@ -9,9 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createErrorResponse ,HttpStatus} from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
-import { HttpStatus } from '@/app/lib/enums';
 
 // Define validation schema for Chart of Account data
 const coaSchema = z.object({

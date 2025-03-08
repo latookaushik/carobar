@@ -9,7 +9,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
+import { refreshAccessToken } from '@/app/lib/refreshToken';
 
 // User type definition (single source of truth)
 export interface AuthUser {
@@ -55,42 +55,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
 
-  // Check if the user is authenticated on mount and when token changes
+  // Check if the user is authenticated on mount
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        // Check if a token exists
-        const storedToken = Cookies.get('token');
-
-        if (!storedToken) {
-          setUser(null);
-          setToken(null);
-          setLoading(false);
-          return;
-        }
-
-        setToken(storedToken);
-
-        // Use the original API endpoint for now
+        // With httpOnly cookies, we don't need to manually send the token
+        // The browser will automatically include the cookie in the request
         const response = await fetch('/api/verifyToken', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: storedToken }),
+          method: 'GET',
+          credentials: 'include', // Important for cookies
         });
 
         if (response.ok) {
           const { user } = await response.json();
           setUser(user);
+          setToken('token-exists'); // Just a flag to indicate authentication
+        } else if (response.status === 401) {
+          // Token might be expired, try to refresh it
+          const refreshed = await refreshAccessToken();
+
+          if (refreshed) {
+            // If token was refreshed successfully, try to verify again
+            const newResponse = await fetch('/api/verifyToken', {
+              method: 'GET',
+              credentials: 'include',
+            });
+
+            if (newResponse.ok) {
+              const { user } = await newResponse.json();
+              setUser(user);
+              setToken('token-exists');
+            } else {
+              setUser(null);
+              setToken(null);
+            }
+          } else {
+            setUser(null);
+            setToken(null);
+          }
         } else {
-          // Clear invalid token
-          Cookies.remove('token');
           setUser(null);
+          setToken(null);
         }
       } catch (error) {
         console.error('Auth verification error:', error);
-        // Clear token on error
-        Cookies.remove('token');
         setUser(null);
+        setToken(null);
       } finally {
         setLoading(false);
       }
@@ -118,18 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       }
 
-      // Set token cookie
-      const token = data.token;
-      Cookies.set('token', token, {
-        expires: 1,
-        path: '/',
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production',
-      });
-
-      // Set user data from the API response
+      // The token is now set as an httpOnly cookie by the server
+      // We just need to update the user state
       setUser(data.user);
-      setToken(token);
+      setToken('token-exists'); // We don't store the actual token anymore, just a flag
 
       return { success: true };
     } catch (error) {
@@ -142,8 +144,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Logout function
-  const logout = () => {
-    Cookies.remove('token');
+  const logout = async () => {
+    try {
+      // Call the logout API to clear the httpOnly cookie
+      await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include', // Important for cookies
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+
+    // Clear client-side state regardless of API success
     setUser(null);
     setToken(null);
     router.push('/');

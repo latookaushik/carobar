@@ -9,9 +9,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { z } from 'zod';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createErrorResponse,HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
-import { HttpStatus, Role } from '@/app/lib/enums';
+import { Role } from '@/app/lib/enums';
 
 // Define validation schema for maker data
 const makerSchema = z.object({

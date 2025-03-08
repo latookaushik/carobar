@@ -10,6 +10,7 @@ import PurchaseModal from './PurchaseModal';
 import PageTemplate from '@/app/components/PageTemplate';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { formatIntDateToString } from '@/app/lib/helpers';
+import { toast } from '@/app/components/ui/use-toast';
 
 // Helper for creating default date range (today - 30 days to today)
 const getDefaultDateRange = () => {
@@ -64,7 +65,22 @@ export default function PurchasePage() {
 
   // Column definitions for the data grid
   const columns: GridColDef[] = [
-    { field: 'chassis_no', headerName: 'Chassis No.', minWidth: 150 },
+    { 
+      field: 'chassis_no', 
+      headerName: 'Chassis No.', 
+      minWidth: 150,
+      renderCell: (params) => (
+        <span 
+          className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleChassisClick(params.row);
+          }}
+        >
+          {params.value}
+        </span>
+      )
+    },
     {
       field: 'purchase_date',
       headerName: 'Date',
@@ -74,11 +90,11 @@ export default function PurchasePage() {
       },
     },
     { field: 'supplier_name', headerName: 'Supplier', minWidth: 200 },
-    { field: 'vehicle_name', headerName: 'Vehicle', minWidth: 250 },
-    { field: 'grade', headerName: 'Grade', minWidth: 150 },
-    { field: 'manufacture_yyyymm', headerName: 'Model', minWidth: 100 },
+    { field: 'vehicle_name', headerName: 'Vehicle', minWidth: 240 },
+    { field: 'grade', headerName: 'Grade', minWidth: 140 },
+    { field: 'model', headerName: 'Model', minWidth: 100,  headerAlign: 'center', align: 'center'},
     { field: 'color', headerName: 'Color', minWidth: 80 },
-    { field: 'maker', headerName: 'Maker', minWidth: 170 },
+    { field: 'maker', headerName: 'Maker', minWidth: 150 },
     { field: 'vehicle_location', headerName: 'Location', minWidth: 200 },
     { field: 'target_country', headerName: 'Country', minWidth: 50 },
     {
@@ -86,7 +102,7 @@ export default function PurchasePage() {
       headerName: 'Base Cost',
       align: 'right',
       headerAlign: 'right',
-      minWidth: 45,
+      minWidth: 50,
       valueFormatter: (param: number) => {
         return Number(param).toLocaleString();
       },
@@ -202,18 +218,13 @@ export default function PurchasePage() {
           supplier_name: string;
           vehicle_name: string;
           grade: string;
-          manufacture_yyyymm: string;
+          model: string;
           color: string;
           maker: string;
           vehicle_location: string;
           target_country: string;
           purchase_cost: number;
-          expenses?: number;
-          tax?: number;
-          commission?: number;
-          recycle_fee?: number;
-          auction_fee?: number;
-          road_tax?: number;
+          expenses: number;
           total_vehicle_fee: number;
           currency: string;
           payment_date: number;
@@ -222,14 +233,6 @@ export default function PurchasePage() {
 
         // Process the data and transform to grid format
         const gridData = data.purchases.map((item: PurchaseResponseItem) => {
-          // Ensure all numeric values are properly converted
-          const expenses = 
-            Number(item.tax || 0) +
-            Number(item.commission || 0) +
-            Number(item.recycle_fee || 0) +
-            Number(item.auction_fee || 0) +
-            Number(item.road_tax || 0);
-            
           const rowData = {
             id: item.chassis_no || 'unknown',
             chassis_no: item.chassis_no || '',
@@ -237,13 +240,13 @@ export default function PurchasePage() {
             supplier_name: item.supplier_name || '',
             vehicle_name: item.vehicle_name || '',
             grade: item.grade || '',
-            manufacture_yyyymm: item.manufacture_yyyymm || '',
+            model: item.model || '',
             color: item.color || '',
             maker: item.maker || '',
             vehicle_location: item.vehicle_location || '',
             target_country: item.target_country || '',
             purchase_cost: Number(item.purchase_cost || 0),
-            expenses: Number(expenses),
+            expenses: Number(item.expenses),
             total_vehicle_fee: Number(item.total_vehicle_fee || 0),
             currency: item.currency || '',
             payment_date: item.payment_date ? Number(item.payment_date) : null,
@@ -275,6 +278,41 @@ export default function PurchasePage() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  // Handler for when chassis number is clicked
+  const handleChassisClick = async (row: PurchaseData) => {
+    try {
+      // Fetch the complete purchase data using the chassis number
+      const response = await fetch(`/api/transactions/purchases?chassis=${row.chassis_no}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch purchase data');
+      }
+      
+      const data = await response.json();
+      
+      if (data.purchases && data.purchases.length > 0) {
+        // Set editing mode and open modal with the first purchase found
+        setIsEditing(true);
+        setSelectedPurchase(data.purchases[0]);
+        setIsModalOpen(true);
+      } else {
+        console.error('No purchase data found for chassis number:', row.chassis_no);
+        toast({
+          title: 'Error',
+          description: 'Could not find purchase data for editing',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching purchase data for editing:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load purchase data for editing',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -346,7 +384,7 @@ export default function PurchasePage() {
           &nbsp;
           <button
             onClick={handleSearch}
-            className="flex items-center gap-2 bg-maroon-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md h-10"
+            className="flex items-center gap-2 bg-maroon-600 hover:bg-red-800 text-white px-4 py-2 rounded-md"
           >
             Search
           </button>

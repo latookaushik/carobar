@@ -3,14 +3,20 @@
  *
  * Provides operations for vehicle purchases in the Carobar application.
  * All operations are secured and company-specific, ensuring proper data isolation.
+ * 
+ * Endpoints:
+ * - POST: Creates a new purchase record with associated vehicle data
+ * - GET: Retrieves purchase records with filtering and pagination
+ * 
+ * Authentication: All endpoints require a valid JWT token with company context
  */
+
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createErrorResponse, HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
-import { HttpStatus } from '@/app/lib/enums';
 
 /**
  * Helper function to create success responses

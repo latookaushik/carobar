@@ -3,8 +3,8 @@
 
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { createToken, JWTPayload } from '@/app/lib/jwtUtil';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createToken, createRefreshToken, JWTPayload } from '@/app/lib/jwtUtil';
+import { createErrorResponse, HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logWarning } from '@/app/lib/logger';
 import prisma from '@/app/lib/prisma';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'; // Import only the specific error type
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // Validate required fields
     if (!company_id || !user_id || !password) {
-      return createErrorResponse('All fields are required', 400);
+      return createErrorResponse('All fields are required',HttpStatus.BAD_REQUEST);
     }
 
     // Find user in database with joined company and role info
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     if (!user) {
       logWarning(`User ${user_id} not found`);
-      return createErrorResponse('User not found', 404);
+      return createErrorResponse('User not found', HttpStatus.NOT_FOUND);
     }
 
     // Transform the result to match the desired output
@@ -61,37 +61,71 @@ export async function POST(request: Request) {
     // Verify password matches
     if (!(await bcrypt.compare(password, user.password_hash))) {
       logError('Incorrect password');
-      return createErrorResponse('Invalid credentials', 401);
+      return createErrorResponse('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
     // Check if both user and company accounts are active
     if (!user.is_active || !user.ref_companies.is_active) {
       logError('User or company inactive');
-      return createErrorResponse('Invalid credentials', 401);
+      return createErrorResponse('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    // Generate JWT token
-    const token = createToken(transformedUser);
-    logInfo(`User ${user.user_id} logged in successfully`);
-    return NextResponse.json(
+    // Generate access token (short-lived)
+    const accessToken = createToken({
+      ...transformedUser,
+      tokenType: 'access'
+    });
+
+    // Generate refresh token (long-lived)
+    const refreshToken = createRefreshToken(
+      transformedUser.userId,
+      transformedUser.companyId
+    );
+
+    // Create response with user data
+    const response = NextResponse.json(
       {
-        token,
         user: transformedUser,
         message: 'Login successful',
       },
       { status: 200 }
     );
+
+    // Set access token as httpOnly cookie
+    response.cookies.set({
+      name: 'token',
+      value: accessToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60, // 1 hour in seconds
+    });
+
+    // Set refresh token as httpOnly cookie
+    response.cookies.set({
+      name: 'refreshToken',
+      value: refreshToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
+    });
+
+    logInfo(`User ${user.user_id} logged in successfully`);
+    return response;
   } catch (error) {
     //check if the error is coming from prisma
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        return createErrorResponse('Record not found', 404);
+        return createErrorResponse('Record not found', HttpStatus.NOT_FOUND);
       }
       logError(`Prisma error: ${error.message}`);
-      return createErrorResponse('A database error occurred', 500);
+      return createErrorResponse('A database error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     logError(`Login error: ${error instanceof Error ? error.message : error}`);
-    return createErrorResponse('An unexpected error occurred. Please try again later.', 500);
+    return createErrorResponse('An unexpected error occurred. Please try again later.', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

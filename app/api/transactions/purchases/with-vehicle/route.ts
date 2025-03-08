@@ -8,9 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createErrorResponse , HttpStatus} from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
-import { HttpStatus } from '@/app/lib/enums';
 
 /**
  * Helper function to create success responses
@@ -52,7 +51,7 @@ export const GET = withUser(async (request: NextRequest) => {
     const targetCountry = searchParams.get('targetCountry');
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '100');
-    const skip = (page - 1) * pageSize;
+    
 
     logDebug(
       `Fetching purchases with vehicle data for company: ${companyId} with filters: fromDate=${fromDate}, toDate=${toDate}, supplier=${supplier}, targetCountry=${targetCountry}`
@@ -152,26 +151,10 @@ const vehicleWhereCondition: VehicleWhereCondition = {
       FROM vehicle_purchase p 
       INNER JOIN vehicle v ON p.company_id = v.company_id AND p.chassis_no = v.chassis_no AND v.is_active = true
       ${whereConditions}
-      ORDER BY p.purchase_date DESC
-      LIMIT ${pageSize} OFFSET ${skip}
+      ORDER BY p.purchase_date DESC      
     `);
-
-    // Define the type for count result
-    interface CountResult {
-      count: number | bigint;
-    }
-
-    // Get total count for pagination
-    const countResult = await prisma.$queryRawUnsafe<CountResult[]>(`
-      SELECT COUNT(*) as count
-      FROM vehicle_purchase p 
-      INNER JOIN vehicle v ON p.company_id = v.company_id AND p.chassis_no = v.chassis_no AND v.is_active = true
-      ${whereConditions}
-    `);
-
-    // Convert bigint to number if necessary and calculate total pages
-    const count = countResult[0]?.count || 0;
-    const total = typeof count === 'bigint' ? Number(count) : count as number;
+ 
+    const total:number=rawPurchases.length;
     const totalPages = Math.ceil(total / pageSize);
 
     logInfo(`Found ${rawPurchases.length} purchase records with vehicle info for company ${companyId}`);

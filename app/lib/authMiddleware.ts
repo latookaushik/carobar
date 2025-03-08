@@ -14,10 +14,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, JWTPayload } from '@/app/lib/jwtUtil';
-import { createErrorResponse } from '@/app/lib/errorUtil';
+import { createErrorResponse, HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
 import { Role } from '@/app/lib/enums';
-import { HttpStatus } from '@/app/lib/enums';
 
 /**
  * Extend the NextRequest type to include user information
