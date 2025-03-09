@@ -5,7 +5,19 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import { CheckRoles } from '@/app/lib/helpers';
 import PageTemplate from '@/app/components/PageTemplate';
 import { toast } from '@/app/components/ui/use-toast';
-import { PlusCircle, Edit, Trash2, RefreshCw, Search } from 'lucide-react';
+import {
+  PlusCircle,
+  Edit,
+  Trash2,
+  RefreshCw,
+  Search,
+  ShoppingCart,
+  BadgeDollarSign,
+  Wrench,
+  Truck,
+  Anchor,
+  UserRound,
+} from 'lucide-react';
 
 type Counterparty = {
   company_id: string;
@@ -86,6 +98,17 @@ export default function CounterpartyManagement() {
     useState<EditingCounterparty>(defaultNewCounterparty);
   const [oldCode, setOldCode] = useState<string>('');
   const modalRef = useRef<HTMLDivElement>(null);
+  // Add a ref to track if data has been fetched to prevent duplicate fetches
+  const dataFetchedRef = useRef(false);
+
+  const [tooltip, setTooltip] = useState({
+    supplier: false,
+    buyer: false,
+    shuriya: false,
+    riksoya: false,
+    shipper: false,
+    journalac: false,
+  });
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,10 +118,15 @@ export default function CounterpartyManagement() {
   const fetchCounterparties = async () => {
     try {
       setLoading(true);
-      console.log('Fetching counterparties...');
 
-      const response = await fetch('/api/counterparties');
-      console.log('Response status:', response.status);
+      // Add caching headers to prevent duplicate network requests
+      const response = await fetch('/api/counterparties', {
+        cache: 'no-store',
+        headers: {
+          Pragma: 'no-cache',
+          'Cache-Control': 'no-cache',
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -106,7 +134,6 @@ export default function CounterpartyManagement() {
       }
 
       const data = await response.json();
-      console.log('Received data:', data);
       setCounterparties(data.counterparties || []);
       setFilteredCounterparties(data.counterparties || []);
     } catch (error) {
@@ -121,8 +148,20 @@ export default function CounterpartyManagement() {
     }
   };
 
+  const handleMouseEnter = (type: string) => {
+    setTooltip((prev) => ({ ...prev, [type]: true }));
+  };
+
+  const handleMouseLeave = (type: string) => {
+    setTooltip((prev) => ({ ...prev, [type]: false }));
+  };
+
   useEffect(() => {
-    fetchCounterparties();
+    // Only fetch data once on component mount
+    if (!dataFetchedRef.current) {
+      dataFetchedRef.current = true;
+      fetchCounterparties();
+    }
   }, []);
 
   useEffect(() => {
@@ -339,7 +378,7 @@ export default function CounterpartyManagement() {
   // Function to get combined address
   const getCombinedAddress = (cp: Counterparty): string => {
     const addressParts = [cp.address1, cp.address2, cp.address3].filter(Boolean);
-    return addressParts.join(', ');
+    return addressParts.join('\n');
   };
 
   // Get paginated data
@@ -372,7 +411,7 @@ export default function CounterpartyManagement() {
             </div>
             <button
               onClick={fetchCounterparties}
-              className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -380,7 +419,7 @@ export default function CounterpartyManagement() {
             </button>
             <button
               onClick={openAddModal}
-              className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
             >
               <PlusCircle size={16} />
               Add Counterparty
@@ -390,21 +429,87 @@ export default function CounterpartyManagement() {
 
         {/* Counterparties Table */}
         <div className="overflow-x-auto rounded-md border border-gray-200">
-          <table className="w-full bg-white" style={{ minWidth: '1400px' }}>
+          <table className="w-full bg-white table-auto text-sm">
             <thead className="bg-maroon-700 text-white">
               <tr>
-                <th className="py-2 px-4 border-b text-left w-[120px]">Code</th>
-                <th className="py-2 px-4 border-b text-left w-[200px]">Name</th>
-                <th className="py-2 px-4 border-b text-left w-[200px]">Email</th>
-                <th className="py-2 px-4 border-b text-left w-[300px]">Address</th>
-                <th className="py-2 px-4 border-b text-left w-[200px]">Phone</th>
-                <th className="py-2 px-4 border-b text-left w-[200px]">Mobile</th>
-                <th className="py-2 px-4 border-b text-center w-[60px]">Supplier</th>
-                <th className="py-2 px-4 border-b text-center w-[60px]">Buyer</th>
-                <th className="py-2 px-4 border-b text-center w-[60px]">Shuriya</th>
-                <th className="py-2 px-4 border-b text-center w-[60px]">Riksoya</th>
-                <th className="py-2 px-4 border-b text-center w-[60px]">Shipper</th>
-                <th className="py-2 px-4 border-b text-center w-[60px]">Journal AC</th>
+                <th className="py-2 px-2 border-b text-left min-w-0">Code</th>
+                <th className="py-2 px-2 border-b text-left min-w-0">Name</th>
+                <th className="py-2 px-2 border-b text-left min-w-0">Email</th>
+                <th className="py-2 px-2 border-b text-left min-w-0">Address</th>
+                <th className="py-2 px-2 border-b text-left min-w-0">Phone</th>
+                <th className="py-2 px-2 border-b text-left min-w-0">Mobile</th>
+                <th
+                  className="py-2 px-2 border-b text-centermin-w-0 relative"
+                  onMouseEnter={() => handleMouseEnter('supplier')}
+                  onMouseLeave={() => handleMouseLeave('supplier')}
+                >
+                  <ShoppingCart size={18} />
+                  {tooltip.supplier && (
+                    <div className="absolute bg-white text-black text-xs border-b py-1 px-2 rounded top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      Supplier
+                    </div>
+                  )}
+                </th>
+                <th
+                  className="py-2 px-2 border-b text-center min-w-0 relative"
+                  onMouseEnter={() => handleMouseEnter('buyer')}
+                  onMouseLeave={() => handleMouseLeave('buyer')}
+                >
+                  <BadgeDollarSign size={18} />
+                  {tooltip.buyer && (
+                    <div className="absolute bg-white text-black text-xs border-b py-1 px-2 rounded top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      Buyer
+                    </div>
+                  )}
+                </th>
+                <th
+                  className="py-2 px-2 border-b text-center min-w-0 relative"
+                  onMouseEnter={() => handleMouseEnter('shuriya')}
+                  onMouseLeave={() => handleMouseLeave('shuriya')}
+                >
+                  <Wrench size={18} />
+                  {tooltip.shuriya && (
+                    <div className="absolute bg-white text-black text-xs border-b py-1 px-2 rounded top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      Shuriya
+                    </div>
+                  )}
+                </th>
+                <th
+                  className="py-2 px-2 border-b text-center min-w-0 relative"
+                  onMouseEnter={() => handleMouseEnter('riksoya')}
+                  onMouseLeave={() => handleMouseLeave('riksoya')}
+                >
+                  <Truck size={18} />
+                  {tooltip.riksoya && (
+                    <div className="absolute bg-white text-black text-xs border-b py-1 px-2 rounded top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      Riksoya
+                    </div>
+                  )}
+                </th>
+                <th
+                  className="py-2 px-2 border-b text-center min-w-0 relative"
+                  onMouseEnter={() => handleMouseEnter('shipper')}
+                  onMouseLeave={() => handleMouseLeave('shipper')}
+                >
+                  <Anchor size={18} />
+                  {tooltip.shipper && (
+                    <div className="absolute bg-white text-black text-xs border-b py-1 px-2 rounded top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      Shipper
+                    </div>
+                  )}
+                </th>
+                <th
+                  className="py-2 px-2 border-b text-center min-w-0 relative"
+                  onMouseEnter={() => handleMouseEnter('journalac')}
+                  onMouseLeave={() => handleMouseLeave('journalac')}
+                >
+                  <UserRound size={18} />
+                  {tooltip.journalac && (
+                    <div className="absolute bg-white text-black text-xs border-b py-1 px-2 rounded top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                      JournalAC
+                    </div>
+                  )}
+                </th>
                 <th className="py-2 px-4 border-b text-center w-[80px]">Actions</th>
               </tr>
             </thead>
@@ -424,53 +529,61 @@ export default function CounterpartyManagement() {
               ) : (
                 getPaginatedData().map((cp) => (
                   <tr key={cp.code} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">{cp.code}</td>
-                    <td className="py-2 px-4 border-b">{cp.name || '-'}</td>
-                    <td className="py-2 px-4 border-b">{cp.email || '-'}</td>
-                    <td className="py-2 px-4 border-b">{getCombinedAddress(cp) || '-'}</td>
-                    <td className="py-2 px-4 border-b">{cp.phone || '-'}</td>
-                    <td className="py-2 px-4 border-b">{cp.mobile || '-'}</td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {cp.is_supplier ? (
-                        <span className="text-green-600">Yes</span>
-                      ) : (
-                        <span className="text-red-600">No</span>
-                      )}
+                    <td className="py-2 px-2 border-b text-nowrap">{cp.code}</td>
+                    <td className="py-2 px-2 border-b text-nowrap">{cp.name || '-'}</td>
+                    <td className="py-2 px-2 border-b">{cp.email || '-'}</td>
+                    <td className="py-2 px-2 border-b text-wrap">
+                      {getCombinedAddress(cp) || '-'}
                     </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {cp.is_buyer ? (
-                        <span className="text-green-600">Yes</span>
-                      ) : (
-                        <span className="text-red-600">No</span>
-                      )}
+                    <td className="py-2 px-2 border-b text-nowrap">{cp.phone || '-'}</td>
+                    <td className="py-2 px-2 border-b text-nowrap">{cp.mobile || '-'}</td>
+                    <td className="py-2 px-2 border-b text-center">
+                      <input
+                        type="checkbox"
+                        checked={cp.is_supplier || false}
+                        readOnly
+                        className="h-4 w-4 cursor-default"
+                      />
                     </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {cp.is_repair ? (
-                        <span className="text-green-600">Yes</span>
-                      ) : (
-                        <span className="text-red-600">No</span>
-                      )}
+                    <td className="py-2 px-2 border-b text-center">
+                      <input
+                        type="checkbox"
+                        checked={cp.is_buyer || false}
+                        readOnly
+                        className="h-4 w-4 cursor-default"
+                      />
                     </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {cp.is_localtransport ? (
-                        <span className="text-green-600">Yes</span>
-                      ) : (
-                        <span className="text-red-600">No</span>
-                      )}
+                    <td className="py-2 px-2 border-b text-center">
+                      <input
+                        type="checkbox"
+                        checked={cp.is_repair || false}
+                        readOnly
+                        className="h-4 w-4 cursor-default"
+                      />
                     </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {cp.is_shipper ? (
-                        <span className="text-green-600">Yes</span>
-                      ) : (
-                        <span className="text-red-600">No</span>
-                      )}
+                    <td className="py-2 px-2 border-b text-center">
+                      <input
+                        type="checkbox"
+                        checked={cp.is_localtransport || false}
+                        readOnly
+                        className="h-4 w-4 cursor-default"
+                      />
                     </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      {cp.is_journal ? (
-                        <span className="text-green-600">Yes</span>
-                      ) : (
-                        <span className="text-red-600">No</span>
-                      )}
+                    <td className="py-2 px-2 border-b text-center">
+                      <input
+                        type="checkbox"
+                        checked={cp.is_shipper || false}
+                        readOnly
+                        className="h-4 w-4 cursor-default"
+                      />
+                    </td>
+                    <td className="py-2 px-2 border-b text-center">
+                      <input
+                        type="checkbox"
+                        checked={cp.is_journal || false}
+                        readOnly
+                        className="h-4 w-4 cursor-default"
+                      />
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       <div className="flex justify-center gap-2">
@@ -581,7 +694,7 @@ export default function CounterpartyManagement() {
 
         {/* Add/Edit Modal */}
         {isAddEditModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center text-sm z-50">
             <div ref={modalRef} className="bg-white rounded-lg p-4 w-full max-w-3xl">
               <h2 className="text-lg font-semibold mb-3">
                 {isEditing ? 'Edit Counterparty' : 'Add New Counterparty'}
@@ -696,7 +809,7 @@ export default function CounterpartyManagement() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+              <div className="flex justify-between gap-2 mb-2">
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -798,14 +911,14 @@ export default function CounterpartyManagement() {
 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Comment</label>
-                <textarea
+                <input
+                  type="text"
                   name="comment"
                   value={currentCounterparty.comment}
                   onChange={handleInputChange}
                   className="w-full p-2 border rounded"
-                  rows={3}
                   maxLength={255}
-                ></textarea>
+                ></input>
               </div>
 
               <div className="flex justify-end gap-2">
@@ -817,7 +930,7 @@ export default function CounterpartyManagement() {
                 </button>
                 <button
                   onClick={isEditing ? handleUpdateCounterparty : handleAddCounterparty}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="px-4 py-2 bg-maroon-600 text-white rounded hover:bg-red-600"
                 >
                   {isEditing ? 'Save Changes' : 'Add Counterparty'}
                 </button>

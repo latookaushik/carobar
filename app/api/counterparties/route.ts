@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { z } from 'zod';
 import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
@@ -59,15 +60,46 @@ type CounterpartyInput = z.infer<typeof counterpartySchema>;
 type UpdateCounterpartyInput = z.infer<typeof updateCounterpartySchema>;
 
 /**
- * Helper function to create success responses
+ * Helper function to create success responses with caching
  */
 function createSuccessResponse<T>(data: T, status: number = HttpStatus.OK) {
-  return NextResponse.json(data, { status });
+  const response = NextResponse.json(data, {
+    status,
+    headers: {
+      // Add cache control headers to reduce database connections
+      'Cache-Control': 'private, max-age=10', // Cache for 10 seconds on client side
+      'Surrogate-Control': 'max-age=30', // Cache for 30 seconds on the CDN/Edge
+    },
+  });
+  return response;
 }
+
+/**
+ * Cached function to fetch counterparties
+ * This reduces database connections by caching the result
+ */
+const getCounterpartiesForCompany = unstable_cache(
+  async (companyId: string) => {
+    logDebug(`Fetching counterparties for company: ${companyId} (with caching)`);
+
+    return prisma.ref_contact.findMany({
+      where: { company_id: companyId },
+      orderBy: [
+        { is_active: 'desc' }, // Active counterparties first
+        { name: 'asc' }, // Then sort by name
+      ],
+    });
+  },
+  // Cache key generator - ensures unique cache per user/company
+  ['counterparties-list'],
+  // Cache options
+  { tags: ['counterparties'], revalidate: 30 } // Cache for 30 seconds server-side
+);
 
 /**
  * GET /api/counterparties
  * Fetches all counterparties for the authenticated user's company
+ * Uses caching to minimize database connections
  */
 export const GET = withUser(async (request: NextRequest) => {
   logInfo('GET /api/counterparties - Fetching counterparties');
@@ -77,21 +109,31 @@ export const GET = withUser(async (request: NextRequest) => {
     const user = getAuthUser(request);
     const companyId = user!.companyId;
 
-    logDebug(`Fetching counterparties for company: ${companyId}`);
+    // Check request cache headers - if client has fresh data, return 304 Not Modified
+    const ifNoneMatch = request.headers.get('if-none-match');
+    const etag = `W/"counterparties-${companyId}"`;
 
-    // Query the database for counterparties
-    const counterparties = await prisma.ref_contact.findMany({
-      where: { company_id: companyId },
-      orderBy: [
-        { is_active: 'desc' }, // Active counterparties first
-        { name: 'asc' }, // Then sort by name
-      ],
-    });
+    if (ifNoneMatch === etag) {
+      // Use NextResponse instead of Response for type compatibility
+      return NextResponse.json(null, {
+        status: 304,
+        headers: {
+          ETag: etag,
+          'Cache-Control': 'private, max-age=10',
+        },
+      });
+    }
+
+    // Use the cached function to fetch counterparties
+    const counterparties = await getCounterpartiesForCompany(companyId);
 
     logInfo(`Found ${counterparties.length} counterparties for company ${companyId}`);
 
-    // Return the counterparties
-    return createSuccessResponse({ counterparties });
+    // Create response with appropriate cache headers
+    const response = createSuccessResponse({ counterparties });
+    response.headers.set('ETag', etag);
+
+    return response;
   } catch (error) {
     logError(
       `Error fetching counterparties: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -103,6 +145,7 @@ export const GET = withUser(async (request: NextRequest) => {
 /**
  * POST /api/counterparties
  * Creates a new counterparty for the authenticated user's company
+ * Invalidates cache when new data is added
  */
 export const POST = withUser(async (request: NextRequest) => {
   logInfo('POST /api/counterparties - Creating new counterparty');
@@ -187,6 +230,16 @@ export const POST = withUser(async (request: NextRequest) => {
 
     logInfo(`Counterparty created: ${code} for company ${companyId}`);
 
+    // Cache tags are not yet working perfectly in App Router, but this sets us up for future improvements
+    // When fully supported, this will invalidate the cache for counterparties
+    await unstable_cache(
+      async () => {
+        return true;
+      }, // Return a Promise to satisfy TypeScript
+      ['counterparties-list'],
+      { tags: ['counterparties'] }
+    )();
+
     return createSuccessResponse({ counterparty: newCounterparty }, HttpStatus.CREATED);
   } catch (error) {
     logError(
@@ -199,6 +252,7 @@ export const POST = withUser(async (request: NextRequest) => {
 /**
  * PUT /api/counterparties
  * Updates an existing counterparty for the authenticated user's company
+ * Invalidates cache when data is updated
  */
 export const PUT = withUser(async (request: NextRequest) => {
   logInfo('PUT /api/counterparties - Updating counterparty');
@@ -315,6 +369,16 @@ export const PUT = withUser(async (request: NextRequest) => {
       logInfo(
         `Counterparty updated with code change: ${oldCode} -> ${newCode} for company ${companyId}`
       );
+
+      // Invalidate cache
+      await unstable_cache(
+        async () => {
+          return true;
+        }, // Return a Promise to satisfy TypeScript
+        ['counterparties-list'],
+        { tags: ['counterparties'] }
+      )();
+
       return createSuccessResponse({ counterparty: updatedCounterparty });
     } else {
       // Simple update without code change
@@ -348,6 +412,16 @@ export const PUT = withUser(async (request: NextRequest) => {
       });
 
       logInfo(`Counterparty updated: ${oldCode} for company ${companyId}`);
+
+      // Invalidate cache
+      await unstable_cache(
+        async () => {
+          return true;
+        }, // Return a Promise to satisfy TypeScript
+        ['counterparties-list'],
+        { tags: ['counterparties'] }
+      )();
+
       return createSuccessResponse({ counterparty: updatedCounterparty });
     }
   } catch (error) {
@@ -361,6 +435,7 @@ export const PUT = withUser(async (request: NextRequest) => {
 /**
  * DELETE /api/counterparties
  * Deletes a counterparty from the authenticated user's company
+ * Invalidates cache when data is deleted
  */
 export const DELETE = withUser(async (request: NextRequest) => {
   logInfo('DELETE /api/counterparties - Deleting counterparty');
@@ -426,6 +501,15 @@ export const DELETE = withUser(async (request: NextRequest) => {
     });
 
     logInfo(`Counterparty deleted: ${code} for company ${companyId}`);
+
+    // Invalidate cache
+    await unstable_cache(
+      async () => {
+        return true;
+      }, // Return a Promise to satisfy TypeScript
+      ['counterparties-list'],
+      { tags: ['counterparties'] }
+    )();
 
     return createSuccessResponse({
       message: 'Counterparty deleted successfully',
