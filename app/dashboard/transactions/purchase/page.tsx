@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Calendar } from 'lucide-react';
 import { DataGrid, GridToolbar, GridColDef } from '@mui/x-data-grid';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import PurchaseModal from './PurchaseModal';
 import PageTemplate from '@/app/components/PageTemplate';
@@ -23,11 +22,11 @@ const getDefaultDateRange = () => {
 interface PurchaseData {
   id: string;
   chassis_no: string;
-  purchase_date: number;
+  purchase_date: number | null;
   supplier_name: string;
   vehicle_name: string;
   grade: string;
-  manufacture_yyyymm: string;
+  model: string; // Changed from manufacture_yyyymm to match the API response
   color: string;
   maker: string;
   vehicle_location: string;
@@ -36,8 +35,9 @@ interface PurchaseData {
   expenses: number;
   total_vehicle_fee: number;
   currency: string;
-  payment_date: number;
+  payment_date: number | null;
   purchase_remarks: string;
+  is_active: boolean; // Added to track if vehicle is active
 }
 
 export default function PurchasePage() {
@@ -48,8 +48,14 @@ export default function PurchasePage() {
   const [purchaseData, setPurchaseData] = useState<PurchaseData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Current filter state
+  // Current filter state - Using Dayjs objects for API interactions
   const [dateRange, setDateRange] = useState<{ from: Dayjs; to: Dayjs }>(getDefaultDateRange());
+
+  // Raw string input values for the date fields - allowing free text entry
+  const [dateInputs, setDateInputs] = useState<{ fromStr: string; toStr: string }>({
+    fromStr: dateRange.from.format('YYYY-MM-DD'),
+    toStr: dateRange.to.format('YYYY-MM-DD'),
+  });
   const [supplier, setSupplier] = useState<string>('');
   const [targetCountry, setTargetCountry] = useState<string>('');
 
@@ -174,11 +180,67 @@ export default function PurchasePage() {
 
   // Function to handle search button click
   const handleSearch = () => {
-    setAppliedFilters({
-      dateRange,
-      supplier,
-      targetCountry,
-    });
+    // Parse the date inputs to Dayjs objects for the API
+    try {
+      // Parse from date if entered
+      let fromDate = dateInputs.fromStr ? dayjs(dateInputs.fromStr) : null;
+      let toDate = dateInputs.toStr ? dayjs(dateInputs.toStr) : null;
+
+      // Fallback to defaults if invalid dates
+      if (fromDate && !fromDate.isValid()) {
+        fromDate = dayjs().subtract(30, 'day');
+        toast({
+          title: 'Invalid Date',
+          description: 'From date is invalid, using default (30 days ago).',
+          variant: 'default',
+        });
+      }
+
+      if (toDate && !toDate.isValid()) {
+        toDate = dayjs();
+        toast({
+          title: 'Invalid Date',
+          description: 'To date is invalid, using today as default.',
+          variant: 'default',
+        });
+      }
+
+      // Default to today if no valid end date
+      if (!toDate) toDate = dayjs();
+
+      // Default to 30 days before end date if no valid start date
+      if (!fromDate) fromDate = toDate.subtract(30, 'day');
+
+      // Update the dateRange with validated dates
+      const updatedDateRange = {
+        from: fromDate,
+        to: toDate,
+      };
+
+      // Apply all filters including parsed dates
+      setDateRange(updatedDateRange);
+      setAppliedFilters({
+        dateRange: updatedDateRange,
+        supplier,
+        targetCountry,
+      });
+    } catch (error) {
+      console.error('Error parsing dates:', error);
+      toast({
+        title: 'Date Error',
+        description: 'There was an error with the date range. Using defaults.',
+        variant: 'destructive',
+      });
+
+      // Use defaults on error
+      const defaultRange = getDefaultDateRange();
+      setDateRange(defaultRange);
+      setAppliedFilters({
+        dateRange: defaultRange,
+        supplier,
+        targetCountry,
+      });
+    }
   };
 
   // Fetch purchase data based on applied filters (not the current filter state)
@@ -239,9 +301,30 @@ export default function PurchasePage() {
           purchase_remarks: string;
         }
 
+        // Define the interface for API response items to include is_active
+        interface PurchaseResponseItem {
+          chassis_no: string;
+          purchase_date: number;
+          supplier_name: string;
+          vehicle_name: string;
+          grade: string;
+          model: string;
+          color: string;
+          maker: string;
+          vehicle_location: string;
+          target_country: string;
+          purchase_cost: number;
+          expenses: number;
+          total_vehicle_fee: number;
+          currency: string;
+          payment_date: number;
+          purchase_remarks: string;
+          is_active: boolean;
+        }
+
         // Process the data and transform to grid format
         const gridData = data.purchases.map((item: PurchaseResponseItem) => {
-          const rowData = {
+          const rowData: PurchaseData = {
             id: item.chassis_no || 'unknown',
             chassis_no: item.chassis_no || '',
             purchase_date: item.purchase_date ? Number(item.purchase_date) : null,
@@ -259,8 +342,9 @@ export default function PurchasePage() {
             currency: item.currency || '',
             payment_date: item.payment_date ? Number(item.payment_date) : null,
             purchase_remarks: item.purchase_remarks || '',
+            is_active: item.is_active === false ? false : true, // Default to true if not specified
           };
-          logDebug(`Raw API response: ${JSON.stringify(rowData)}`);
+          logDebug(`Processed row data: ${JSON.stringify(rowData)}`);
           return rowData;
         });
         logDebug(`Processed grid data: ${JSON.stringify(gridData)}`);
@@ -332,20 +416,16 @@ export default function PurchasePage() {
 
   return (
     <PageTemplate title="Vehicle Purchases">
-      {/* Filter Panel - New Layout */}
-      <div className="flex flex-wrap items-end gap-4 mb-6 w-full">
-        <div className="flex items-center text-sm gap-2">
-          <label className="text-sm font-medium">Purchase date</label>
+      {/* Filter Panel - Single Row Layout */}
+      <div className="flex items-center gap-2 mb-6 w-full">
+        {/* Date Inputs */}
+        <div className="flex items-center">
+          <label className="text-sm font-medium whitespace-nowrap mr-2">Purchase date</label>
           <div className="relative">
             <input
               type="date"
-              value={dateRange.from ? dateRange.from.format('YYYY-MM-DD') : ''}
-              onChange={(e) =>
-                setDateRange((prev) => ({
-                  ...prev,
-                  from: e.target.value ? dayjs(e.target.value) : dayjs(),
-                }))
-              }
+              value={dateInputs.fromStr}
+              onChange={(e) => setDateInputs((prev) => ({ ...prev, fromStr: e.target.value }))}
               className="pl-6 pr-2 py-1 border border-gray-300 rounded-md text-xs"
             />
             <Calendar
@@ -353,16 +433,11 @@ export default function PurchasePage() {
               size={12}
             />
           </div>
-          <div className="relative">
+          <div className="relative ml-1">
             <input
               type="date"
-              value={dateRange.to ? dateRange.to.format('YYYY-MM-DD') : ''}
-              onChange={(e) =>
-                setDateRange((prev) => ({
-                  ...prev,
-                  to: e.target.value ? dayjs(e.target.value) : dayjs(),
-                }))
-              }
+              value={dateInputs.toStr}
+              onChange={(e) => setDateInputs((prev) => ({ ...prev, toStr: e.target.value }))}
               className="pl-6 pr-2 py-1 border border-gray-300 rounded-md text-xs"
             />
             <Calendar
@@ -371,56 +446,60 @@ export default function PurchasePage() {
             />
           </div>
         </div>
-        &nbsp;&nbsp;
-        <div className="flex w-max items-center text-sm gap-4">
-          <FormControl sx={{ minWidth: '320px' }} size="small">
-            <InputLabel>Supplier</InputLabel>
-            <Select
-              value={supplier}
-              label="Supplier"
-              onChange={(e) => setSupplier(e.target.value as string)}
-            >
-              <MenuItem value="">All Suppliers</MenuItem>
-              {suppliers.map((supplier) => (
-                <MenuItem key={supplier.code} value={supplier.code}>
-                  {supplier.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          &nbsp;
-          <FormControl sx={{ minWidth: '280px' }} size="small">
-            <InputLabel>Target Country</InputLabel>
-            <Select
-              value={targetCountry}
-              label="Target Country"
-              onChange={(e) => setTargetCountry(e.target.value as string)}
-            >
-              <MenuItem value="">All Countries</MenuItem>
-              {countries.map((country) => (
-                <MenuItem key={country.code} value={country.code}>
-                  {country.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          &nbsp;
-          <button
-            onClick={handleSearch}
-            className="flex items-center gap-2 bg-maroon-600 hover:bg-red-800 text-white px-4 py-2 rounded-md"
+
+        {/* Supplier Dropdown */}
+        <div className="flex items-center">
+          <label className="text-sm font-medium whitespace-nowrap mr-2">Supplier</label>
+          <select
+            value={supplier}
+            onChange={(e) => setSupplier(e.target.value)}
+            className="py-1 px-2 w-[220px] border border-gray-300 rounded-md text-xs"
           >
-            Search
-          </button>
+            <option value="">All Suppliers</option>
+            {suppliers.map((supplier) => (
+              <option key={supplier.code} value={supplier.code}>
+                {supplier.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="ml-auto flex items-center gap-4">
-          <button
-            onClick={openNewPurchaseModal}
-            className="flex items-center gap-2 bg-maroon-600 hover:bg-red-800 text-white px-4 py-2 rounded-md"
+
+        {/* Target Country */}
+        <div className="flex items-center">
+          <label className="text-sm font-medium whitespace-nowrap mr-2">Target Country</label>
+          <select
+            value={targetCountry}
+            onChange={(e) => setTargetCountry(e.target.value)}
+            className="py-1 px-2 w-[180px] border border-gray-300 rounded-md text-xs"
           >
-            <Plus size={16} />
-            Add New Purchase
-          </button>
+            <option value="">All Countries</option>
+            {countries.map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.name}
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Empty div with margin-left:auto to push the buttons to the right */}
+        <div className="ml-auto"></div>
+
+        {/* Search Button - now next to Add New Purchase */}
+        <button
+          onClick={handleSearch}
+          className="flex items-center justify-center bg-maroon-600 hover:bg-red-800 text-white px-4 py-1 rounded-md text-sm font-medium"
+        >
+          Search
+        </button>
+
+        {/* Add New Purchase - now directly after Search Button */}
+        <button
+          onClick={openNewPurchaseModal}
+          className="flex items-center gap-1 bg-maroon-600 hover:bg-red-800 text-white px-4 py-1 rounded-md text-sm font-medium"
+        >
+          <Plus size={14} />
+          Add New Purchase
+        </button>
       </div>
 
       {/* Data Grid */}
@@ -434,7 +513,7 @@ export default function PurchasePage() {
           autoPageSize={false}
           initialState={{
             pagination: {
-              paginationModel: { pageSize: 10 },
+              paginationModel: { pageSize: 50 },
             },
             density: 'compact',
           }}
@@ -447,13 +526,31 @@ export default function PurchasePage() {
             },
           }}
           getRowHeight={() => 'auto'}
+          getRowClassName={(params) => {
+            // This will be used to apply data-* attributes through CSS classes
+            return params.row.is_active === false ? 'inactive-row' : '';
+          }}
           sx={{
-            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: 1 },
-            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: 1.5 },
-            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: 2 },
-            '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold' },
+            // Match text size with filter panel controls
+            '& .MuiDataGrid-root': { fontSize: '0.75rem' },
+            '& .MuiDataGrid-cell': { fontSize: '0.75rem', py: 0.75 },
+            '& .MuiTablePagination-root': { fontSize: '0.75rem' },
+            '& .MuiDataGrid-toolbarContainer button': { fontSize: '0.75rem' },
+            '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold', fontSize: '0.75rem' },
             '& .MuiDataGrid-columnHeaders div[role="row"]': {
-              backgroundColor: '#de9b9b',
+              // Corrected selector
+              backgroundColor: '#8b0000', // Maroon color
+              color: 'white',
+              fontSize: '0.75rem',
+            },
+            // Make row hover highlight more visible
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+            },
+            // Make the row with inactive Vehicles gray
+            '& .MuiDataGrid-row[data-is-active="false"]': {
+              backgroundColor: '#f5f5f5',
+              color: '#666',
             },
             overflowX: 'scroll',
           }}

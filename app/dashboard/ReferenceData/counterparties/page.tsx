@@ -530,7 +530,8 @@ export default function CounterpartyManagement() {
                 getPaginatedData().map((cp) => (
                   <tr
                     key={cp.code}
-                    className={`${!cp.is_active ? 'bg-gray-200' : ''} hover:bg-gray-50`}
+                    className={`${!cp.is_active ? 'bg-gray-200 text-gray-600' : ''} hover:bg-gray-50`}
+                    data-is-active={cp.is_active}
                   >
                     <td className="py-2 px-2 border-b text-nowrap">{cp.code}</td>
                     <td className="py-2 px-2 border-b text-nowrap">{cp.name || '-'}</td>

@@ -94,13 +94,11 @@ export const GET = withUser(async (request: NextRequest) => {
     // Vehicle where condition for target country filter
     interface VehicleWhereCondition {
       company_id: string;
-      is_active: boolean;
       target_country?: string;
     }
 
     const vehicleWhereCondition: VehicleWhereCondition = {
       company_id: companyId,
-      is_active: true,
     };
 
     if (targetCountry) {
@@ -152,9 +150,10 @@ export const GET = withUser(async (request: NextRequest) => {
         COALESCE(p.total_vehicle_fee, 0) as total_vehicle_fee, 
         p.currency,
         p.payment_date, 
-        p.purchase_remarks
+        p.purchase_remarks,
+        v.is_active
       FROM vehicle_purchase p 
-      INNER JOIN vehicle v ON p.company_id = v.company_id AND p.chassis_no = v.chassis_no AND v.is_active = true
+      INNER JOIN vehicle v ON p.company_id = v.company_id AND p.chassis_no = v.chassis_no 
       ${whereConditions}
       ORDER BY p.purchase_date DESC      
     `);
