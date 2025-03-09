@@ -10,6 +10,7 @@ import prisma from '@/app/lib/prisma';
 import { withUser, getAuthUser } from '@/app/lib/authMiddleware';
 import { createErrorResponse, HttpStatus } from '@/app/lib/errorUtil';
 import { logInfo, logError, logDebug } from '@/app/lib/logger';
+import { getOrFetchData } from '@/app/lib/cacheService';
 
 /**
  * Helper function to create success responses
@@ -132,31 +133,43 @@ export const GET = withUser(async (request: NextRequest) => {
     if (supplier) whereConditions += ` AND p.supplier_code = '${supplier}'`;
     if (targetCountry) whereConditions += ` AND v.target_country = '${targetCountry}'`;
 
-    // Use a raw query to fetch the combined data as specified in requirements
-    const rawPurchases = await prisma.$queryRawUnsafe<PurchaseWithVehicleData[]>(`
-      SELECT 
-        p.chassis_no, 
-        p.purchase_date, 
-        p.supplier_name, 
-        v.vehicle_name, 
-        v.grade, 
-        v.manufacture_yyyymm as model,
-        v.color,
-        v.maker,
-        v.vehicle_location,
-        v.target_country,
-        COALESCE(p.purchase_cost, 0) as purchase_cost, 
-        (COALESCE(p.tax, 0) + COALESCE(p.commission, 0) + COALESCE(p.recycle_fee, 0) + COALESCE(p.auction_fee, 0) + COALESCE(p.road_tax, 0)) as expenses, 
-        COALESCE(p.total_vehicle_fee, 0) as total_vehicle_fee, 
-        p.currency,
-        p.payment_date, 
-        p.purchase_remarks,
-        v.is_active
-      FROM vehicle_purchase p 
-      INNER JOIN vehicle v ON p.company_id = v.company_id AND p.chassis_no = v.chassis_no 
-      ${whereConditions}
-      ORDER BY p.purchase_date DESC      
-    `);
+    // Create a cache key based on filters
+    const cacheKey = `purchases_with_vehicle:${companyId}:${fromDate || 'null'}:${toDate || 'null'}:${supplier || 'null'}:${targetCountry || 'null'}`;
+
+    // Use caching for the purchase query (5 min TTL)
+    const fetchPurchases = async (): Promise<PurchaseWithVehicleData[]> => {
+      logDebug(`Cache miss for ${cacheKey}, querying database`);
+      return prisma.$queryRawUnsafe<PurchaseWithVehicleData[]>(`
+        SELECT 
+          p.chassis_no, 
+          p.purchase_date, 
+          p.supplier_name, 
+          v.vehicle_name, 
+          v.grade, 
+          v.manufacture_yyyymm as model,
+          v.color,
+          v.maker,
+          v.vehicle_location,
+          v.target_country,
+          COALESCE(p.purchase_cost, 0) as purchase_cost, 
+          (COALESCE(p.tax, 0) + COALESCE(p.commission, 0) + COALESCE(p.recycle_fee, 0) + COALESCE(p.auction_fee, 0) + COALESCE(p.road_tax, 0)) as expenses, 
+          COALESCE(p.total_vehicle_fee, 0) as total_vehicle_fee, 
+          p.currency,
+          p.payment_date, 
+          p.purchase_remarks,
+          v.is_active
+        FROM vehicle_purchase p 
+        INNER JOIN vehicle v ON p.company_id = v.company_id AND p.chassis_no = v.chassis_no 
+        ${whereConditions}
+        ORDER BY p.purchase_date DESC      
+      `);
+    };
+
+    const rawPurchases = await getOrFetchData<PurchaseWithVehicleData[]>(
+      cacheKey,
+      fetchPurchases,
+      5 * 60 * 1000 // 5 minute cache TTL
+    );
 
     const total: number = rawPurchases.length;
     const totalPages = Math.ceil(total / pageSize);

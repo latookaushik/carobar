@@ -361,64 +361,36 @@ export default function PurchaseEntryForm({
     }
 
     try {
-      // Common request options for all fetch calls
+      // Use the optimized combined reference data endpoint
       const requestOptions: RequestInit = {
-        credentials: 'include' as RequestCredentials, // Important for sending cookies with requests
+        credentials: 'include' as RequestCredentials,
         headers: {
           'Content-Type': 'application/json',
         },
       };
 
-      // Suppliers
-      const suppliersRes = await fetch('/api/counterparties', requestOptions);
-      if (suppliersRes.ok) {
-        const data = await suppliersRes.json();
-        setSuppliers(data.counterparties?.filter((c: Counterparty) => c.is_supplier) || []);
-      }
+      const response = await fetch('/api/reference-data/purchase', requestOptions);
 
-      const fuelTypesRes = await fetch('/api/fuel-types', requestOptions);
-      if (fuelTypesRes.ok) {
-        const data = await fuelTypesRes.json();
-        setFuelTypes(data.fuelTypes || []);
-      }
+      if (response.ok) {
+        const data = await response.json();
+        const refData = data.referenceData;
 
-      // Makers
-      const makersRes = await fetch('/api/makers', requestOptions);
-      if (makersRes.ok) {
-        const data = await makersRes.json();
-        setMakers(data.makers || []);
-      }
+        // Set all reference data at once
+        setSuppliers(refData.counterparties || []);
+        setFuelTypes(refData.fuelTypes || []);
+        setMakers(refData.makers || []);
+        setColors(refData.colors || []);
+        setLocations(refData.locations || []);
+        setCountries(refData.countries || []);
+        setVehicleTypes(refData.vehicleTypes || []);
 
-      // Colors
-      const colorsRes = await fetch('/api/colors', requestOptions);
-      if (colorsRes.ok) {
-        const data = await colorsRes.json();
-        setColors(data.colors || []);
-      }
+        logDebug('All reference data loaded successfully');
 
-      // Locations
-      const locationsRes = await fetch('/api/locations', requestOptions);
-      if (locationsRes.ok) {
-        const data = await locationsRes.json();
-        setLocations(data.locations || []);
+        // Mark data as fetched to prevent duplicate calls
+        dataFetchedRef.current = true;
+      } else {
+        throw new Error(`Failed to fetch reference data: ${response.status}`);
       }
-
-      // Countries
-      const countriesRes = await fetch('/api/countries', requestOptions);
-      if (countriesRes.ok) {
-        const data = await countriesRes.json();
-        setCountries(data.countries || []);
-      }
-
-      // Vehicle Types
-      const vehicleTypesRes = await fetch('/api/vehicle-types', requestOptions);
-      if (vehicleTypesRes.ok) {
-        const data = await vehicleTypesRes.json();
-        setVehicleTypes(data.vehicleTypes || []);
-      }
-
-      // Mark data as fetched to prevent duplicate calls
-      dataFetchedRef.current = true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logError(`Error fetching reference data: ${errorMessage}`);

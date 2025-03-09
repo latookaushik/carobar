@@ -152,26 +152,39 @@ export default function PurchasePage() {
     { field: 'purchase_remarks', headerName: 'Remarks', minWidth: 500 },
   ];
 
-  // Fetch reference data (suppliers and countries) on component mount
+  // Fetch reference data once on component mount
   useEffect(() => {
     const fetchReferenceData = async () => {
       try {
-        // Fetch suppliers
-        const suppliersResponse = await fetch('/api/counterparties');
-        if (suppliersResponse.ok) {
-          const data = await suppliersResponse.json();
-          setSuppliers(data.counterparties || []);
-        }
+        // Use the optimized combined reference data endpoint
+        const response = await fetch('/api/reference-data/purchase', {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-        // Fetch countries
-        const countriesResponse = await fetch('/api/countries');
-        if (countriesResponse.ok) {
-          const data = await countriesResponse.json();
-          setCountries(data.countries || []);
+        if (response.ok) {
+          const data = await response.json();
+          const refData = data.referenceData;
+
+          // Only need suppliers and countries for this page
+          setSuppliers(refData.counterparties || []);
+          setCountries(refData.countries || []);
+
+          logDebug('Reference data loaded successfully for purchase page');
+        } else {
+          throw new Error(`Failed to fetch reference data: ${response.status}`);
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         logError('Error fetching reference data: ' + errorMessage);
+
+        toast({
+          title: 'Error',
+          description: 'Failed to load reference data. Please refresh the page.',
+          variant: 'destructive',
+        });
       }
     };
 
