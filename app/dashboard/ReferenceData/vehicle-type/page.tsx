@@ -241,7 +241,7 @@ export default function VehicleTypePage() {
           <div className="flex gap-2">
             <button
               onClick={fetchVehicleTypes}
-              className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -250,7 +250,7 @@ export default function VehicleTypePage() {
             {!addingType && (
               <button
                 onClick={() => setAddingType(true)}
-                className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               >
                 <PlusCircle size={16} />
                 Add New Type
@@ -289,7 +289,7 @@ export default function VehicleTypePage() {
               </button>
               <button
                 onClick={handleAddType}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                className="bg-maroon-600 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Add Type
               </button>
@@ -305,8 +305,8 @@ export default function VehicleTypePage() {
         )}
 
         {/* Vehicle types table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg">
+        <div className="overflow-x-auto rounded-md border border-gray-200">
+          <table className="w-full bg-white table-auto text-sm">
             <thead className="bg-maroon-700 text-white">
               <tr>
                 <th className="py-2 px-4 border-b text-left">Vehicle Type</th>
@@ -374,14 +374,14 @@ export default function VehicleTypePage() {
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleUpdateType(type.vehicle_type)}
-                            className="text-blue-500 hover:text-blue-700"
+                            className="text-green-600 hover:text-green-800"
                             title="Save"
                           >
                             <Check size={18} />
                           </button>
                           <button
                             onClick={cancelEdit}
-                            className="text-gray-500 hover:text-gray-700"
+                            className="text-red-500 hover:text-red-700"
                             title="Cancel"
                           >
                             <X size={18} />
@@ -389,16 +389,12 @@ export default function VehicleTypePage() {
                         </div>
                       ) : (
                         <div className="flex justify-center gap-2">
-                          <button
-                            onClick={() => startEditType(type)}
-                            className="text-blue-500 hover:text-blue-700"
-                            title="Edit"
-                          >
+                          <button onClick={() => startEditType(type)} title="Edit">
                             <Edit size={18} />
                           </button>
                           <button
                             onClick={() => handleDeleteType(type.vehicle_type)}
-                            className="text-red-500 hover:text-red-700"
+                            className="text-red-600"
                             title="Delete"
                           >
                             <Trash2 size={18} />

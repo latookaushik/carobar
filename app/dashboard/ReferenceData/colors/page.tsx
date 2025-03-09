@@ -303,7 +303,7 @@ export default function ColorsPage() {
           <div className="flex gap-2">
             <button
               onClick={fetchColors}
-              className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -312,7 +312,7 @@ export default function ColorsPage() {
             {!addingColor && (
               <button
                 onClick={() => setAddingColor(true)}
-                className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               >
                 <PlusCircle size={16} />
                 Add New Color
@@ -349,7 +349,7 @@ export default function ColorsPage() {
               </button>
               <button
                 onClick={handleAddColor}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                className="bg-maroon-600 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Add Color
               </button>
@@ -365,8 +365,8 @@ export default function ColorsPage() {
         )}
 
         {/* Colors table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg">
+        <div className="overflow-x-auto rounded-md border border-gray-200">
+          <table className="w-full bg-white table-auto text-sm">
             <thead className="bg-maroon-700 text-white">
               <tr>
                 <th className="py-2 px-4 border-b text-left">Color</th>
@@ -431,7 +431,7 @@ export default function ColorsPage() {
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleUpdateColor(color.color)}
-                            className="text-blue-500 hover:text-blue-700"
+                            className="text-green-600 hover:text-green-800"
                             title="Save"
                           >
                             <Check size={18} />
@@ -446,11 +446,7 @@ export default function ColorsPage() {
                         </div>
                       ) : (
                         <div className="flex justify-center gap-2">
-                          <button
-                            onClick={() => startEditColor(color)}
-                            className="text-blue-500 hover:text-blue-700"
-                            title="Edit"
-                          >
+                          <button onClick={() => startEditColor(color)} title="Edit">
                             <Edit size={18} />
                           </button>
                           <button

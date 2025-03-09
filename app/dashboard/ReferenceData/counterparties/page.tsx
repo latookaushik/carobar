@@ -528,7 +528,10 @@ export default function CounterpartyManagement() {
                 </tr>
               ) : (
                 getPaginatedData().map((cp) => (
-                  <tr key={cp.code} className="hover:bg-gray-50">
+                  <tr
+                    key={cp.code}
+                    className={`${!cp.is_active ? 'bg-gray-200' : ''} hover:bg-gray-50`}
+                  >
                     <td className="py-2 px-2 border-b text-nowrap">{cp.code}</td>
                     <td className="py-2 px-2 border-b text-nowrap">{cp.name || '-'}</td>
                     <td className="py-2 px-2 border-b">{cp.email || '-'}</td>
@@ -587,16 +590,12 @@ export default function CounterpartyManagement() {
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => openEditModal(cp)}
-                          className="text-blue-500 hover:text-blue-700"
-                          title="Edit"
-                        >
+                        <button onClick={() => openEditModal(cp)} title="Edit">
                           <Edit size={18} />
                         </button>
                         <button
                           onClick={() => handleDeleteCounterparty(cp.code)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-600"
                           title="Delete"
                         >
                           <Trash2 size={18} />

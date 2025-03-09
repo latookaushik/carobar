@@ -275,7 +275,7 @@ export default function BankManagement() {
           <div className="flex gap-2">
             <button
               onClick={fetchBanks}
-              className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -284,7 +284,7 @@ export default function BankManagement() {
             {!isAdding && (
               <button
                 onClick={() => setIsAdding(true)}
-                className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               >
                 <PlusCircle size={16} />
                 Add Bank
@@ -390,7 +390,7 @@ export default function BankManagement() {
               </button>
               <button
                 onClick={handleAddBank}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                className="bg-maroon-600 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Add Bank
               </button>
@@ -399,8 +399,8 @@ export default function BankManagement() {
         )}
 
         {/* Banks Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg">
+        <div className="overflow-x-auto rounded-md border border-gray-200">
+          <table className="w-full bg-white table-auto text-sm">
             <thead className="bg-maroon-700 text-white">
               <tr>
                 <th className="py-2 px-4 border-b text-left">Account Number</th>
@@ -426,7 +426,10 @@ export default function BankManagement() {
                 </tr>
               ) : (
                 banks.map((bank) => (
-                  <tr key={bank.account_number} className="hover:bg-gray-50">
+                  <tr
+                    key={bank.account_number}
+                    className={`${!bank.is_active ? 'bg-gray-200' : ''} hover:bg-gray-50`}
+                  >
                     {editingBankId === bank.account_number ? (
                       // Editing Mode
                       <>
@@ -508,14 +511,14 @@ export default function BankManagement() {
                           <div className="flex justify-center gap-2">
                             <button
                               onClick={handleUpdateBank}
-                              className="text-blue-500 hover:text-blue-700"
+                              className="text-green-600 hover:text-green-800"
                               title="Save"
                             >
                               <Check size={18} />
                             </button>
                             <button
                               onClick={cancelEditing}
-                              className="text-gray-500 hover:text-gray-700"
+                              className="text-red-500 hover:text-red-700"
                               title="Cancel"
                             >
                               <X size={18} />
@@ -550,16 +553,12 @@ export default function BankManagement() {
                         </td>
                         <td className="py-2 px-4 border-b text-center">
                           <div className="flex justify-center gap-2">
-                            <button
-                              onClick={() => startEditing(bank)}
-                              className="text-blue-500 hover:text-blue-700"
-                              title="Edit"
-                            >
+                            <button onClick={() => startEditing(bank)} title="Edit">
                               <Edit size={18} />
                             </button>
                             <button
                               onClick={() => handleDeleteBank(bank.account_number)}
-                              className="text-red-500 hover:text-red-700"
+                              className="text-red-600"
                               title="Delete"
                               disabled={!!bank.is_default}
                             >
@@ -572,7 +571,6 @@ export default function BankManagement() {
                               onClick={() =>
                                 handleToggleDefault(bank.account_number, !!bank.is_default)
                               }
-                              className="text-yellow-500 hover:text-yellow-700"
                               title="Toggle Default"
                             >
                               {bank.is_default ? <X size={18} /> : <Check size={18} />}

@@ -338,7 +338,7 @@ export default function ChartOfAccountsManagement() {
   return (
     <PageTemplate title="Chart of Accounts" requiredRoles={CheckRoles.allRoles}>
       <div className="w-full">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center text-sm mb-4">
           <h1 className="text-2xl font-bold">Chart of Accounts</h1>
           <div className="flex gap-2">
             <div className="relative">
@@ -353,7 +353,7 @@ export default function ChartOfAccountsManagement() {
             </div>
             <button
               onClick={fetchAccounts}
-              className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -361,7 +361,7 @@ export default function ChartOfAccountsManagement() {
             </button>
             <button
               onClick={openAddModal}
-              className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              className="flex items-center gap-1 bg-maroon-600 text-white px-3 py-1 rounded hover:bg-red-600"
             >
               <PlusCircle size={16} />
               Add Account
@@ -370,11 +370,11 @@ export default function ChartOfAccountsManagement() {
         </div>
 
         {/* Accounts Table */}
-        <div className="overflow-x-auto rounded-md border border-gray-200">
+        <div className="overflow-x-auto rounded-md border text-sm border-gray-200">
           <table className="w-full bg-white">
             <thead className="bg-maroon-700 text-white">
               <tr>
-                <th className="py-2 px-4 border-b text-left w-[120px]">Account Code</th>
+                <th className="py-2 px-4 border-b text-left w-[150px]">Account Code</th>
                 <th className="py-2 px-4 border-b text-left w-[250px]">Account Name</th>
                 <th className="py-2 px-4 border-b text-left w-[150px]">Type</th>
                 <th className="py-2 px-4 border-b text-left">Description</th>
@@ -399,7 +399,10 @@ export default function ChartOfAccountsManagement() {
                 </tr>
               ) : (
                 filteredAccounts.map((account) => (
-                  <tr key={account.account_code} className="hover:bg-gray-50">
+                  <tr
+                    key={account.account_code}
+                    className={`hover:bg-gray-50 ${!account.is_active ? 'bg-gray-200' : ''}`}
+                  >
                     <td className="py-2 px-4 border-b">{account.account_code}</td>
                     <td className="py-2 px-4 border-b">{account.account_name}</td>
                     <td className="py-2 px-4 border-b">{account.account_type}</td>
@@ -437,11 +440,7 @@ export default function ChartOfAccountsManagement() {
                     </td>
                     <td className="py-2 px-4 border-b text-center">
                       <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => openEditModal(account)}
-                          className="text-blue-500 hover:text-blue-700"
-                          title="Edit"
-                        >
+                        <button onClick={() => openEditModal(account)} title="Edit">
                           <Edit size={18} />
                         </button>
                         <button
@@ -518,7 +517,7 @@ export default function ChartOfAccountsManagement() {
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-3 py-1 border rounded text-sm ${
-                      currentPage === pageNum ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'
+                      currentPage === pageNum ? 'bg-maroon-600 text-white' : 'hover:bg-gray-100'
                     }`}
                   >
                     {pageNum}
@@ -640,7 +639,7 @@ export default function ChartOfAccountsManagement() {
                 </button>
                 <button
                   onClick={isEditing ? handleUpdateAccount : handleAddAccount}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="px-4 py-2 bg-maroon-600 text-white rounded hover:bg-red-600"
                 >
                   {isEditing ? 'Save Changes' : 'Add Account'}
                 </button>

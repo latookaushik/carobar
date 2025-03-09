@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Calendar } from 'lucide-react';
 import { DataGrid, GridToolbar, GridColDef } from '@mui/x-data-grid';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import PurchaseModal from './PurchaseModal';
 import PageTemplate from '@/app/components/PageTemplate';
@@ -335,37 +334,45 @@ export default function PurchasePage() {
     <PageTemplate title="Vehicle Purchases">
       {/* Filter Panel - New Layout */}
       <div className="flex flex-wrap items-end gap-4 mb-6 w-full">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Purchase date</span>
-          <DatePicker
-            value={dateRange.from}
-            onChange={(newValue: Dayjs | null) =>
-              setDateRange((prev) => ({ ...prev, from: newValue || dayjs() }))
-            }
-            format="YYYY-MM-DD"
-            slotProps={{
-              textField: {
-                size: 'small',
-                sx: { width: '160px' },
-              },
-            }}
-          />
-          <DatePicker
-            value={dateRange.to}
-            onChange={(newValue: Dayjs | null) =>
-              setDateRange((prev) => ({ ...prev, to: newValue || dayjs() }))
-            }
-            format="YYYY-MM-DD"
-            slotProps={{
-              textField: {
-                size: 'small',
-                sx: { width: '160px' },
-              },
-            }}
-          />
+        <div className="flex items-center text-sm gap-2">
+          <label className="text-sm font-medium">Purchase date</label>
+          <div className="relative">
+            <input
+              type="date"
+              value={dateRange.from ? dateRange.from.format('YYYY-MM-DD') : ''}
+              onChange={(e) =>
+                setDateRange((prev) => ({
+                  ...prev,
+                  from: e.target.value ? dayjs(e.target.value) : dayjs(),
+                }))
+              }
+              className="pl-6 pr-2 py-1 border border-gray-300 rounded-md text-xs"
+            />
+            <Calendar
+              className="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={12}
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="date"
+              value={dateRange.to ? dateRange.to.format('YYYY-MM-DD') : ''}
+              onChange={(e) =>
+                setDateRange((prev) => ({
+                  ...prev,
+                  to: e.target.value ? dayjs(e.target.value) : dayjs(),
+                }))
+              }
+              className="pl-6 pr-2 py-1 border border-gray-300 rounded-md text-xs"
+            />
+            <Calendar
+              className="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={12}
+            />
+          </div>
         </div>
         &nbsp;&nbsp;
-        <div className="flex w-max items-center  gap-4">
+        <div className="flex w-max items-center text-sm gap-4">
           <FormControl sx={{ minWidth: '320px' }} size="small">
             <InputLabel>Supplier</InputLabel>
             <Select
