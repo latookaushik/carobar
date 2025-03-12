@@ -1,0 +1,323 @@
+{
+"ref_maker": [
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "TOYOTA",
+		"created_at" : "2025-02-15T09:20:45.111Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.111Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "NISSAN",
+		"created_at" : "2025-02-15T09:20:45.114Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.114Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "ISUZU",
+		"created_at" : "2025-02-15T09:20:45.115Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.115Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "HONDA",
+		"created_at" : "2025-02-15T09:20:45.116Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.116Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "MAZDA",
+		"created_at" : "2025-02-15T09:20:45.117Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.117Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "MITSUBISHI",
+		"created_at" : "2025-02-15T09:20:45.120Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.120Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "DAIHATSU",
+		"created_at" : "2025-02-15T09:20:45.121Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.121Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "SUBARU",
+		"created_at" : "2025-02-15T09:20:45.123Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.123Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "CATERPILLER",
+		"created_at" : "2025-02-15T09:20:45.124Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.124Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "FOREIGN",
+		"created_at" : "2025-02-15T09:20:45.126Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.126Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "HINO",
+		"created_at" : "2025-02-15T09:20:45.127Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.127Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "SUZUKI",
+		"created_at" : "2025-02-15T09:20:45.128Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.128Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "MERCEDES",
+		"created_at" : "2025-02-15T09:20:45.129Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.129Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "BMW",
+		"created_at" : "2025-02-15T09:20:45.130Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.130Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "OPEL",
+		"created_at" : "2025-02-15T09:20:45.132Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.132Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "VOLKS WAGEN",
+		"created_at" : "2025-02-15T09:20:45.133Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.133Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "FORD",
+		"created_at" : "2025-02-15T09:20:45.134Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.134Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "AUDI",
+		"created_at" : "2025-02-15T09:20:45.135Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.135Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "MERCEDES BENZ",
+		"created_at" : "2025-02-15T09:20:45.136Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.136Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"name" : "VOLVO",
+		"created_at" : "2025-02-15T09:20:45.137Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T09:20:45.137Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "AUDI",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "BMW",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "CATERPILLER",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "DAIHATSU",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "FORD",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "FOREIGN",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "HINO",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "HONDA",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "ISUZU",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "MAZDA",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "MERCEDES",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "MERCEDES BENZ",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "MITSUBISHI",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "NISSAN",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "OPEL",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "SUBARU",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "SUZUKI",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "TOYOTA",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "VOLKS WAGEN",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"name" : "VOLVO",
+		"created_at" : "2025-02-15T16:35:47.360Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:35:47.360Z",
+		"updated_by" : null
+	}
+]}

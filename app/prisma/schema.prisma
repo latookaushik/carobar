@@ -1,0 +1,600 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_bank {
+  company_id     String        @db.Uuid
+  account_number String        @db.VarChar(30)
+  bank_name      String        @db.VarChar(100)
+  bank_branch    String?       @db.VarChar(100)
+  currency       String?       @db.VarChar(3)
+  description    String?       @db.VarChar(500)
+  is_default     Boolean?
+  is_active      Boolean?
+  created_at     DateTime?     @default(now()) @db.Timestamp(6)
+  created_by     String?       @db.VarChar(50)
+  updated_at     DateTime?     @default(now()) @db.Timestamp(6)
+  updated_by     String?       @db.VarChar(50)
+  ref_companies  ref_companies @relation(fields: [company_id], references: [company_id], onUpdate: Restrict, map: "fk_bank_companies")
+  t_banktrans    t_banktrans[]
+
+  @@id([company_id, account_number], map: "pk_ref_bank")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_color {
+  company_id String    @db.Uuid
+  color      String    @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  created_by String?   @db.VarChar(50)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_by String?   @db.VarChar(50)
+
+  @@id([company_id, color], map: "pk_color")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_companies {
+  company_id       String        @id(map: "pk_companies") @db.Uuid
+  company_name     String        @db.VarChar(100)
+  address1         String?       @db.VarChar(255)
+  address2         String?       @db.VarChar(255)
+  address3         String?       @db.VarChar(255)
+  country          String?       @db.VarChar(3)
+  phone            String?       @db.VarChar(25)
+  mobile           String?       @db.VarChar(25)
+  email            String?       @db.VarChar(50)
+  is_active        Boolean?
+  base_currency    String?       @db.VarChar(3)
+  lastopeningday   Int?
+  lastinvoiceno    Int?          @default(0)
+  lastlocalinvoice Int?          @default(0)
+  taxpercent       Float?        @db.Real
+  report_prefix    String?       @default("carobar") @db.VarChar(8)
+  last_login_date  DateTime?     @db.Timestamp(6)
+  created_at       DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?     @default(now()) @db.Timestamp(6)
+  ref_coa          ref_coa[]
+  ref_bank         ref_bank[]
+  ref_contact      ref_contact[]
+  ref_users        ref_users[]
+  vehicle          vehicle[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_contact {
+  company_id              String                    @db.Uuid
+  code                    String                    @db.VarChar(25)
+  name                    String?                   @db.VarChar(100)
+  address1                String?                   @db.VarChar(255)
+  address2                String?                   @db.VarChar(255)
+  address3                String?                   @db.VarChar(255)
+  phone                   String?                   @db.VarChar(25)
+  mobile                  String?                   @db.VarChar(25)
+  fax                     String?                   @db.VarChar(25)
+  email                   String?                   @db.VarChar(50)
+  is_active               Boolean?
+  comment                 String?                   @db.VarChar(255)
+  is_supplier             Boolean?                  @default(false)
+  is_buyer                Boolean?                  @default(false)
+  is_repair               Boolean?                  @default(false)
+  is_localtransport       Boolean?                  @default(false)
+  is_shipper              Boolean?                  @default(false)
+  is_journal              Boolean?                  @default(false)
+  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_by              String?                   @db.VarChar(50)
+  updated_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  created_by              String?                   @db.VarChar(50)
+  ref_companies           ref_companies             @relation(fields: [company_id], references: [company_id], onUpdate: Restrict, map: "fk_contact_company")
+  t_banktrans             t_banktrans[]
+  t_journal_entry         t_journal_entry[]
+  vehicle_local_transport vehicle_local_transport[]
+  vehicle_purchase        vehicle_purchase[]
+  vehicle_repair          vehicle_repair[]
+  vehicle_sales           vehicle_sales[]
+  vehicle_shipment        vehicle_shipment[]
+
+  @@id([company_id, code], map: "pk_ref_transport")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_country {
+  company_id       String    @default(dbgenerated("'12c992da-e2f3-4ea4-b661-7570d2ac7c68'::uuid")) @db.Uuid
+  code             String    @db.VarChar(3)
+  name             String?   @db.VarChar(100)
+  is_targetcountry Boolean?
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  created_by       String?   @db.VarChar(50)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_by       String?   @db.VarChar(50)
+
+  @@id([company_id, code], map: "pk_ref_country")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_fueltype {
+  name        String  @id(map: "pk_fueltype") @db.VarChar(10)
+  description String? @db.VarChar(50)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_invoiceterms {
+  name        String  @id(map: "pk_invoiceterms") @db.VarChar(50)
+  description String? @db.VarChar(50)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_location {
+  company_id String    @db.Uuid
+  name       String    @db.VarChar(100)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  created_by String?   @db.VarChar(50)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_by String?   @db.VarChar(50)
+
+  @@id([company_id, name], map: "pk_ref_location")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_maker {
+  company_id String    @db.Uuid
+  name       String    @db.VarChar(100)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  created_by String?   @db.VarChar(50)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_by String?   @db.VarChar(50)
+
+  @@id([company_id, name], map: "pk_ref_maker")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_roles {
+  role_name   String      @id(map: "pk_ref_roles") @db.VarChar(25)
+  description String?     @db.VarChar(50)
+  ref_users   ref_users[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_users {
+  user_id         String        @db.VarChar(50)
+  company_id      String        @db.Uuid
+  role_name       String?       @db.VarChar(25)
+  first_name      String        @db.VarChar(100)
+  last_name       String        @db.VarChar(100)
+  email           String        @db.VarChar(50)
+  password_hash   String        @db.VarChar(255)
+  is_active       Boolean?
+  created_at      DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?     @default(now()) @db.Timestamp(6)
+  last_login_date DateTime?     @db.Timestamp(6)
+  ref_companies   ref_companies @relation(fields: [company_id], references: [company_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_user_company")
+  ref_roles       ref_roles?    @relation(fields: [role_name], references: [role_name], onDelete: Restrict, onUpdate: Restrict, map: "fk_user_role")
+
+  @@id([user_id, company_id], map: "pk_users")
+}
+
+
+model ref_coa {
+  company_id      String        @db.Uuid
+  account_code    String        @db.VarChar(50)
+  account_name    String        @db.VarChar(100)
+  account_type    String        @db.VarChar(50)
+  description     String?       @db.VarChar(250)
+  is_active       Boolean?
+  created_at      DateTime?     @default(now()) @db.Timestamp(6)
+  created_by      String?       @db.VarChar(50)
+  updated_at      DateTime?     @default(now()) @db.Timestamp(6)
+  updated_by      String?       @db.VarChar(50)
+  ref_companies   ref_companies @relation(fields: [company_id], references: [company_id], onDelete: Cascade, onUpdate: Restrict, map: "fk_coa_company")
+  @@id([company_id, account_code], map: "pk_ref_coa")
+}
+
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ref_vehicle_type {
+  company_id   String    @db.Uuid
+  vehicle_type String    @db.VarChar(100)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  created_by   String?   @db.VarChar(50)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_by   String?   @db.VarChar(50)
+
+  @@id([company_id, vehicle_type], map: "pk_vehicle_type")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model t_banktrans {
+  company_id       String       @db.Uuid
+  account_number   String       @db.VarChar(30)
+  seq_no           BigInt
+  transaction_date Int
+  party_code       String?      @db.VarChar(25)
+  amount           Float?
+  currency         String?      @db.VarChar(4)
+  drcr             String?      @db.VarChar(1)
+  description      String?      @db.VarChar(500)
+  is_active        Boolean?
+  created_at       DateTime?    @default(now()) @db.Timestamp(6)
+  created_by       String?      @db.VarChar(50)
+  updated_at       DateTime?    @default(now()) @db.Timestamp(6)
+  updated_by       String?      @db.VarChar(50)
+  ref_bank         ref_bank     @relation(fields: [company_id, account_number], references: [company_id, account_number], onUpdate: Restrict, map: "fk_banktrans__bank")
+  ref_contact      ref_contact? @relation(fields: [company_id, party_code], references: [company_id, code], onUpdate: Restrict, map: "fk_banktrans_contact")
+
+  @@id([company_id, account_number, seq_no], map: "pk_banktrans")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model t_journal_entry {
+  company_id        String      @db.Uuid
+  date              Int
+  counterparty_code String      @db.VarChar(25)
+  seq               Int         @default(0)
+  is_openingbalance Boolean?
+  drcr              String?     @db.VarChar(1)
+  amount            Float?      @default(0)
+  currency          String?     @db.VarChar(3)
+  description       String?     @db.VarChar(500)
+  is_active         Boolean?
+  created_at        DateTime?   @default(now()) @db.Timestamp(6)
+  created_by        String?     @db.VarChar(50)
+  updated_at        DateTime?   @default(now()) @db.Timestamp(6)
+  updated_by        String?     @db.VarChar(50)
+  ref_contact       ref_contact @relation(fields: [company_id, counterparty_code], references: [company_id, code], onUpdate: Restrict, map: "fk_journal_contact")
+
+  @@id([company_id, date, seq, counterparty_code], map: "pk_t_journal_entry")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model transaction_audit_log {
+  log_id     String    @id(map: "pk_trans_audit") @db.Uuid
+  action     String    @db.VarChar(1000)
+  table_name String?   @db.VarChar(100)
+  old_value  String?   @db.VarChar(500)
+  new_value  String?   @db.VarChar(500)
+  user_id    String?   @db.VarChar(50)
+  company_id String?   @db.Uuid
+  timestamp  DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vehicle {
+  company_id              String                    @db.Uuid
+  chassis_no              String                    @db.VarChar(50)
+  vehicle_name            String?                   @db.VarChar(50)
+  grade                   String?                   @db.VarChar(50)
+  manufacture_yyyymm      String?                   @db.VarChar(7)
+  color                   String?                   @db.VarChar(50)
+  seats                   Int?                      @db.SmallInt
+  doors                   Int?                      @db.SmallInt
+  mileage                 Int?
+  fuel_type               String?                   @db.VarChar(10)
+  is_auto                 Boolean?
+  is_ac                   Boolean?
+  is_power_steering       Boolean?
+  is_power_lock           Boolean?
+  is_power_mirror         Boolean?
+  is_power_windows        Boolean?
+  is_sun_roof             Boolean?
+  is_high_roof            Boolean?
+  is_4wd                  Boolean?
+  is_alloy_wheel          Boolean?
+  is_sun_glass            Boolean?
+  is_full_option          Boolean?
+  gear_type               String?                   @db.VarChar(5)
+  vehicle_location        String?                   @db.VarChar(50)
+  inspection_rank         Float?
+  remarks                 String?                   @db.VarChar(255)
+  cc                      Int?
+  engine_no               String?                   @db.VarChar(50)
+  vehicle_type            String?                   @db.VarChar(50)
+  maker                   String?                   @db.VarChar(50)
+  auction_ref_no          String?                   @db.VarChar(50)
+  target_country          String?                   @db.VarChar(3)
+  is_active               Boolean?
+  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  created_by              String?                   @db.VarChar(50)
+  updated_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_by              String?                   @db.VarChar(50)
+  ref_companies           ref_companies             @relation(fields: [company_id], references: [company_id], onUpdate: Restrict, map: "fk_vehicle_company")
+  vehicle_attachments     vehicle_attachments[]
+  vehicle_local_transport vehicle_local_transport[]
+  vehicle_purchase        vehicle_purchase?
+  vehicle_repair          vehicle_repair[]
+  vehicle_sales           vehicle_sales?
+  vehicle_shipment        vehicle_shipment?
+
+  @@id([company_id, chassis_no], map: "pk_vehicle")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vehicle_attachments {
+  company_id    String    @db.Uuid
+  chassis_no    String    @db.VarChar(50)
+  seq_no        Int       @default(0)
+  document_type String?   @db.VarChar(10)
+  file_name     String?   @db.VarChar(100)
+  comment       String?   @db.VarChar(100)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  created_by    String?   @db.VarChar(30)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_by    String?   @db.VarChar(30)
+  vehicle       vehicle   @relation(fields: [company_id, chassis_no], references: [company_id, chassis_no], onUpdate: Restrict, map: "fk_attachments_vehicle")
+
+  @@id([company_id, chassis_no, seq_no], map: "pk_am_attachments")
+}
+
+model vehicle_documentation {
+  company_id               String    @default(dbgenerated("'12c992da-e2f3-4ea4-b661-7570d2ac7c68'::uuid")) @db.Uuid
+  chassis_no               String    @db.VarChar(30)
+  startdate                Int?
+  shakensho_jyotoshomeisho Boolean?
+  shakensho_inijyou        Boolean?
+  shakensho_inkanshomeisho Boolean?
+  shakensho_tourokujikou   Boolean?
+  shakensho_jibaiseki      Boolean?
+  ichiji_jyoutoshomeisho   Boolean?
+  export_jyotoshomeisho    Boolean?
+  export_inijyou           Boolean?
+  parts_houshousho         Boolean?
+  parts_torisetsu          Boolean?
+  parts_kirokubo           Boolean?
+  parts_sparekey           Boolean?
+  parts_navirom            Boolean?
+  parts_remotecontroller   Boolean?
+  parts_cd_magazine        Boolean?
+  parts_other              String?   @db.VarChar(60)
+  out_changetype           String?   @db.VarChar(50)
+  out_exportschedule       Int?
+  out_changedate           Int?
+  out_senddate             Int?
+  sendto                   String?   @db.VarChar(50)
+  salestatus               Int?
+  created_at               DateTime? @default(now()) @db.Timestamp(6)
+  created_by               String?   @db.VarChar(30)
+  updated_at               DateTime? @default(now()) @db.Timestamp(6)
+  updated_by               String?   @db.VarChar(30)
+
+  @@id([company_id, chassis_no], map: "pk_vehicle_documentation")
+}
+
+model vehicle_invoice {
+  company_id        String    @default(dbgenerated("'12c992da-e2f3-4ea4-b661-7570d2ac7c68'::uuid")) @db.Uuid
+  invoice_no        String    @db.VarChar(18)
+  line_no           Int
+  date              Int?
+  sailing_date      Int?
+  vessel            String?   @db.VarChar(50)
+  from_port         String?   @db.VarChar(50)
+  to_port           String?   @db.VarChar(50)
+  buyer_code        String?   @db.VarChar(7)
+  buyername         String?   @db.VarChar(50)
+  buyer_address1    String?   @db.VarChar(50)
+  buyer_address2    String?   @db.VarChar(50)
+  buyer_address3    String?   @db.VarChar(50)
+  lc_number         String?   @db.VarChar(50)
+  invoiceof         String?   @db.VarChar(50)
+  shipping_mark1    String?   @db.VarChar(20)
+  shipping_mark2    String?   @db.VarChar(20)
+  shipping_mark3    String?   @db.VarChar(20)
+  director_name     String?   @db.VarChar(50)
+  chassis_no        String?   @db.VarChar(30)
+  currency          String?   @db.VarChar(4)
+  cost              Float?
+  freight           Float?
+  description       String?   @db.VarChar(200)
+  unit              Int?
+  amount            Float?
+  amount_words      String?   @db.VarChar(100)
+  amount_total      Float?
+  amounttotal_words String?   @db.VarChar(100)
+  lc_detail_1       String?   @db.VarChar(60)
+  lc_detail_2       String?   @db.VarChar(60)
+  lc_detail_3       String?   @db.VarChar(60)
+  lc_detail_4       String?   @db.VarChar(60)
+  lc_detail_5       String?   @db.VarChar(60)
+  lc_detail_6       String?   @db.VarChar(60)
+  notify            String?   @db.VarChar(35)
+  notify_address1   String?   @db.VarChar(50)
+  notify_address2   String?   @db.VarChar(50)
+  notify_address3   String?   @db.VarChar(50)
+  engine_no         String?   @db.VarChar(20)
+  idf               String?   @db.VarChar(20)
+  stock_no          String?   @db.VarChar(20)
+  tax_line          String?   @db.VarChar(50)
+  pay_terms         String?   @db.VarChar(50)
+  netweight         String?   @db.VarChar(50)
+  length_cm         String?   @db.VarChar(50)
+  width_cm          String?   @db.VarChar(50)
+  height_cm         String?   @db.VarChar(50)
+  is_active         Boolean?
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  created_by        String?   @db.VarChar(30)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_by        String?   @db.VarChar(30)
+
+  @@id([company_id, invoice_no, line_no], map: "pk_vehicle_invoice")
+}
+
+model vehicle_invoice_local {
+  company_id   String? @default(dbgenerated("'12c992da-e2f3-4ea4-b661-7570d2ac7c68'::uuid")) @db.Uuid
+  invoice_no   String  @db.VarChar(14)
+  line_no      Int
+  date         Int
+  buyer_code   String? @db.VarChar(10)
+  buyername    String? @db.VarChar(50)
+  address1     String? @db.VarChar(50)
+  address2     String? @db.VarChar(50)
+  address3     String? @db.VarChar(50)
+  chassis_no   String? @db.VarChar(30)
+  price        Int?
+  recycle      Int?
+  road_tax     Int?
+  description  String? @db.VarChar(200)
+  amount       Int?
+  amount_total Int?
+  total_words  String? @db.VarChar(50)
+  detail_1     String? @db.VarChar(60)
+  detail_2     String? @db.VarChar(60)
+  detail_3     String? @db.VarChar(60)
+  detail_4     String? @db.VarChar(60)
+  detail_5     String? @db.VarChar(60)
+  detail_6     String? @db.VarChar(60)
+  tax_line     String? @db.VarChar(50)
+  stock_no     String? @db.VarChar(20)
+
+  @@id([invoice_no, line_no], map: "pk_invoice_local")
+}
+
+model vehicle_local_transport {
+  company_id               String       @db.Uuid
+  chassis_no               String       @db.VarChar(50)
+  local_transport_date     Int
+  local_transporter_code   String?      @db.VarChar(25)
+  local_transporter_name   String?      @db.VarChar(100)
+  local_transport_charges  Float?       @default(0)
+  local_transport_currency String?      @db.VarChar(3)
+  remarks                  String?      @db.VarChar(255)
+  created_at               DateTime?    @default(now()) @db.Timestamp(6)
+  created_by               String?      @db.VarChar(50)
+  updated_at               DateTime?    @default(now()) @db.Timestamp(6)
+  updated_by               String?      @db.VarChar(50)
+  ref_contact              ref_contact? @relation(fields: [company_id, local_transporter_code], references: [company_id, code], onUpdate: Restrict, map: "fk_transport_transporter")
+  vehicle                  vehicle      @relation(fields: [company_id, chassis_no], references: [company_id, chassis_no], onUpdate: Restrict, map: "fk_transport_vehicle")
+
+  @@id([company_id, chassis_no, local_transport_date], map: "pk_vehicle_local_transport")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vehicle_purchase {
+  company_id        String      @db.Uuid
+  chassis_no        String      @db.VarChar(50)
+  purchase_date     Int
+  supplier_code     String      @db.VarChar(25)
+  supplier_name     String?     @db.VarChar(100)
+  currency          String?     @db.VarChar(3)
+  purchase_cost     Float?      @default(0)
+  tax               Float?
+  commission        Float?      @db.Real
+  recycle_fee       Float?
+  auction_fee       Float?
+  road_tax          Float?
+  total_vehicle_fee Float?
+  payment_date      Int?
+  purchase_remarks  String?     @db.VarChar(255)
+  created_at        DateTime?   @default(now()) @db.Timestamp(6)
+  created_by        String?     @db.VarChar(50)
+  updated_at        DateTime?   @default(now()) @db.Timestamp(6)
+  updated_by        String?     @db.VarChar(50)
+  ref_contact       ref_contact @relation(fields: [company_id, supplier_code], references: [company_id, code], onUpdate: Restrict, map: "fk_purchase_supplier")
+  vehicle           vehicle     @relation(fields: [company_id, chassis_no], references: [company_id, chassis_no], onUpdate: Restrict, map: "fk_purchase_vehicle")
+
+  @@id([company_id, chassis_no], map: "pk_am_purchase")
+}
+
+model vehicle_repair {
+  company_id      String       @db.Uuid
+  chassis_no      String       @db.VarChar(50)
+  repair_date     Int
+  repairer_code   String?      @db.VarChar(25)
+  repairer_name   String?      @db.VarChar(100)
+  repair_charges  Float?       @default(0)
+  repair_currency String?      @db.VarChar(3)
+  remarks         String?      @db.VarChar(255)
+  created_at      DateTime?    @default(now()) @db.Timestamp(6)
+  created_by      String?      @db.VarChar(50)
+  updated_at      DateTime?    @default(now()) @db.Timestamp(6)
+  updated_by      String?      @db.VarChar(50)
+  ref_contact     ref_contact? @relation(fields: [company_id, repairer_code], references: [company_id, code], onUpdate: Restrict, map: "fk_repair_contact")
+  vehicle         vehicle      @relation(fields: [company_id, chassis_no], references: [company_id, chassis_no], onUpdate: Restrict, map: "fk_repair_vehicle")
+
+  @@id([company_id, chassis_no, repair_date], map: "pk_vehicle_repair")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vehicle_sales {
+  company_id       String      @db.Uuid
+  chassis_no       String      @db.VarChar(50)
+  sales_date       Int
+  buyer_code       String      @db.VarChar(25)
+  buyer_name       String?     @db.VarChar(100)
+  selling_price    Float?      @default(0)
+  buyers_claim     Float?      @default(0)
+  currency         String?     @db.VarChar(3)
+  remarks          String?     @db.VarChar(500)
+  payment_received Boolean?
+  conversion_rate  Float?      @default(1)
+  created_at       DateTime?   @default(now()) @db.Timestamp(6)
+  created_by       String?     @db.VarChar(50)
+  updated_at       DateTime?   @default(now()) @db.Timestamp(6)
+  updated_by       String?     @db.VarChar(50)
+  ref_contact      ref_contact @relation(fields: [company_id, buyer_code], references: [company_id, code], onUpdate: Restrict, map: "fk_sales_buyer")
+  vehicle          vehicle     @relation(fields: [company_id, chassis_no], references: [company_id, chassis_no], onUpdate: Restrict, map: "fk_sales_vehicle")
+
+  @@id([company_id, chassis_no], map: "pk_sales")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vehicle_shipment {
+  company_id          String       @db.Uuid
+  chassis_no          String       @db.VarChar(50)
+  shipment_date       Int?
+  shipper_code        String?      @db.VarChar(25)
+  shipper_name        String?      @db.VarChar(100)
+  vessel_name         String?      @db.VarChar(50)
+  bl_no               String?      @db.VarChar(25)
+  is_roro             Boolean?
+  container_no        String?      @db.VarChar(35)
+  load_unload_charges Float?       @default(0)
+  shipment_charges    Float?       @default(0)
+  storage_charges     Float?       @default(0)
+  freight_charges     Float?       @default(0)
+  misc_expense        Float?
+  destination         String?      @db.VarChar(50)
+  shipment_remarks    String?      @db.VarChar(500)
+  created_at          DateTime?    @default(now()) @db.Timestamp(6)
+  created_by          String?      @db.VarChar(50)
+  updated_at          DateTime?    @default(now()) @db.Timestamp(6)
+  updated_by          String?      @db.VarChar(50)
+  ref_contact         ref_contact? @relation(fields: [company_id, shipper_code], references: [company_id, code], onUpdate: Restrict, map: "fk_shipment_shipper")
+  vehicle             vehicle      @relation(fields: [company_id, chassis_no], references: [company_id, chassis_no], onUpdate: Restrict, map: "fk_shipment_vehicle")
+
+  @@id([company_id, chassis_no], map: "pk_shipment")
+}
+
+model vehicle_shippinginstructions {
+  company_id        String  @default(dbgenerated("'12c992da-e2f3-4ea4-b661-7570d2ac7c68'::uuid")) @db.Uuid
+  seq               BigInt
+  line_no           Int
+  date              Int
+  chassis_no        String? @db.VarChar(30)
+  shipping_agent    String? @db.VarChar(50)
+  packing           String? @db.VarChar(10)
+  consignee_name    String? @db.VarChar(50)
+  consignee_address String? @db.VarChar(1000)
+  consignee_phone   String? @db.VarChar(50)
+  notify_name       String? @db.VarChar(50)
+  notify_address    String? @db.VarChar(1000)
+  notify_phone      String? @db.VarChar(50)
+  source            String? @db.VarChar(100)
+  destination       String? @db.VarChar(100)
+  shippingmark1     String? @db.VarChar(50)
+  shippingmark2     String? @db.VarChar(50)
+  shippingmark3     String? @db.VarChar(50)
+  group_no          String? @db.VarChar(10)
+  length_cm         Float?
+  width_cm          Float?
+  height_cm         Float?
+  net_weight        Float?
+  gross_weight      Float?
+  fob_cost          Float?
+  currency          Float?
+
+  @@id([company_id, seq, line_no], map: "pk_vehicle_shippinginstructions")
+}

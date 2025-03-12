@@ -1,0 +1,203 @@
+{
+"ref_country": [
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "JPN",
+		"name" : "JAPAN",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "TZA",
+		"name" : "TANZANIA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "UGA",
+		"name" : "UGANDA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "THA",
+		"name" : "THAILAND",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "AUS",
+		"name" : "AUSTRALIA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "KEN",
+		"name" : "KENYA",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "BGD",
+		"name" : "BANGLADESH",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "ARE",
+		"name" : "UNITED ARAB EMIRATES",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "PAK",
+		"name" : "PAKISTAN",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"code" : "ZAF",
+		"name" : "SOUTH AFRICA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:04:25.419Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:04:25.419Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "JPN",
+		"name" : "JAPAN",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "TZA",
+		"name" : "TANZANIA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "UGA",
+		"name" : "UGANDA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "THA",
+		"name" : "THAILAND",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "AUS",
+		"name" : "AUSTRALIA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "KEN",
+		"name" : "KENYA",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "BGD",
+		"name" : "BANGLADESH",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "ARE",
+		"name" : "UNITED ARAB EMIRATES",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "PAK",
+		"name" : "PAKISTAN",
+		"is_targetcountry" : true,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"code" : "ZAF",
+		"name" : "SOUTH AFRICA",
+		"is_targetcountry" : false,
+		"created_at" : "2025-02-15T16:05:50.098Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:05:50.098Z",
+		"updated_by" : null
+	}
+]}

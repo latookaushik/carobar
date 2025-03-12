@@ -1,0 +1,15 @@
+{
+"ref_invoiceterms": [
+	{
+		"name" : "CNF",
+		"description" : "Cost and Freight (Cost Of Goods + Freight)"
+	},
+	{
+		"name" : "FOB",
+		"description" : "Free On Board (Port Delivery + Loading)"
+	},
+	{
+		"name" : "CIF",
+		"description" : "Cost, Insurance, Freight"
+	}
+]}

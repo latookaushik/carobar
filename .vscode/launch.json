@@ -1,0 +1,52 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Next.js: Debug Server",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev",
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceFolder}/node_modules/**"
+            ],
+            "env": {
+                "NODE_OPTIONS": "--inspect"
+            }
+        },
+        {
+            "name": "Next.js: Debug Client",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}",
+            "sourceMapPathOverrides": {
+                "webpack://_N_E/*": "${webRoot}/*"
+            }
+        },
+        {
+            "name": "Next.js: Debug Full Stack",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/next",
+            "args": ["dev"],
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceFolder}/node_modules/**"
+            ],
+            "env": {
+                "NODE_OPTIONS": "--inspect"
+            },
+            "serverReadyAction": {
+                "pattern": "- Local:.+(https?://\\S+|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+:[0-9]+)",
+                "uriFormat": "http://localhost:3000",
+                "action": "debugWithChrome",
+                "killOnServerStop": true
+            }
+        }
+    ]
+}

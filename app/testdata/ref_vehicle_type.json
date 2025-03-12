@@ -1,0 +1,211 @@
+{
+"ref_vehicle_type": [
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "CAR",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "TRUCK",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "HEAVY EQUIPMENT",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "BUS",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "VAN",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "WAGON",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "DUMP",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "W-CAB PICKUP",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "PICKUP-TRUCK",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "GEEP",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "RV",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "SEDAN",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "12c992da-e2f3-4ea4-b661-7570d2ac7c68",
+		"vehicle_type" : "STATION WAGON",
+		"created_at" : "2025-02-15T16:48:05.678Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:48:05.678Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "BUS",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "CAR",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "DUMP",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "GEEP",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "HEAVY EQUIPMENT",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "PICKUP-TRUCK",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "RV",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "SEDAN",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "STATION WAGON",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "TRUCK",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "VAN",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "W-CAB PICKUP",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	},
+	{
+		"company_id" : "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+		"vehicle_type" : "WAGON",
+		"created_at" : "2025-02-15T16:53:17.558Z",
+		"created_by" : "carobari1",
+		"updated_at" : "2025-02-15T16:53:17.558Z",
+		"updated_by" : null
+	}
+]}
