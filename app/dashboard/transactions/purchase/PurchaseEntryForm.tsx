@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import PictureTab from './PictureTab';
 import { useCompany } from '@/app/contexts/CompanyContext';
 import { toast } from '@/app/components/ui/use-toast';
 import { Save, X, Search, Upload, Camera, Calendar, RefreshCw } from 'lucide-react';
@@ -119,6 +120,7 @@ export default function PurchaseEntryForm({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [activeTab, setActiveTab] = useState<'vehicle' | 'documents' | 'pictures'>('vehicle');
   // Add to the state declarations
   const [fuelTypes, setFuelTypes] = useState<FuelType[]>([]);
   const [makers, setMakers] = useState<VehicleMaker[]>([]);
@@ -514,10 +516,7 @@ export default function PurchaseEntryForm({
   };
 
   const openPictureUpload = () => {
-    toast({
-      title: 'Feature Coming Soon',
-      description: 'Picture upload functionality is under development.',
-    });
+    setActiveTab('pictures');
   };
 
   const handleSave = async () => {
@@ -691,14 +690,25 @@ export default function PurchaseEntryForm({
         <div className="border-b border-gray-200 mb-2">
           <ul className="flex -mb-px">
             <li className="mr-1">
-              <button className="inline-flex items-center px-2 py-1 font-medium text-xs border-b-2 border-maroon-600 text-maroon-600">
+              <button
+                onClick={() => setActiveTab('vehicle')}
+                className={`inline-flex items-center px-2 py-1 font-medium text-xs ${
+                  activeTab === 'vehicle'
+                    ? 'border-b-2 border-maroon-600 text-maroon-600'
+                    : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'
+                }`}
+              >
                 Vehicle Details
               </button>
             </li>
             <li className="mr-1">
               <button
                 onClick={openDocumentUpload}
-                className="inline-flex items-center px-2 py-1 font-medium text-xs text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                className={`inline-flex items-center px-2 py-1 font-medium text-xs ${
+                  activeTab === 'documents'
+                    ? 'border-b-2 border-maroon-600 text-maroon-600'
+                    : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'
+                }`}
               >
                 <Upload className="mr-1" size={10} />
                 Documents
@@ -707,7 +717,11 @@ export default function PurchaseEntryForm({
             <li>
               <button
                 onClick={openPictureUpload}
-                className="inline-flex items-center px-2 py-1 font-medium text-xs text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                className={`inline-flex items-center px-2 py-1 font-medium text-xs ${
+                  activeTab === 'pictures'
+                    ? 'border-b-2 border-maroon-600 text-maroon-600'
+                    : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent'
+                }`}
               >
                 <Camera className="mr-1" size={10} />
                 Pictures
@@ -716,605 +730,612 @@ export default function PurchaseEntryForm({
           </ul>
         </div>
 
-        {/* Vehicle Form - True 2-column layout */}
-        <div className="space-y-3">
-          {/* Row 1: Left - Chassis No, Vehicle Name | Right - Maker, Grade */}
-          <div className="flex gap-5">
-            {/* Left column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">
-                    <span className="text-red-600">Chassis No *</span>
+        {/* Vehicle Form - Only shown when vehicle tab is active */}
+        {activeTab === 'vehicle' && (
+          <div className="space-y-3">
+            {/* Row 1: Left - Chassis No, Vehicle Name | Right - Maker, Grade */}
+            <div className="flex gap-5">
+              {/* Left column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      <span className="text-red-600">Chassis No *</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="chassis_no"
+                      value={formData.chassis_no}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Vehicle Name</label>
+                    <input
+                      type="text"
+                      name="vehicle_name"
+                      value={formData.vehicle_name}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Maker</label>
+                    <select
+                      name="maker"
+                      value={formData.maker}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      {makers.map((m) => (
+                        <option key={m.name} value={m.name}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Grade</label>
+                    <input
+                      type="text"
+                      name="grade"
+                      value={formData.grade}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Left - Mileage, Engine (cc) | Right - Model, Color */}
+            <div className="flex gap-5">
+              {/* Left column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Mileage (km)</label>
+                    <input
+                      type="number"
+                      name="mileage"
+                      value={formData.mileage}
+                      onChange={(e) => handleNumberChange(e)}
+                      className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Engine (cc)</label>
+                    <input
+                      type="number"
+                      name="cc"
+                      value={formData.cc}
+                      onChange={(e) => handleNumberChange(e)}
+                      className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Model (YYYY/MM)</label>
+                    <input
+                      type="text"
+                      name="model"
+                      value={formData.model}
+                      onChange={handleInputChange}
+                      placeholder="YYYY/MM"
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Color</label>
+                    <select
+                      name="color"
+                      value={formData.color}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      {colors.map((c) => (
+                        <option key={c.color} value={c.color}>
+                          {c.color}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Fuel Type</label>
+                    <select
+                      name="fuel_type"
+                      value={formData.fuel_type}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      {fuelTypes.map((ft) => (
+                        <option key={ft.name} value={ft.name}>
+                          {ft.name + ' : ' + ft.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 3: Left - Seats, Doors | Right - Gear Type, Engine No */}
+            <div className="flex gap-5">
+              {/* Left column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Seats</label>
+                    <input
+                      type="number"
+                      name="seats"
+                      value={formData.seats}
+                      onChange={(e) => handleNumberChange(e)}
+                      min="0"
+                      className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Doors</label>
+                    <input
+                      type="number"
+                      name="doors"
+                      value={formData.doors}
+                      onChange={(e) => handleNumberChange(e)}
+                      min="0"
+                      className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Vehicle Type</label>
+                    <select
+                      name="vehicle_type"
+                      value={formData.vehicle_type}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      {vehicleTypes.map((vt) => (
+                        <option key={vt.vehicle_type} value={vt.vehicle_type}>
+                          {vt.vehicle_type}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Gear Type</label>
+                    <select
+                      name="gear_type"
+                      value={formData.gear_type}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      <option value="5F">5-Speed Manual</option>
+                      <option value="4C">4-Speed Auto</option>
+                      <option value="CVT">CVT</option>
+                      <option value="DCT">Dual Clutch</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Engine No.</label>
+                    <input
+                      type="text"
+                      name="engine_no"
+                      value={formData.engine_no}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Vehicle Attributes Checkboxes */}
+            <div className="border border-gray-200 rounded-md p-1">
+              <div className="grid grid-cols-6 gap-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_auto"
+                    name="is_auto"
+                    checked={formData.is_auto}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_auto: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_auto" className="text-xs">
+                    Auto
                   </label>
-                  <input
-                    type="text"
-                    name="chassis_no"
-                    value={formData.chassis_no}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium mb-1">Vehicle Name</label>
+                <div className="flex items-center">
                   <input
-                    type="text"
-                    name="vehicle_name"
-                    value={formData.vehicle_name}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    type="checkbox"
+                    id="is_ac"
+                    name="is_ac"
+                    checked={formData.is_ac}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, is_ac: e.target.checked }))}
+                    className="mr-1 h-3 w-3"
                   />
+                  <label htmlFor="is_ac" className="text-xs">
+                    AC
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_power_steering"
+                    name="is_power_steering"
+                    checked={formData.is_power_steering}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_power_steering: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_power_steering" className="text-xs">
+                    PS
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_power_lock"
+                    name="is_power_lock"
+                    checked={formData.is_power_lock}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_power_lock: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_power_lock" className="text-xs">
+                    PL
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_power_mirror"
+                    name="is_power_mirror"
+                    checked={formData.is_power_mirror}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_power_mirror: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_power_mirror" className="text-xs">
+                    PM
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_power_windows"
+                    name="is_power_windows"
+                    checked={formData.is_power_windows}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_power_windows: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_power_windows" className="text-xs">
+                    PW
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_sun_roof"
+                    name="is_sun_roof"
+                    checked={formData.is_sun_roof}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_sun_roof: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_sun_roof" className="text-xs">
+                    SR
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_high_roof"
+                    name="is_high_roof"
+                    checked={formData.is_high_roof}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_high_roof: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_high_roof" className="text-xs">
+                    HR
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_4wd"
+                    name="is_4wd"
+                    checked={formData.is_4wd}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, is_4wd: e.target.checked }))}
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_4wd" className="text-xs">
+                    4WD
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_alloy_wheel"
+                    name="is_alloy_wheel"
+                    checked={formData.is_alloy_wheel}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_alloy_wheel: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_alloy_wheel" className="text-xs">
+                    AW
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_full_option"
+                    name="is_full_option"
+                    checked={formData.is_full_option}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_full_option: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_full_option" className="text-xs">
+                    Full Opts
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    name="is_active"
+                    checked={formData.is_active}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, is_active: e.target.checked }))
+                    }
+                    className="mr-1 h-3 w-3"
+                  />
+                  <label htmlFor="is_active" className="text-xs">
+                    Active?
+                  </label>
                 </div>
               </div>
             </div>
 
-            {/* Right column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-2 gap-2">
+            {/* Row 4: Left - Inspection Rank, Auction No | Right - Stock Location, Target Country */}
+            <div className="flex gap-5">
+              {/* Left column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Inspection Rank</label>
+                    <input
+                      type="number"
+                      name="rank"
+                      value={formData.rank}
+                      onChange={(e) => handleNumberChange(e, 1)}
+                      min="0"
+                      max="5"
+                      step="0.1"
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Auction No.</label>
+                    <input
+                      type="text"
+                      name="auction_ref_no"
+                      value={formData.auction_ref_no}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right column */}
+              <div className="w-1/2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Stock Location</label>
+                    <select
+                      name="stock_location"
+                      value={formData.stock_location}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      {locations.map((loc) => (
+                        <option key={loc.name} value={loc.name}>
+                          {loc.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium mb-1">Target Country</label>
+                    <select
+                      name="target_country"
+                      value={formData.target_country}
+                      onChange={handleInputChange}
+                      className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    >
+                      <option value="">Select</option>
+                      {countries.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.code} - {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Section */}
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-8 gap-2">
                 <div>
-                  <label className="block text-xs font-medium mb-1">Maker</label>
+                  <label className="block text-xs mb-1">Currency</label>
                   <select
-                    name="maker"
-                    value={formData.maker}
+                    name="currency"
+                    value={formData.currency}
                     onChange={handleInputChange}
                     className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                   >
-                    <option value="">Select</option>
-                    {makers.map((m) => (
-                      <option key={m.name} value={m.name}>
-                        {m.name}
-                      </option>
-                    ))}
+                    <option value={company?.base_currency || 'JPY'}>
+                      {company?.base_currency || 'JPY'}
+                    </option>
+                    <option value="USD">USD</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium mb-1">Grade</label>
-                  <input
-                    type="text"
-                    name="grade"
-                    value={formData.grade}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 2: Left - Mileage, Engine (cc) | Right - Model, Color */}
-          <div className="flex gap-5">
-            {/* Left column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">Mileage (km)</label>
+                  <label className="block text-xs mb-1">Vehicle Price</label>
                   <input
                     type="number"
-                    name="mileage"
-                    value={formData.mileage}
+                    name="purchase_cost"
+                    value={formData.purchase_cost}
                     onChange={(e) => handleNumberChange(e)}
-                    className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    className="w-full py-1 px-2 border text-right rounded-md text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium mb-1">Engine (cc)</label>
+                  <label className="block text-xs mb-1">Auction Fee</label>
                   <input
                     type="number"
-                    name="cc"
-                    value={formData.cc}
+                    name="auction_fee"
+                    value={formData.auction_fee}
                     onChange={(e) => handleNumberChange(e)}
-                    className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
+                    className="w-full py-1 px-2 border text-right rounded-md text-xs"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-xs font-medium mb-1">Model (YYYY/MM)</label>
+                  <label className="block text-xs mb-1">GST ({taxPercent}%)</label>
+                  <input
+                    type="number"
+                    name="tax"
+                    value={formData.tax}
+                    onChange={(e) => handleNumberChange(e)}
+                    className="w-full py-1 px-2 border text-right rounded-md text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs mb-1">Commission</label>
+                  <input
+                    type="number"
+                    name="commission"
+                    value={formData.commission}
+                    onChange={(e) => handleNumberChange(e)}
+                    className="w-full py-1 px-2 border text-right rounded-md text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs mb-1">Recycle Fee</label>
+                  <input
+                    type="number"
+                    name="recycle_fee"
+                    value={formData.recycle_fee}
+                    onChange={(e) => handleNumberChange(e)}
+                    className="w-full py-1 px-2 border text-right rounded-md text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs mb-1">Road Tax</label>
+                  <input
+                    type="number"
+                    name="road_tax"
+                    value={formData.road_tax}
+                    onChange={(e) => handleNumberChange(e)}
+                    className="w-full py-1 px-2 border text-right rounded-md text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs mb-1">Total Cost</label>
                   <input
                     type="text"
-                    name="model"
-                    value={formData.model}
-                    onChange={handleInputChange}
-                    placeholder="YYYY/MM"
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
+                    value={formatNumber(formData.total_vehicle_fee)}
+                    readOnly
+                    className="w-full py-1 px-2 border bg-gray-50 text-right rounded-md text-xs"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Right column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">Color</label>
-                  <select
-                    name="color"
-                    value={formData.color}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  >
-                    <option value="">Select</option>
-                    {colors.map((c) => (
-                      <option key={c.color} value={c.color}>
-                        {c.color}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium mb-1">Fuel Type</label>
-                  <select
-                    name="fuel_type"
-                    value={formData.fuel_type}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  >
-                    <option value="">Select</option>
-                    {fuelTypes.map((ft) => (
-                      <option key={ft.name} value={ft.name}>
-                        {ft.name + ' : ' + ft.description}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+            {/* Remarks */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-600 whitespace-nowrap">Remarks</span>
+              <input
+                type="text"
+                name="purchase_remarks"
+                value={formData.purchase_remarks}
+                onChange={handleInputChange}
+                className="flex-1 py-1 px-2 border border-gray-300 rounded-md text-xs"
+                placeholder="Additional information or comments"
+              />
             </div>
           </div>
+        )}
 
-          {/* Row 3: Left - Seats, Doors | Right - Gear Type, Engine No */}
-          <div className="flex gap-5">
-            {/* Left column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">Seats</label>
-                  <input
-                    type="number"
-                    name="seats"
-                    value={formData.seats}
-                    onChange={(e) => handleNumberChange(e)}
-                    min="0"
-                    className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium mb-1">Doors</label>
-                  <input
-                    type="number"
-                    name="doors"
-                    value={formData.doors}
-                    onChange={(e) => handleNumberChange(e)}
-                    min="0"
-                    className="w-10px py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1">Vehicle Type</label>
-                  <select
-                    name="vehicle_type"
-                    value={formData.vehicle_type}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  >
-                    <option value="">Select</option>
-                    {vehicleTypes.map((vt) => (
-                      <option key={vt.vehicle_type} value={vt.vehicle_type}>
-                        {vt.vehicle_type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Right column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">Gear Type</label>
-                  <select
-                    name="gear_type"
-                    value={formData.gear_type}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  >
-                    <option value="">Select</option>
-                    <option value="5F">5-Speed Manual</option>
-                    <option value="4C">4-Speed Auto</option>
-                    <option value="CVT">CVT</option>
-                    <option value="DCT">Dual Clutch</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium mb-1">Engine No.</label>
-                  <input
-                    type="text"
-                    name="engine_no"
-                    value={formData.engine_no}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Vehicle Attributes Checkboxes */}
-          <div className="border border-gray-200 rounded-md p-1">
-            <div className="grid grid-cols-6 gap-2">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_auto"
-                  name="is_auto"
-                  checked={formData.is_auto}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, is_auto: e.target.checked }))}
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_auto" className="text-xs">
-                  Auto
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_ac"
-                  name="is_ac"
-                  checked={formData.is_ac}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, is_ac: e.target.checked }))}
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_ac" className="text-xs">
-                  AC
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_power_steering"
-                  name="is_power_steering"
-                  checked={formData.is_power_steering}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_power_steering: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_power_steering" className="text-xs">
-                  PS
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_power_lock"
-                  name="is_power_lock"
-                  checked={formData.is_power_lock}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_power_lock: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_power_lock" className="text-xs">
-                  PL
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_power_mirror"
-                  name="is_power_mirror"
-                  checked={formData.is_power_mirror}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_power_mirror: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_power_mirror" className="text-xs">
-                  PM
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_power_windows"
-                  name="is_power_windows"
-                  checked={formData.is_power_windows}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_power_windows: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_power_windows" className="text-xs">
-                  PW
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_sun_roof"
-                  name="is_sun_roof"
-                  checked={formData.is_sun_roof}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_sun_roof: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_sun_roof" className="text-xs">
-                  SR
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_high_roof"
-                  name="is_high_roof"
-                  checked={formData.is_high_roof}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_high_roof: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_high_roof" className="text-xs">
-                  HR
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_4wd"
-                  name="is_4wd"
-                  checked={formData.is_4wd}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, is_4wd: e.target.checked }))}
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_4wd" className="text-xs">
-                  4WD
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_alloy_wheel"
-                  name="is_alloy_wheel"
-                  checked={formData.is_alloy_wheel}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_alloy_wheel: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_alloy_wheel" className="text-xs">
-                  AW
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_full_option"
-                  name="is_full_option"
-                  checked={formData.is_full_option}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_full_option: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_full_option" className="text-xs">
-                  Full Opts
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, is_active: e.target.checked }))
-                  }
-                  className="mr-1 h-3 w-3"
-                />
-                <label htmlFor="is_active" className="text-xs">
-                  Active?
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 4: Left - Inspection Rank, Auction No | Right - Stock Location, Target Country */}
-          <div className="flex gap-5">
-            {/* Left column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">Inspection Rank</label>
-                  <input
-                    type="number"
-                    name="rank"
-                    value={formData.rank}
-                    onChange={(e) => handleNumberChange(e, 1)}
-                    min="0"
-                    max="5"
-                    step="0.1"
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs text-right"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium mb-1">Auction No.</label>
-                  <input
-                    type="text"
-                    name="auction_ref_no"
-                    value={formData.auction_ref_no}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Right column */}
-            <div className="w-1/2">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-medium mb-1">Stock Location</label>
-                  <select
-                    name="stock_location"
-                    value={formData.stock_location}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  >
-                    <option value="">Select</option>
-                    {locations.map((loc) => (
-                      <option key={loc.name} value={loc.name}>
-                        {loc.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium mb-1">Target Country</label>
-                  <select
-                    name="target_country"
-                    value={formData.target_country}
-                    onChange={handleInputChange}
-                    className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                  >
-                    <option value="">Select</option>
-                    {countries.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.code} - {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Financial Section */}
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-8 gap-2">
-              <div>
-                <label className="block text-xs mb-1">Currency</label>
-                <select
-                  name="currency"
-                  value={formData.currency}
-                  onChange={handleInputChange}
-                  className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
-                >
-                  <option value={company?.base_currency || 'JPY'}>
-                    {company?.base_currency || 'JPY'}
-                  </option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">Vehicle Price</label>
-                <input
-                  type="number"
-                  name="purchase_cost"
-                  value={formData.purchase_cost}
-                  onChange={(e) => handleNumberChange(e)}
-                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">Auction Fee</label>
-                <input
-                  type="number"
-                  name="auction_fee"
-                  value={formData.auction_fee}
-                  onChange={(e) => handleNumberChange(e)}
-                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">GST ({taxPercent}%)</label>
-                <input
-                  type="number"
-                  name="tax"
-                  value={formData.tax}
-                  onChange={(e) => handleNumberChange(e)}
-                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">Commission</label>
-                <input
-                  type="number"
-                  name="commission"
-                  value={formData.commission}
-                  onChange={(e) => handleNumberChange(e)}
-                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">Recycle Fee</label>
-                <input
-                  type="number"
-                  name="recycle_fee"
-                  value={formData.recycle_fee}
-                  onChange={(e) => handleNumberChange(e)}
-                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">Road Tax</label>
-                <input
-                  type="number"
-                  name="road_tax"
-                  value={formData.road_tax}
-                  onChange={(e) => handleNumberChange(e)}
-                  className="w-full py-1 px-2 border text-right rounded-md text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs mb-1">Total Cost</label>
-                <input
-                  type="text"
-                  value={formatNumber(formData.total_vehicle_fee)}
-                  readOnly
-                  className="w-full py-1 px-2 border bg-gray-50 text-right rounded-md text-xs"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Remarks */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600 whitespace-nowrap">Remarks</span>
-            <input
-              type="text"
-              name="purchase_remarks"
-              value={formData.purchase_remarks}
-              onChange={handleInputChange}
-              className="flex-1 py-1 px-2 border border-gray-300 rounded-md text-xs"
-              placeholder="Additional information or comments"
-            />
-          </div>
-        </div>
+        {/* Pictures Tab Component */}
+        <PictureTab chassisNo={formData.chassis_no} isVisible={activeTab === 'pictures'} />
       </div>
     </div>
   );
