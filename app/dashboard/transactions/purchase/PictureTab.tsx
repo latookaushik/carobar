@@ -315,16 +315,9 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
         throw new Error(`Upload failed: ${response.status}`);
       }
 
-      // Get the response data with uploaded files
-      const data = await response.json();
-
-      // Convert uploaded files to URL format matching existing images
-      const uploadedImageUrls = data.uploadedFiles.map(
-        (filename: string) => `/uploads/vehicles/${company?.company_id}/${chassisNo}/${filename}`
-      );
-
-      // Update existing images state directly with new images
-      setExistingImages((prevImages) => [...prevImages, ...uploadedImageUrls]);
+      // After successful upload, fetch the updated image list
+      // This ensures we get the same format URLs as the API returns
+      loadExistingImages();
 
       toast({
         title: 'Success',
@@ -399,7 +392,7 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
                   onClick={() => setSelectedImage(src)}
                 >
                   <img
-                    src={`${src}?t=${Date.now()}`}
+                    src={src}
                     alt={`Vehicle image ${index + 1}`}
                     style={{ width: '100%', height: '110px', objectFit: 'cover' }}
                   />
@@ -530,7 +523,7 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
               <XCircle size={24} />
             </button>
             <img
-              src={`${selectedImage}?t=${Date.now()}`}
+              src={selectedImage}
               alt="Full-size image"
               style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain' }}
               onClick={(e) => e.stopPropagation()}

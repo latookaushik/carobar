@@ -42,17 +42,31 @@ const handler = async (request: NextRequest) => {
       return NextResponse.json({ images: [] }, { status: 200 });
     }
 
-    // Read directory contents and filter for image files
-    const files = fs.readdirSync(imagesDir);
-    const imageFiles = files.filter((file) => {
-      const ext = path.extname(file).toLowerCase();
-      return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
-    });
+    // Read directory contents and filter for image files - using { withFileTypes: true } to get more info
+    const dirEntries = fs.readdirSync(imagesDir, { withFileTypes: true });
 
-    // Convert filenames to URLs
+    // Filter for only files (not directories) and only image files by extension
+    const imageFiles = dirEntries
+      .filter((dirent) => dirent.isFile())
+      .map((dirent) => dirent.name)
+      .filter((file) => {
+        const ext = path.extname(file).toLowerCase();
+        return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
+      });
+
+    // Get the current server's address from the request
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const host = request.headers.get('host') || '';
+    const baseUrl = `${protocol}://${host}`;
+
+    // Convert filenames to fully qualified URLs with timestamp to bust cache
+    const timestamp = Date.now();
     const imageUrls = imageFiles.map(
-      (file) => `/uploads/vehicles/${companyId}/${chassisNo}/${file}`
+      (file) => `${baseUrl}/uploads/vehicles/${companyId}/${chassisNo}/${file}?t=${timestamp}`
     );
+
+    // Log the image URLs for debugging
+    console.log(`Found ${imageUrls.length} images for chassis ${chassisNo}`);
 
     return NextResponse.json({ images: imageUrls }, { status: 200 });
   } catch (error) {
