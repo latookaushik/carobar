@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -397,12 +398,10 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
                   style={{ height: '110px', width: '100%' }}
                   onClick={() => setSelectedImage(src)}
                 >
-                  <Image
+                  <img
                     src={`${src}?t=${Date.now()}`}
                     alt={`Vehicle image ${index + 1}`}
-                    width={120}
-                    height={110}
-                    style={{ objectFit: 'cover' }}
+                    style={{ width: '100%', height: '110px', objectFit: 'cover' }}
                   />
                 </div>
               ))}
@@ -530,11 +529,10 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
             >
               <XCircle size={24} />
             </button>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`${selectedImage}?t=${Date.now()}`}
               alt="Full-size image"
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain' }}
               onClick={(e) => e.stopPropagation()}
             />
           </div>
