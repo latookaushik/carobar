@@ -370,10 +370,9 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
 
       if (uploadedFiles.length > 0) {
         // Immediately update the UI with the new images
-        const baseUrl = window.location.origin;
+        // Use relative paths consistent with the API
         const newImageUrls = uploadedFiles.map(
-          (filename: string) =>
-            `${baseUrl}/uploads/vehicles/${company?.company_id}/${chassisNo}/${filename}`
+          (filename: string) => `/uploads/vehicles/${company?.company_id}/${chassisNo}/${filename}`
         );
 
         console.log('Constructed image URLs:', newImageUrls);
@@ -468,32 +467,10 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
                   onClick={() => setSelectedImage(src)}
                 >
                   <img
-                    src={src}
+                    src={`${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt={`Vehicle image ${index + 1}`}
                     style={{ width: '100%', height: '110px', objectFit: 'cover' }}
-                    onError={(e) => {
-                      console.error(`Error loading image: ${src}`);
-                      // Try to debug by logging the image element
-                      console.log('Image element with error:', e.currentTarget);
-
-                      // Try an alternative path format as fallback
-                      const imgElement = e.currentTarget as HTMLImageElement;
-
-                      // Try to reconstruct the path - extract chassis number from URL
-                      const matches = src.match(/vehicles\/[^/]+\/([^/]+)\//);
-                      if (matches && matches[1]) {
-                        const chassisNumber = matches[1];
-                        // Create a direct path that should work
-                        const directPath = `/uploads/vehicles/${company?.company_id}/${chassisNumber}/${chassisNumber}_p${index + 1}.jpg`;
-                        console.log(`Trying fallback path: ${directPath}`);
-                        imgElement.src = directPath;
-                      }
-                    }}
                   />
-                  {/* Display the image URL for debugging */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-[6px] p-1 overflow-hidden">
-                    {src.split('/').pop()}
-                  </div>
                 </div>
               ))}
 

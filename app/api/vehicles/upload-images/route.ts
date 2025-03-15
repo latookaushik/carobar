@@ -34,6 +34,7 @@ const handler = async (request: NextRequest) => {
     // Get chassis number from form data
     const chassisNo = formData.get('chassisNo') as string;
     if (!chassisNo) {
+      console.log('Missing chassis number in upload request');
       return NextResponse.json({ error: 'Chassis number is required' }, { status: 400 });
     }
 
@@ -42,6 +43,8 @@ const handler = async (request: NextRequest) => {
     if (!companyId) {
       companyId = user.companyId.toString();
     }
+
+    console.log(`Processing image upload for chassis ${chassisNo}, company ${companyId}`);
 
     // Create directory for uploads if it doesn't exist
     const uploadDir = path.join(
@@ -91,10 +94,13 @@ const handler = async (request: NextRequest) => {
         const fileName = `${chassisNo}_p${fileIndex}.jpg`;
         const filePath = path.join(uploadDir, fileName);
 
+        console.log(`Saving file: ${fileName} (${file.size} bytes) to: ${filePath}`);
+
         // Convert to buffer and save
         const buffer = Buffer.from(await file.arrayBuffer());
         await writeFile(filePath, buffer);
 
+        console.log(`Successfully saved file: ${fileName}`);
         uploadedFiles.push(fileName);
         fileIndex++;
       }

@@ -54,15 +54,13 @@ const handler = async (request: NextRequest) => {
         return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
       });
 
-    // Get the current server's address from the request
-    const protocol = request.headers.get('x-forwarded-proto') || 'http';
-    const host = request.headers.get('host') || '';
-    const baseUrl = `${protocol}://${host}`;
+    // Use relative paths instead of absolute URLs
+    // This avoids issues with hostname resolution in the browser
 
-    // Convert filenames to fully qualified URLs with timestamp to bust cache
+    // Convert filenames to relative URLs with timestamp to bust cache
     const timestamp = Date.now();
     const imageUrls = imageFiles.map(
-      (file) => `${baseUrl}/uploads/vehicles/${companyId}/${chassisNo}/${file}?t=${timestamp}`
+      (file) => `/uploads/vehicles/${companyId}/${chassisNo}/${file}?t=${timestamp}`
     );
 
     // Log the image URLs and paths for debugging
