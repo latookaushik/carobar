@@ -479,27 +479,37 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
                   onClick={() => setSelectedImage(src)}
                 >
                   <img
-                    src={`${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                    // Remove any 'hostname:port' prefix if present and ensure one timestamp parameter
+                    src={(() => {
+                      // Extract path portion only (no hostname)
+                      let cleanPath = src;
+                      if (src.includes('://')) {
+                        cleanPath = '/' + src.split('/').slice(3).join('/');
+                      }
+
+                      // Remove any existing timestamp parameters
+                      cleanPath = cleanPath.split('?')[0];
+
+                      // Add a fresh timestamp
+                      return `${cleanPath}?t=${Date.now()}`;
+                    })()}
                     alt={`Vehicle image ${index + 1}`}
                     style={{ width: '100%', height: '110px', objectFit: 'cover' }}
                     onError={(e) => {
                       console.error(`Error loading image: ${src}`);
 
-                      // Try to extract filename and create full path as fallback
+                      // Try a direct path with just the filename
                       const imgElement = e.currentTarget as HTMLImageElement;
-
-                      // Get the filename from the URL
                       const filename = src.split('/').pop()?.split('?')[0];
+
                       if (filename && company && chassisNo) {
-                        // Create a direct path that should work
+                        // Create a simple direct path with no host
                         const directPath = `/uploads/vehicles/${company.company_id}/${chassisNo}/${filename}?t=${Date.now()}`;
-                        console.log(`Trying fallback path: ${directPath}`);
+                        console.log(`Trying direct file path: ${directPath}`);
                         imgElement.src = directPath;
                       }
                     }}
                   />
-                  {/* Display small indicator that image is loaded */}
-                  <div className="absolute bottom-0 right-0 bg-green-500 w-2 h-2 rounded-full opacity-50"></div>
                 </div>
               ))}
 
@@ -627,23 +637,36 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
               <XCircle size={24} />
             </button>
             <img
-              src={`${selectedImage}${selectedImage?.includes('?') ? '&' : '?'}t=${Date.now()}`}
+              // Use same URL cleaning approach as thumbnail images
+              src={(() => {
+                // Extract path portion only (no hostname)
+                let cleanPath = selectedImage || '';
+                if (cleanPath.includes('://')) {
+                  cleanPath = '/' + cleanPath.split('/').slice(3).join('/');
+                }
+
+                // Remove any existing timestamp parameters
+                cleanPath = cleanPath.split('?')[0];
+
+                // Add a fresh timestamp
+                return `${cleanPath}?t=${Date.now()}`;
+              })()}
               alt="Full-size image"
               style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain' }}
               onClick={(e) => e.stopPropagation()}
               onError={(e) => {
                 console.error(`Error loading full-size image: ${selectedImage}`);
 
-                // Try to extract filename and create full path as fallback
+                // Try a direct path with just the filename
                 if (selectedImage && company && chassisNo) {
                   const imgElement = e.currentTarget as HTMLImageElement;
 
-                  // Get the filename from the URL
+                  // Extract filename only
                   const filename = selectedImage.split('/').pop()?.split('?')[0];
                   if (filename) {
-                    // Create a direct path that should work
+                    // Create a simple direct path with no host
                     const directPath = `/uploads/vehicles/${company.company_id}/${chassisNo}/${filename}?t=${Date.now()}`;
-                    console.log(`Trying fullsize fallback path: ${directPath}`);
+                    console.log(`Trying direct file path for modal: ${directPath}`);
                     imgElement.src = directPath;
                   }
                 }
