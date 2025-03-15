@@ -67,7 +67,6 @@ export function withAuth(
       return createErrorResponse('Authentication required', HttpStatus.UNAUTHORIZED);
     }
 
-    logInfo(`Token: ${token}`);
     const user: JWTPayload | null = await verifyToken(token);
 
     if (!user) {

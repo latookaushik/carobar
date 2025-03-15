@@ -314,6 +314,17 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
         throw new Error(`Upload failed: ${response.status}`);
       }
 
+      // Get the response data with uploaded files
+      const data = await response.json();
+
+      // Convert uploaded files to URL format matching existing images
+      const uploadedImageUrls = data.uploadedFiles.map(
+        (filename: string) => `/uploads/vehicles/${company?.company_id}/${chassisNo}/${filename}`
+      );
+
+      // Update existing images state directly with new images
+      setExistingImages((prevImages) => [...prevImages, ...uploadedImageUrls]);
+
       toast({
         title: 'Success',
         description: `Successfully uploaded ${images.length} image${images.length === 1 ? '' : 's'}.`,
@@ -322,9 +333,6 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
       // Clear the uploaded images
       images.forEach((image) => URL.revokeObjectURL(image.preview));
       setImages([]);
-
-      // Reload existing images to show the newly uploaded ones
-      loadExistingImages();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logError(`Error uploading images: ${errorMessage}`);
@@ -522,10 +530,11 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
             >
               <XCircle size={24} />
             </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`${selectedImage}?t=${Date.now()}`}
               alt="Full-size image"
-              className="max-w-full max-h-[85vh] object-contain"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               onClick={(e) => e.stopPropagation()}
             />
           </div>
