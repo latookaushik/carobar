@@ -65,8 +65,11 @@ const handler = async (request: NextRequest) => {
       (file) => `${baseUrl}/uploads/vehicles/${companyId}/${chassisNo}/${file}?t=${timestamp}`
     );
 
-    // Log the image URLs for debugging
-    console.log(`Found ${imageUrls.length} images for chassis ${chassisNo}`);
+    // Log the image URLs and paths for debugging
+    console.log(`Found ${imageFiles.length} images in directory for chassis ${chassisNo}`);
+    console.log(`Directory path: ${imagesDir}`);
+    console.log(`Image files: ${imageFiles.join(', ')}`);
+    console.log(`Returning image URLs: ${imageUrls.join(', ')}`);
 
     return NextResponse.json({ images: imageUrls }, { status: 200 });
   } catch (error) {

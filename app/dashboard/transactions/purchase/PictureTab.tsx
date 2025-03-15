@@ -26,27 +26,62 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
 
   // Define loadExistingImages as a useCallback
   const loadExistingImages = useCallback(async () => {
-    if (!company || !chassisNo) return;
+    if (!company || !chassisNo) {
+      console.log('Cannot load images: missing company or chassisNo', { company, chassisNo });
+      return;
+    }
 
+    console.log(`Loading images for chassis: ${chassisNo}, company: ${company?.company_id}`);
     setLoading(true);
     try {
-      // This would be replaced with an actual API call in production
-      // For demo, we're just simulating loading existing images
-      const response = await fetch(`/api/vehicles/images?chassisNo=${chassisNo}`, {
+      const apiUrl = `/api/vehicles/images?chassisNo=${chassisNo}`;
+      console.log(`Fetching from: ${apiUrl}`);
+      const response = await fetch(apiUrl, {
         credentials: 'include',
+        // Add cache: 'no-store' to prevent caching
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+        },
       });
+
+      console.log(`API response status: ${response.status}`);
 
       if (response.ok) {
         const data = await response.json();
-        setExistingImages(data.images || []);
+        console.log('API response data:', data);
+        console.log('Images returned:', data.images ? data.images.length : 0);
+
+        if (data.images && data.images.length > 0) {
+          console.log('Image URLs:', data.images);
+
+          // Create absolute URLs if they aren't already
+          const absoluteUrls = data.images.map((url: string) => {
+            // If URL doesn't start with http or /, add leading /
+            if (!url.startsWith('http') && !url.startsWith('/')) {
+              return `/${url}`;
+            }
+            return url;
+          });
+
+          console.log('Setting image URLs:', absoluteUrls);
+          setExistingImages(absoluteUrls);
+        } else {
+          console.log('No images returned from API');
+          setExistingImages([]);
+        }
       } else {
         // Handle 404 silently - just means no images yet
         if (response.status !== 404) {
           throw new Error(`Failed to load images: ${response.status}`);
+        } else {
+          console.log('404 response - no images found');
         }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`Error loading images: ${errorMessage}`);
       logError(`Error loading images: ${errorMessage}`);
 
       // Only show toast for non-404 errors
@@ -273,7 +308,9 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
 
   // Handle uploading images
   const handleUpload = async () => {
+    console.log('Starting image upload...');
     if (!company || !chassisNo) {
+      console.error('Missing company or chassisNo for upload', { company, chassisNo });
       toast({
         title: 'Error',
         description: 'Missing company or chassis number information.',
@@ -283,6 +320,7 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
     }
 
     if (images.length === 0) {
+      console.log('No images to upload');
       toast({
         title: 'No images',
         description: 'Please select at least one image to upload.',
@@ -291,6 +329,7 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
       return;
     }
 
+    console.log(`Uploading ${images.length} images for chassis ${chassisNo}`);
     setUploading(true);
 
     try {
@@ -301,23 +340,59 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
 
       // Append each file with its position
       images.forEach((image, index) => {
+        console.log(
+          `Adding image ${index + 1}: ${image.name} (${image.file.size} bytes, type: ${image.file.type})`
+        );
         formData.append(`image_${index + 1}`, image.file, image.name);
       });
 
       // Send the images to the server
+      console.log('Sending upload request to server...');
       const response = await fetch('/api/vehicles/upload-images', {
         method: 'POST',
         credentials: 'include',
         body: formData,
       });
 
+      console.log(`Upload response status: ${response.status}`);
+
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.status}`);
       }
 
-      // After successful upload, fetch the updated image list
-      // This ensures we get the same format URLs as the API returns
-      loadExistingImages();
+      const responseData = await response.json();
+      console.log('Upload response data:', responseData);
+
+      // After successful upload, manually construct the URLs
+      // This is an alternative approach to calling loadExistingImages
+      const uploadedFiles = responseData.uploadedFiles || [];
+      console.log('Uploaded files from response:', uploadedFiles);
+
+      if (uploadedFiles.length > 0) {
+        // Immediately update the UI with the new images
+        const baseUrl = window.location.origin;
+        const newImageUrls = uploadedFiles.map(
+          (filename: string) =>
+            `${baseUrl}/uploads/vehicles/${company?.company_id}/${chassisNo}/${filename}`
+        );
+
+        console.log('Constructed image URLs:', newImageUrls);
+
+        // Merge with existing images and remove duplicates
+        setExistingImages((prevImages) => {
+          const allImages = [...prevImages, ...newImageUrls];
+          // Remove duplicates by converting to Set and back to array
+          const uniqueImages = Array.from(new Set(allImages));
+          console.log('Updated existing images:', uniqueImages);
+          return uniqueImages;
+        });
+      }
+
+      // Also try to reload from the API to stay in sync with the server
+      setTimeout(() => {
+        console.log('Reloading images from API after upload...');
+        loadExistingImages();
+      }, 500); // Short delay to allow server to process
 
       toast({
         title: 'Success',
@@ -325,6 +400,7 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
       });
 
       // Clear the uploaded images
+      console.log('Clearing temporary image previews...');
       images.forEach((image) => URL.revokeObjectURL(image.preview));
       setImages([]);
     } catch (error) {
@@ -395,7 +471,29 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
                     src={src}
                     alt={`Vehicle image ${index + 1}`}
                     style={{ width: '100%', height: '110px', objectFit: 'cover' }}
+                    onError={(e) => {
+                      console.error(`Error loading image: ${src}`);
+                      // Try to debug by logging the image element
+                      console.log('Image element with error:', e.currentTarget);
+
+                      // Try an alternative path format as fallback
+                      const imgElement = e.currentTarget as HTMLImageElement;
+
+                      // Try to reconstruct the path - extract chassis number from URL
+                      const matches = src.match(/vehicles\/[^/]+\/([^/]+)\//);
+                      if (matches && matches[1]) {
+                        const chassisNumber = matches[1];
+                        // Create a direct path that should work
+                        const directPath = `/uploads/vehicles/${company?.company_id}/${chassisNumber}/${chassisNumber}_p${index + 1}.jpg`;
+                        console.log(`Trying fallback path: ${directPath}`);
+                        imgElement.src = directPath;
+                      }
+                    }}
                   />
+                  {/* Display the image URL for debugging */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-[6px] p-1 overflow-hidden">
+                    {src.split('/').pop()}
+                  </div>
                 </div>
               ))}
 
