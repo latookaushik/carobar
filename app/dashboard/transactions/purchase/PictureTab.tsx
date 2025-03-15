@@ -377,9 +377,21 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
 
         console.log('Constructed image URLs:', newImageUrls);
 
-        // Merge with existing images and remove duplicates
+        // Create URL strings with timestamps to directly display in the UI
+        const uploadedImageElements: string[] = [];
+
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          // Create URL string with timestamp
+          const imageUrl = newImageUrls[i] + '?t=' + Date.now();
+
+          // Log the actual image URL being used
+          console.log(`Creating image with src: ${imageUrl}`);
+          uploadedImageElements.push(imageUrl);
+        }
+
+        // Immediately update the existing images with these newly uploaded images
         setExistingImages((prevImages) => {
-          const allImages = [...prevImages, ...newImageUrls];
+          const allImages = [...prevImages, ...uploadedImageElements];
           // Remove duplicates by converting to Set and back to array
           const uniqueImages = Array.from(new Set(allImages));
           console.log('Updated existing images:', uniqueImages);
@@ -470,7 +482,24 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
                     src={`${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`}
                     alt={`Vehicle image ${index + 1}`}
                     style={{ width: '100%', height: '110px', objectFit: 'cover' }}
+                    onError={(e) => {
+                      console.error(`Error loading image: ${src}`);
+
+                      // Try to extract filename and create full path as fallback
+                      const imgElement = e.currentTarget as HTMLImageElement;
+
+                      // Get the filename from the URL
+                      const filename = src.split('/').pop()?.split('?')[0];
+                      if (filename && company && chassisNo) {
+                        // Create a direct path that should work
+                        const directPath = `/uploads/vehicles/${company.company_id}/${chassisNo}/${filename}?t=${Date.now()}`;
+                        console.log(`Trying fallback path: ${directPath}`);
+                        imgElement.src = directPath;
+                      }
+                    }}
                   />
+                  {/* Display small indicator that image is loaded */}
+                  <div className="absolute bottom-0 right-0 bg-green-500 w-2 h-2 rounded-full opacity-50"></div>
                 </div>
               ))}
 
@@ -598,10 +627,27 @@ export default function PictureTab({ chassisNo, isVisible }: PictureProps) {
               <XCircle size={24} />
             </button>
             <img
-              src={selectedImage}
+              src={`${selectedImage}${selectedImage?.includes('?') ? '&' : '?'}t=${Date.now()}`}
               alt="Full-size image"
               style={{ maxWidth: '100%', maxHeight: '85vh', objectFit: 'contain' }}
               onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                console.error(`Error loading full-size image: ${selectedImage}`);
+
+                // Try to extract filename and create full path as fallback
+                if (selectedImage && company && chassisNo) {
+                  const imgElement = e.currentTarget as HTMLImageElement;
+
+                  // Get the filename from the URL
+                  const filename = selectedImage.split('/').pop()?.split('?')[0];
+                  if (filename) {
+                    // Create a direct path that should work
+                    const directPath = `/uploads/vehicles/${company.company_id}/${chassisNo}/${filename}?t=${Date.now()}`;
+                    console.log(`Trying fullsize fallback path: ${directPath}`);
+                    imgElement.src = directPath;
+                  }
+                }
+              }}
             />
           </div>
         </div>
