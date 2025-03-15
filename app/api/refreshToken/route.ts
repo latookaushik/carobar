@@ -45,12 +45,15 @@ export async function POST(request: Request) {
       { status: HttpStatus.OK }
     );
 
+    // Determine if we should use secure cookies (only if explicitly configured for HTTPS)
+    const useSecureCookies = process.env.USE_HTTPS === 'true';
+
     // Set the new access token as a cookie
     response.cookies.set({
       name: 'token',
       value: newAccessToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: useSecureCookies,
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60, // 1 hour in seconds

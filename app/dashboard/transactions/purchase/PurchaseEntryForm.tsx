@@ -202,7 +202,6 @@ export default function PurchaseEntryForm({
             case 'chassis_no':
             case 'vehicle_name':
             case 'maker':
-            case 'grade':
             case 'model':
             case 'color':
             case 'engine_no':
@@ -216,6 +215,9 @@ export default function PurchaseEntryForm({
             case 'currency':
             case 'purchase_remarks':
               mappedData[key] = String(value);
+              break;
+            case 'grade':
+              mappedData.grade = value ? String(value) : '';
               break;
             case 'seats':
             case 'doors':
@@ -257,7 +259,7 @@ export default function PurchaseEntryForm({
       // Map each vehicle field to the corresponding form field
       if (vehicle.vehicle_name !== undefined) mappedData.vehicle_name = vehicle.vehicle_name;
       if (vehicle.maker !== undefined) mappedData.maker = vehicle.maker;
-      if (vehicle.grade !== undefined) mappedData.grade = vehicle.grade;
+      mappedData.grade = vehicle.grade ? String(vehicle.grade) : '';
       if (vehicle.color !== undefined) mappedData.color = vehicle.color;
       if (vehicle.seats !== undefined) mappedData.seats = vehicle.seats;
       if (vehicle.doors !== undefined) mappedData.doors = vehicle.doors;
@@ -789,7 +791,7 @@ export default function PurchaseEntryForm({
                     <input
                       type="text"
                       name="grade"
-                      value={formData.grade}
+                      value={formData.grade || ''}
                       onChange={handleInputChange}
                       className="w-full py-1 px-2 border border-gray-300 rounded-md text-xs"
                     />

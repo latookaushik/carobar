@@ -52,6 +52,9 @@ export async function GET(req: Request) {
     } else {
       logError('Invalid or expired token');
 
+      // Determine if we should use secure cookies (only if explicitly configured for HTTPS)
+      const useSecureCookies = process.env.USE_HTTPS === 'true';
+
       // Clear the invalid token
       const response = NextResponse.json(
         { error: 'Invalid or expired token' },
@@ -62,7 +65,7 @@ export async function GET(req: Request) {
         name: 'token',
         value: '',
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: useSecureCookies,
         sameSite: 'strict',
         path: '/',
         maxAge: 0, // Expire immediately

@@ -92,12 +92,15 @@ export async function POST(request: Request) {
       { status: 200 }
     );
 
-    // Set access token as httpOnly cookie
+    // Determine if we should use secure cookies (only if explicitly configured for HTTPS)
+    const useSecureCookies = process.env.USE_HTTPS === 'true';
+
+    // Set access token as httpOnly cookie with conditional secure attribute
     response.cookies.set({
       name: 'token',
       value: accessToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: useSecureCookies,
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60, // 1 hour in seconds
@@ -108,7 +111,7 @@ export async function POST(request: Request) {
       name: 'refreshToken',
       value: refreshToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: useSecureCookies,
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days in seconds

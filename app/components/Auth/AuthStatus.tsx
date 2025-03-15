@@ -17,10 +17,12 @@ import { useEffect, useState } from 'react';
 export default function AuthStatus() {
   const { user, loading, logout, isAuthenticated } = useAuth();
 
-  // Debug log to console
+  // Simplified log for authentication state changes
   useEffect(() => {
-    console.log('AuthStatus: user state', { user, isAuthenticated, loading });
-  }, [user, isAuthenticated, loading]);
+    if (user) {
+      console.log('User authenticated:', user.userName);
+    }
+  }, [user]);
 
   // Track if we're in the post-login state
   const [recentlyLoggedIn, setRecentlyLoggedIn] = useState(false);
@@ -31,12 +33,12 @@ export default function AuthStatus() {
 
     // When user becomes authenticated, set the recently logged in flag
     if (!loading && isAuthenticated && !recentlyLoggedIn) {
-      console.log('Setting recently logged in flag');
+      // Set recently logged in flag
       setRecentlyLoggedIn(true);
 
       // Clear the flag after the grace period
       gracePeriodTimer = setTimeout(() => {
-        console.log('Login grace period ended');
+        // Login grace period ended
         setRecentlyLoggedIn(false);
       }, 10000); // 10 second grace period after login
     }
@@ -46,53 +48,57 @@ export default function AuthStatus() {
     };
   }, [loading, isAuthenticated, recentlyLoggedIn]);
 
-  // Separate effect for detecting expired cookies
+  // Separate effect for validating authentication state
   useEffect(() => {
-    let cookieCheckTimer: NodeJS.Timeout | null = null;
+    let authCheckTimer: NodeJS.Timeout | null = null;
     let initialCheckTimer: NodeJS.Timeout | null = null;
 
-    // Function to check if authentication cookies exist
-    const checkCookies = () => {
+    // Function to verify authentication state
+    const verifyAuthState = async () => {
       // Skip checks in these scenarios:
       // 1. We're in the loading state
       // 2. We're in the post-login grace period
       // 3. We're on the login page
       if (loading || recentlyLoggedIn || window.location.pathname.includes('/login')) {
-        console.log('Skipping cookie check due to loading/grace period/login page');
+        // Skip auth check when in loading/grace period or on login page
         return;
       }
 
-      // More accurate cookie detection
-      const authCookieRegex = /(?:^|;\s*)(token|refreshToken)=/;
-      const hasCookies = authCookieRegex.test(document.cookie);
-      console.log('Cookie check result:', hasCookies);
+      try {
+        // Don't check document.cookie as httpOnly cookies are not accessible there
+        // Instead, make a lightweight call to verifyToken API
+        if (isAuthenticated) {
+          // Verify token validity
+          const response = await fetch('/api/verifyToken', {
+            method: 'GET',
+            credentials: 'include', // Important for cookies
+          });
 
-      // Only force logout if:
-      // 1. Cookies are missing
-      // 2. We believe we're authenticated
-      // 3. We're not on a public page
-      if (!hasCookies && isAuthenticated && !window.location.pathname.includes('/unauthorized')) {
-        console.log('Auth cookies missing but state shows authenticated - logging out');
-        logout();
+          if (!response.ok && response.status === 401) {
+            // Token invalid - log out
+            logout();
+          }
+        }
+      } catch (error) {
+        console.error('Auth verification error:', error);
       }
     };
 
-    // Set up periodic cookie checking every 60 seconds
-    cookieCheckTimer = setInterval(() => {
-      console.log('Running periodic cookie check');
-      checkCookies();
-    }, 60000); // Longer interval of 60 seconds
+    // Set up periodic authentication checking every 60 seconds
+    authCheckTimer = setInterval(() => {
+      // Periodic auth check
+      verifyAuthState();
+    }, 60000); // 60 second interval
 
-    // Delay the initial check to allow cookies to be properly set after page load
-    // This prevents false positives immediately after login
+    // Delay the initial check to avoid race conditions on page load
     initialCheckTimer = setTimeout(() => {
-      console.log('Running initial cookie check after delay');
-      checkCookies();
+      // Initial auth check
+      verifyAuthState();
     }, 10000); // 10 second delay for initial check
 
     // Clean up
     return () => {
-      if (cookieCheckTimer) clearInterval(cookieCheckTimer);
+      if (authCheckTimer) clearInterval(authCheckTimer);
       if (initialCheckTimer) clearTimeout(initialCheckTimer);
     };
   }, [loading, isAuthenticated, logout, recentlyLoggedIn]);

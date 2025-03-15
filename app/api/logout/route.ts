@@ -12,12 +12,15 @@ export async function POST() {
     { status: HttpStatus.OK }
   );
 
+  // Determine if we should use secure cookies (only if explicitly configured for HTTPS)
+  const useSecureCookies = process.env.USE_HTTPS === 'true';
+
   // Clear the access token cookie
   response.cookies.set({
     name: 'token',
     value: '',
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: useSecureCookies,
     sameSite: 'strict',
     path: '/',
     maxAge: 0, // Expire immediately
@@ -28,7 +31,7 @@ export async function POST() {
     name: 'refreshToken',
     value: '',
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: useSecureCookies,
     sameSite: 'strict',
     path: '/',
     maxAge: 0, // Expire immediately
